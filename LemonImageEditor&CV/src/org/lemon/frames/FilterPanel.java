@@ -2,6 +2,8 @@ package org.lemon.frames;
 
 
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -14,6 +16,9 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 
+import org.lemon.colors.ColorRemover;
+import org.lemon.frames.alert_dialogs.RemoveColorDialog;
+
 public class FilterPanel extends JPanel {
 
 	//version id
@@ -22,7 +27,12 @@ public class FilterPanel extends JPanel {
 	JButton btnColorRemover  = new JButton();
 	JButton btnMix2imgs = new JButton();
 	
-	public FilterPanel() throws IOException {
+	public FilterPanel() {
+	}
+	
+	private FilterPanel current = this;
+	
+	public FilterPanel(BufferedImage img) throws IOException {
 		
 		//color remover
 		BufferedImage btnRemoverIcon = ImageIO.read(new File("icons\\eraserIcon.png"));
@@ -43,5 +53,20 @@ public class FilterPanel extends JPanel {
         
         add(btnColorRemover);
         add(btnMix2imgs);
+        
+        btnColorRemover.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				if(img == null)
+					return;
+				
+				RemoveColorDialog rcd = new RemoveColorDialog(current);
+				Color col = rcd.getPreferredColor();
+				new ColorRemover(img, col);
+				revalidate();
+			}
+		});
 	}
 }

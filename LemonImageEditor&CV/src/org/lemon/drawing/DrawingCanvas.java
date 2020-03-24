@@ -10,15 +10,19 @@ import java.awt.event.MouseMotionListener;
 public class DrawingCanvas extends MouseAdapter implements MouseMotionListener {
 
 	private Canvas canvas = new Canvas();
+	private Color choosenCol;
 	
-	public DrawingCanvas() {
+	public DrawingCanvas(Color choosenCol) {
+		
+		this.choosenCol = choosenCol;
+		
 		canvas.setBackground(Color.WHITE);
 		canvas.addMouseMotionListener(this);
 		canvas.addMouseListener(this);
 	}
 	
 	public Canvas getCanvas() {
-		return canvas;
+		return this.canvas;
 	}
 	
 	@Override
@@ -29,7 +33,7 @@ public class DrawingCanvas extends MouseAdapter implements MouseMotionListener {
 		y = e.getY();
 		
 		Graphics g = canvas.getGraphics();
-		g.setColor(Color.RED);
+		g.setColor(this.choosenCol);
 		
 		g.fillOval(x, y, 5, 5);
 		
@@ -43,7 +47,7 @@ public class DrawingCanvas extends MouseAdapter implements MouseMotionListener {
 		y = e.getY();
 		
 		Graphics g = canvas.getGraphics();
-		g.setColor(Color.RED);
+		g.setColor(this.choosenCol);
 		
 		g.fillOval(x, y, 5, 5);
 	}

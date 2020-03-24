@@ -1,19 +1,13 @@
 package org.lemon.edge;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
-import javax.imageio.ImageIO;
 
 public class SobelEdge {
-    public static void main(String args[]) throws IOException {
-
-        System.out.println("Started");
-
-        String filename = "C:\\Users\\Ramesh\\Desktop\\opencv\\mack.jpg";
-
-        File file = new File(filename);
-        BufferedImage image = ImageIO.read(file);
+	
+	private BufferedImage img;
+	
+    public SobelEdge(BufferedImage image) throws IOException {
 
         int x = image.getWidth();
         int y = image.getHeight();
@@ -67,6 +61,8 @@ public class SobelEdge {
             }
         }
         
+        this.img = image;
+        
     }
 
     public static int  getGrayScale(int rgb) {
@@ -79,5 +75,9 @@ public class SobelEdge {
         //int gray = (r + g + b) / 3;
 
         return gray;
+    }
+    
+    public BufferedImage getFinalImg() {
+    	return this.img;
     }
 }

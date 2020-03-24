@@ -22,7 +22,7 @@ public class RotateImg {
 		if(degree == 180) {
 			rotate180();
 		}
-		if(degree == 90) {
+		else if(degree == 90) {
 			rotate90();
 		}
 		

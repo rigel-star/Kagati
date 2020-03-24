@@ -9,19 +9,26 @@ import java.io.IOException;
 
 public class SharpImg {
 	
-	BufferedImage src, out;
+	BufferedImage src;
 	
 	public SharpImg(BufferedImage src) throws IOException {
 		
 		this.src = src;
-		out = new BufferedImage(src.getWidth(), src.getHeight(), src.getType());
+		//this.out = new BufferedImage(src.getWidth(), src.getHeight(), src.getType());
 		
-		Kernel kernel = new Kernel(3, 3, new float[] {-1,-1,-1,-1,9,-1,-1,-1,-1});
+		Kernel kernel = 
+				new Kernel(3, 3, 
+				new float[] 
+						{-1,-1,-1,
+						-1,9,-1,
+						-1,-1,-1});
+		
 		BufferedImageOp op = new ConvolveOp(kernel);
-		out = op.filter(src, out);
+		this.src = op.filter(this.src, null);
+		
 	}
 	
 	public BufferedImage getSharpedImg() {
-		return out;
+		return this.src;
 	}
 }

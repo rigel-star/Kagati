@@ -2,55 +2,80 @@ package application;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
-import javax.swing.Icon;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
-import org.lemon.frames.DrawingPanel;
+import org.lemon.drawing.NewDrawingPanel;
+import org.lemon.edge.SobelEdge;
+import org.lemon.filters.BlurImg;
+import org.lemon.filters.GrayScale;
+import org.lemon.filters.SharpImg;
 import org.lemon.frames.FilterPanel;
 import org.lemon.frames.ImagePanel;
-import org.lemon.frames.InternalImageEditingToolsPanel;
-import org.lemon.frames.NewDrawingPanel;
+import org.lemon.frames.NewImagePanel;
 import org.lemon.frames.ToolPanel;
+import org.lemon.image.ChooseImage;
+import org.lemon.rotate.RotateImg;
+
 
 public class MainFrame extends JFrame implements ActionListener{
 
-	JMenu file, edit, filter, editSubMenu;
-	JMenuItem newPage, itemOpenImage, saveImg, grayScale, cannyEdge, 
-				silverEdge, sharpImg, blurImg, rotate180, rotate90, rotateNeg90;
-	JMenuBar menuBar;
+	/**
+	 * default version id
+	 */
+	private static final long serialVersionUID = 1L;
 	
-	ImagePanel impanel;
+	private JMenu file, edit, filter, editSubMenu, fileSubMenu;
+	private JMenuItem openImage, saveImg, grayScale, sobelEdge,
+				sharpImg, blurImg, rotate180, rotate90,
+				drawingPage;
+	private JMenuBar menuBar;
 
+	
+	//middle panel where drawing and image panel will be added.
+	//central panel
+	private JPanel editingPanel = new JPanel();
+	
+	//test img
+	private BufferedImage choosenImage = null;
+	
+	//default image panel
+	private ImagePanel impanel = new ImagePanel();
+	
+	//default color
+	private Color choosenColor = new Color(0, 255, 0);
 	
 	public MainFrame() throws IOException {
 		
+		editingPanel.setLayout(new BorderLayout());
+		
+		fileSubMenu = new JMenu("New");
 		file = new JMenu("File");
 		edit = new JMenu("Edit");
 		filter = new JMenu("Filter");
 		editSubMenu = new JMenu("Rotate");
 		
 		//file properties
-		newPage = new JMenuItem("New");
 		saveImg = new JMenuItem("Save");
-		itemOpenImage = new JMenuItem("Open");
+		openImage = new JMenuItem("Open");
+		drawingPage = new JMenuItem("New Page");
 		
 		//filter properties
 		grayScale = new JMenuItem("B&W");
-		cannyEdge = new JMenuItem("Edge Highlight");
-		silverEdge = new JMenuItem("Silver Cypher");
+		sobelEdge = new JMenuItem("Edge Highlight");
 		sharpImg = new JMenuItem("Sharp Img");
 		blurImg = new JMenuItem("Blur Img");
 		
@@ -64,18 +89,20 @@ public class MainFrame extends JFrame implements ActionListener{
 		//sub menus
 		editSubMenu.add(rotate180);
 		editSubMenu.add(rotate90);
+		//file sub menu
+		fileSubMenu.add(drawingPage);
 		
 		//file options
-		file.add(newPage);
-		file.add(itemOpenImage);
+		//file
+		file.add(fileSubMenu);
+		file.add(openImage);
 		file.add(saveImg);
 		//edit options
 		edit.add(editSubMenu);
 		edit.add(blurImg);
 		//filter options
 		filter.add(grayScale);
-		filter.add(cannyEdge);
-		filter.add(silverEdge);
+		filter.add(sobelEdge);
 		filter.add(sharpImg);
 		
 		//main menu options
@@ -83,24 +110,20 @@ public class MainFrame extends JFrame implements ActionListener{
 		menuBar.add(edit);
 		menuBar.add(filter);
 		
+		//all buttons events are intialized in this method
 		events();
-		
-		//default img
-		BufferedImage bi = ImageIO.read(new File("C:\\Users\\Ramesh\\Desktop\\styletransfer\\fruit.jpg"));
 		
 		//screen size
 		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 		
-		//frame style
+		//frame style and properties
 		setBackground(Color.GRAY);
 		setTitle("Lemon Image Editor");
-		setSize(screen.width, 800);
-		setResizable(false);
+		setSize(screen.width - 200, screen.height - 200);
+		setResizable(true);
 		setLayout(new BorderLayout());
-		
 		setJMenuBar(menuBar);
-		addPanelsToFrame(bi);
-		
+		addPanelsToFrame(choosenImage);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
 		
@@ -108,54 +131,189 @@ public class MainFrame extends JFrame implements ActionListener{
 	}
 
 	private void events(){
-		newPage.addActionListener(this);
+		openImage.addActionListener(this);
+		drawingPage.addActionListener(this);
 		grayScale.addActionListener(this);
 		rotate90.addActionListener(this);
 		saveImg.addActionListener(this);
 		rotate180.addActionListener(this);
-		cannyEdge.addActionListener(this);
-		silverEdge.addActionListener(this);
+		sobelEdge.addActionListener(this);
 		blurImg.addActionListener(this);
 		sharpImg.addActionListener(this);
 	}
 	
-	private BufferedImage getImageFromLabel() {
-		
-		JLabel img = new JLabel();
-		Icon icon = img .getIcon();
-
-        BufferedImage bi = new BufferedImage(
-            icon.getIconWidth(),
-            icon.getIconHeight(),
-            BufferedImage.TYPE_INT_RGB);
-        Graphics g = bi.createGraphics();
-        // paint the Icon to the BufferedImage.
-        icon.paintIcon(null, g, 0,0);
-        
-        g.dispose();
-        
-        return bi;
-	}
-	
+	//adding all required panels to frame
 	private void addPanelsToFrame(BufferedImage bi) throws IOException {
 		
-		impanel = new ImagePanel(bi);
+		//editingPanel.add(new NewDrawingPanel());
 		
-		add(impanel, BorderLayout.CENTER);
-		add(new FilterPanel(), BorderLayout.EAST);
-		add(new ToolPanel(), BorderLayout.WEST);
+		Container c = getContentPane();
+		
+		c.add(editingPanel, BorderLayout.CENTER);
+		c.add(new FilterPanel(this.impanel.getCurrentImg()), BorderLayout.EAST);
+		c.add(new ToolPanel(this.editingPanel, this.choosenColor), BorderLayout.WEST);
 		
 	}
 
+	//frame action performed
 	@Override
-	public void actionPerformed(ActionEvent e) {
+	public void actionPerformed(ActionEvent action) {
 		
-		if(e.getSource() == newPage) {
-			System.out.println("New drawing pane.");
-			remove(impanel);
-			add(new NewDrawingPanel(), BorderLayout.CENTER);
-			repaint();
+		//new page in the editingPanel
+		if(action.getSource() == drawingPage) {
+			
+			//removing pre existing panel from frame to add new
+			this.removeExistingPanel();
+			//panel
+			//where user can draw paintings
+			NewDrawingPanel drawPanel = new NewDrawingPanel(this.choosenColor);
+			this.editingPanel.add(drawPanel, BorderLayout.CENTER);
+			this.add(editingPanel, BorderLayout.CENTER);
+			this.revalidate();
+		}
+		
+		//rotate existing image to 180 degree
+		else if(action.getSource() == rotate180) {
+			this.removeExistingPanel();
+			if(this.choosenImage == null) {
+				this.noImgSelectedDialog();
+				return;
+			}
+			try {
+				this.editingPanel.add(new NewImagePanel(new RotateImg(180, choosenImage).getRotatedImg()));
+				this.add(this.editingPanel, BorderLayout.CENTER);
+				this.revalidate();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}
+		
+		//rotate existing image to 90 degree
+		else if(action.getSource() == rotate90) {
+			this.removeExistingPanel();
+			if(this.choosenImage == null) {
+				this.noImgSelectedDialog();
+				return;
+			}
+			try {
+				this.editingPanel.add(new NewImagePanel(new RotateImg(90, choosenImage).getRotatedImg()));
+				this.add(this.editingPanel, BorderLayout.CENTER);
+				this.revalidate();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}
+		
+		//sharping the image
+		else if(action.getSource() == this.sharpImg) {
+			this.removeExistingPanel();
+			if(this.choosenImage == null) {
+				noImgSelectedDialog();
+				return;
+			}
+			try {
+				SharpImg simg = new SharpImg(this.choosenImage);
+				this.editingPanel.add(new NewImagePanel(simg.getSharpedImg()));
+				this.choosenImage = simg.getSharpedImg();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			} finally {
+				this.add(this.editingPanel, BorderLayout.CENTER);
+				this.revalidate();
+			}
+		}
+		
+		//blurring the image
+		else if(action.getSource() == this.blurImg) {
+			this.removeExistingPanel();
+			if(this.choosenImage == null) {
+				this.noImgSelectedDialog();
+				return;
+			}
+			try {
+				BlurImg bimg = new BlurImg(this.choosenImage);
+				this.editingPanel.add(new NewImagePanel(bimg.getBlurredImg()));
+				this.choosenImage = bimg.getBlurredImg();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+				this.revalidate();
+			}
+		}
+		
+		//gray scaling the image
+		else if(action.getSource() == this.grayScale) {
+			//this.removeExistingPanel();
+			if(this.choosenImage == null) {
+				this.noImgSelectedDialog();
+				return;
+			}
+			try {
+				this.editingPanel.add(new NewImagePanel(new GrayScale(this.choosenImage).getGrayScaledImg()));
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			} finally {
+				this.revalidate();
+			}
+		}
+		
+		//detecting edges of image
+		else if(action.getSource() == this.sobelEdge) {
+			//this.removeExistingPanel();
+			if(this.choosenImage == null) {
+				this.noImgSelectedDialog();
+				return;
+			}
+			try {
+				this.editingPanel.add(new NewImagePanel(new SobelEdge(this.choosenImage).getFinalImg()));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		//choosing image from pc
+		else if(action.getSource() == this.openImage) {
+			this.removeExistingPanel();
+			
+			//image panel
+			//where user can edit his/her photos
+			NewImagePanel impanel;
+			
+			//img chooser which returns choosen file using JFileChooser class
+			ChooseImage cimg = new ChooseImage();
+			
+			try {			
+				BufferedImage img = ImageIO.read(cimg.getChoosenFile());
+				
+				this.impanel.img = img;
+				this.choosenImage = img;
+				
+				impanel = new NewImagePanel(img);			
+				editingPanel.add(impanel, BorderLayout.CENTER);
+				editingPanel.repaint();
+				this.add(editingPanel, BorderLayout.CENTER);
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 		}
 		
 	}
+	
+	//if image is selected, this dialog will pop up
+	private void noImgSelectedDialog() {
+		JOptionPane.showMessageDialog(this, "No image selected!");
+	}
+	
+	//removing existing panel before adding new
+	private void removeExistingPanel() {
+		Component[] comps = this.editingPanel.getComponents();
+		
+		//deleting all components attached to editing panel
+		for(Component c: comps) {
+			this.editingPanel.remove(c);
+		}
+		//finally removing the editing panel
+		this.remove(this.editingPanel);
+	}
+	
 }

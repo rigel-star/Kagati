@@ -1,34 +1,41 @@
 package org.lemon.frames;
 
 import java.awt.Color;
-import java.awt.FlowLayout;
 import java.awt.image.BufferedImage;
-
+import java.io.IOException;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.border.Border;
 
-public class ImagePanel extends JPanel {
+public class ImagePanel extends JLabel {
 
 	/**
 	 * default version id
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	//img label
-	private JLabel imgLabel = new JLabel();
+	public BufferedImage img;
+	
+	public ImagePanel() {
+		
+	}
 
-	public ImagePanel(BufferedImage img) {
+	public ImagePanel(BufferedImage img) throws IOException {
 		
+		this.img = img;
+		//layout for panel
+		//BoxLayout layout = new BoxLayout(getContentPane(), BoxLayout.Y_AXIS);
+				
 		Border border = BorderFactory.createLineBorder(Color.GRAY, 1);
-		
-		setLayout(new FlowLayout());
 		setBorder(border);
-		setSize(500, 500);
-		imgLabel.setIcon(new ImageIcon(img));
-		add(imgLabel);
+		setSize(400, 400);
+		
+		setIcon(new ImageIcon(img));
+	}
+	
+	public BufferedImage getCurrentImg() {
+		return this.img;
 	}
 	
 }

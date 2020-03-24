@@ -1,4 +1,4 @@
-package org.lemon.frames;
+package org.lemon.drawing;
 
 import java.awt.Color;
 
@@ -7,14 +7,17 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 
-public class ToolPanel extends JPanel {
 
-	/**
-	 * default version id
-	 */
+public class NewDrawingPanel extends JPanel {
+
 	private static final long serialVersionUID = 1L;
 	
-	public ToolPanel (JPanel canvas, Color col) {
+	private Color col;
+
+	public NewDrawingPanel(Color col) {
+		
+		//button will show the selected color and properties of button
+		this.col = col;
 		
 		//layout for panel
 		BoxLayout layout = new BoxLayout(this, BoxLayout.Y_AXIS);
@@ -26,7 +29,6 @@ public class ToolPanel extends JPanel {
 		setBorder(layoutBorder);
 		setSize(200, 300);
 		
-		add(new InternalImageEditingToolsPanel(canvas, col));
-				
+		add(new DrawingPanel(this.col));
 	}
 }
