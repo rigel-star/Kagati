@@ -22,7 +22,7 @@ public class InternalImageEditingToolsPanel extends JInternalFrame implements Ac
 	JButton colPicker = new JButton();
 	
 	//panels
-	JPanel right, left;
+	JPanel right;
 	
 	JPanel drawingCanvas;
 	
@@ -34,10 +34,8 @@ public class InternalImageEditingToolsPanel extends JInternalFrame implements Ac
 		this.drawingCanvas = drawingCanvas;
 		
 		right = new JPanel();
-		left = new JPanel();
 		
 		right.setLayout(new BoxLayout(right, BoxLayout.Y_AXIS));
-		left.setLayout(new BoxLayout(left, BoxLayout.Y_AXIS));
 		
 		setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
 		
@@ -51,16 +49,15 @@ public class InternalImageEditingToolsPanel extends JInternalFrame implements Ac
 		setLocation(30, 40);
 		
 		c.add(right);
-		c.add(left);
 		
 		this.actions();
 		this.settings();
 		
 		right.add(penTool);
 		right.add(button1);
-		left.add(button2);
-		left.add(button3);
 		right.add(this.colPicker);
+		right.add(button2);
+		right.add(button3);
 		
 	}
 

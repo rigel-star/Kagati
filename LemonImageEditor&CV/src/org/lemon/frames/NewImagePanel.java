@@ -7,11 +7,16 @@ import java.io.IOException;
 import javax.swing.BorderFactory;
 import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
 import javax.swing.border.Border;
 
 public class NewImagePanel extends JPanel{
 
 	private static final long serialVersionUID = 1L;
+	
+	//scroll pane
+	@SuppressWarnings("unused")
+	private JSlider scrlBar = new JSlider(JSlider.HORIZONTAL);
 	
 	public NewImagePanel(BufferedImage file) throws IOException {
 		

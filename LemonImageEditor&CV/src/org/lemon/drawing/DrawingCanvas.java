@@ -2,6 +2,7 @@ package org.lemon.drawing;
 
 import java.awt.Canvas;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -11,6 +12,9 @@ public class DrawingCanvas extends MouseAdapter implements MouseMotionListener {
 
 	private Canvas canvas = new Canvas();
 	private Color choosenCol;
+	
+	private int startX = 0, startY = 0;
+	private int endX = 0, endY = 0;
 	
 	public DrawingCanvas(Color choosenCol) {
 		
@@ -35,7 +39,8 @@ public class DrawingCanvas extends MouseAdapter implements MouseMotionListener {
 		Graphics g = canvas.getGraphics();
 		g.setColor(this.choosenCol);
 		
-		g.fillOval(x, y, 5, 5);
+		//g.fillOval(x, y, 5, 5);
+		g.draw3DRect(x, y, 100, 100, false);
 		
 	}
 
@@ -45,16 +50,42 @@ public class DrawingCanvas extends MouseAdapter implements MouseMotionListener {
 		int x, y;
 		x = e.getX();
 		y = e.getY();
+//		
+//		Graphics g = canvas.getGraphics();
+//		g.setColor(this.choosenCol);
+//		
+//		g.fillOval(x, y, 5, 5);
 		
-		Graphics g = canvas.getGraphics();
-		g.setColor(this.choosenCol);
-		
-		g.fillOval(x, y, 5, 5);
+		if(this.startX == 0 && this.startY == 0) {
+			this.startX = x;
+			this.startY = y;
+		}
 	}
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
 		
+		//when mouse is moved, this class helps to change the mouse cursor
+		Cursor cursor = new Cursor(Cursor.CROSSHAIR_CURSOR);
+		//setting cursor to canvas
+		canvas.setCursor(cursor);
+		
+	}
+	
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		
+		this.endX = e.getX();
+		this.endY = e.getY();
+		
+		Graphics g = canvas.getGraphics();
+		g.setColor(this.choosenCol);
+		
+		g.drawLine(this.startX, this.startY, this.endX, this.endY);
+		
+		//reset startX and startY on mouse release
+		this.startX = 0;
+		this.startY = 0;
 	}
 
 }

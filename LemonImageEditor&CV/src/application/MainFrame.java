@@ -22,13 +22,15 @@ import org.lemon.drawing.NewDrawingPanel;
 import org.lemon.edge.SobelEdge;
 import org.lemon.filters.BlurImg;
 import org.lemon.filters.GrayScale;
+import org.lemon.filters.RotateImg;
 import org.lemon.filters.SharpImg;
 import org.lemon.frames.FilterPanel;
 import org.lemon.frames.ImagePanel;
 import org.lemon.frames.NewImagePanel;
 import org.lemon.frames.ToolPanel;
+import org.lemon.frames.alert_dialogs.ImageCropDg;
 import org.lemon.image.ChooseImage;
-import org.lemon.rotate.RotateImg;
+import org.rampcv.rampcv.RampCV;
 
 
 public class MainFrame extends JFrame implements ActionListener{
@@ -40,7 +42,7 @@ public class MainFrame extends JFrame implements ActionListener{
 	
 	private JMenu file, edit, filter, editSubMenu, fileSubMenu;
 	private JMenuItem openImage, saveImg, grayScale, sobelEdge,
-				sharpImg, blurImg, rotate180, rotate90,
+				sharpImg, blurImg, rotate180, rotate90, pixelateImg,
 				drawingPage;
 	private JMenuBar menuBar;
 
@@ -82,6 +84,7 @@ public class MainFrame extends JFrame implements ActionListener{
 		//edit properties
 		rotate180 = new JMenuItem("Rotate 180");
 		rotate90 = new JMenuItem("Rotate 90");
+		pixelateImg = new JMenuItem("Pixelate");
 		
 		menuBar = new JMenuBar();
 	
@@ -104,6 +107,7 @@ public class MainFrame extends JFrame implements ActionListener{
 		filter.add(grayScale);
 		filter.add(sobelEdge);
 		filter.add(sharpImg);
+		filter.add(pixelateImg);
 		
 		//main menu options
 		menuBar.add(file);
@@ -140,6 +144,7 @@ public class MainFrame extends JFrame implements ActionListener{
 		sobelEdge.addActionListener(this);
 		blurImg.addActionListener(this);
 		sharpImg.addActionListener(this);
+		pixelateImg.addActionListener(this);
 	}
 	
 	//adding all required panels to frame
@@ -243,13 +248,14 @@ public class MainFrame extends JFrame implements ActionListener{
 		
 		//gray scaling the image
 		else if(action.getSource() == this.grayScale) {
-			//this.removeExistingPanel();
+			this.removeExistingPanel();
 			if(this.choosenImage == null) {
 				this.noImgSelectedDialog();
 				return;
 			}
 			try {
 				this.editingPanel.add(new NewImagePanel(new GrayScale(this.choosenImage).getGrayScaledImg()));
+				this.add(editingPanel, BorderLayout.CENTER);
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			} finally {
@@ -259,13 +265,31 @@ public class MainFrame extends JFrame implements ActionListener{
 		
 		//detecting edges of image
 		else if(action.getSource() == this.sobelEdge) {
-			//this.removeExistingPanel();
+			this.removeExistingPanel();
 			if(this.choosenImage == null) {
 				this.noImgSelectedDialog();
 				return;
 			}
 			try {
 				this.editingPanel.add(new NewImagePanel(new SobelEdge(this.choosenImage).getFinalImg()));
+				this.add(editingPanel, BorderLayout.CENTER);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		//pixelating the img
+		else if(action.getSource() == this.pixelateImg) {
+			this.removeExistingPanel();
+			if(this.choosenImage == null) {
+				this.noImgSelectedDialog();
+				return;
+			}
+			try {
+				BufferedImage pimg = RampCV.pixelate(this.choosenImage, 10);
+				this.editingPanel.add(new NewImagePanel(pimg));
+				this.add(editingPanel, BorderLayout.CENTER);
+				this.choosenImage = pimg;
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -273,30 +297,45 @@ public class MainFrame extends JFrame implements ActionListener{
 		
 		//choosing image from pc
 		else if(action.getSource() == this.openImage) {
-			this.removeExistingPanel();
-			
 			//image panel
 			//where user can edit his/her photos
 			NewImagePanel impanel;
-			
 			//img chooser which returns choosen file using JFileChooser class
 			ChooseImage cimg = new ChooseImage();
 			
 			try {			
-				BufferedImage img = ImageIO.read(cimg.getChoosenFile());
-				
-				this.impanel.img = img;
+				BufferedImage img = cimg.getChoosenFile();
 				this.choosenImage = img;
 				
-				impanel = new NewImagePanel(img);			
-				editingPanel.add(impanel, BorderLayout.CENTER);
-				editingPanel.repaint();
-				this.add(editingPanel, BorderLayout.CENTER);
+				
+				if(img.getWidth() > 600) {
+					impanel = new NewImagePanel(this.croppingImage(this.choosenImage));
+					this.removeExistingPanel();
+					this.setImageOnLabel(impanel);
+				}
+				else {
+					impanel = new NewImagePanel(img);
+					this.removeExistingPanel();
+					this.setImageOnLabel(impanel);
+				}		
+				
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
 		}
 		
+	}
+	
+	//setting image on label
+	private void setImageOnLabel(NewImagePanel impanel) {
+		editingPanel.add(impanel, BorderLayout.CENTER);
+		this.revalidate();
+		this.add(editingPanel, BorderLayout.CENTER);
+	}
+	//cropping image
+	private BufferedImage croppingImage(BufferedImage img) {
+		ImageCropDg imcdg = new ImageCropDg(img);
+		return imcdg.getCroppedImg();
 	}
 	
 	//if image is selected, this dialog will pop up
