@@ -2,13 +2,13 @@ package application;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
@@ -18,6 +18,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import org.lemon.accessories.AccessoriesRemover;
 import org.lemon.drawing.NewDrawingPanel;
 import org.lemon.edge.SobelEdge;
 import org.lemon.filters.BlurImg;
@@ -28,8 +29,11 @@ import org.lemon.frames.FilterPanel;
 import org.lemon.frames.ImagePanel;
 import org.lemon.frames.NewImagePanel;
 import org.lemon.frames.ToolPanel;
+import org.lemon.frames.alert_dialogs.DenoiseImgDg;
 import org.lemon.frames.alert_dialogs.ImageCropDg;
+import org.lemon.frames.alert_dialogs.InvertColorDg;
 import org.lemon.image.ChooseImage;
+import org.lemon.image.ResizeImg;
 import org.rampcv.rampcv.RampCV;
 
 
@@ -40,10 +44,10 @@ public class MainFrame extends JFrame implements ActionListener{
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	private JMenu file, edit, filter, editSubMenu, fileSubMenu;
+	private JMenu file, edit, filter, extras, editSubMenu, fileSubMenu, noiseSubMenu;
 	private JMenuItem openImage, saveImg, grayScale, sobelEdge,
-				sharpImg, blurImg, rotate180, rotate90, pixelateImg,
-				drawingPage;
+				sharpImg, blurImg, rotate180, rotate90, pixelateImg, cropImg,
+				invertImg, denoiseImg, drawingPage;
 	private JMenuBar menuBar;
 
 	
@@ -62,13 +66,19 @@ public class MainFrame extends JFrame implements ActionListener{
 	
 	public MainFrame() throws IOException {
 		
+		this.choosenImage = ImageIO.read(new File("C:\\Users\\Ramesh\\Desktop\\opencv\\mack.jpg"));
 		editingPanel.setLayout(new BorderLayout());
 		
+		//main sub menus
 		fileSubMenu = new JMenu("New");
+		editSubMenu = new JMenu("Rotate");
+		noiseSubMenu = new JMenu("Noise");
+		
+		//main menu items
 		file = new JMenu("File");
 		edit = new JMenu("Edit");
 		filter = new JMenu("Filter");
-		editSubMenu = new JMenu("Rotate");
+		extras = new JMenu("Extras");
 		
 		//file properties
 		saveImg = new JMenuItem("Save");
@@ -79,12 +89,15 @@ public class MainFrame extends JFrame implements ActionListener{
 		grayScale = new JMenuItem("B&W");
 		sobelEdge = new JMenuItem("Edge Highlight");
 		sharpImg = new JMenuItem("Sharp Img");
-		blurImg = new JMenuItem("Blur Img");
+		pixelateImg = new JMenuItem("Pixelate");
+		invertImg = new JMenuItem("Invert");
+		denoiseImg = new JMenuItem("Denoise");
 		
 		//edit properties
 		rotate180 = new JMenuItem("Rotate 180");
 		rotate90 = new JMenuItem("Rotate 90");
-		pixelateImg = new JMenuItem("Pixelate");
+		cropImg = new JMenuItem("Crop");
+		blurImg = new JMenuItem("Blur Img");
 		
 		menuBar = new JMenuBar();
 	
@@ -94,7 +107,8 @@ public class MainFrame extends JFrame implements ActionListener{
 		editSubMenu.add(rotate90);
 		//file sub menu
 		fileSubMenu.add(drawingPage);
-		
+		//noise sub menu
+		noiseSubMenu.add(denoiseImg);
 		//file options
 		//file
 		file.add(fileSubMenu);
@@ -103,16 +117,20 @@ public class MainFrame extends JFrame implements ActionListener{
 		//edit options
 		edit.add(editSubMenu);
 		edit.add(blurImg);
+		edit.add(cropImg);
+		edit.add(noiseSubMenu);
 		//filter options
 		filter.add(grayScale);
 		filter.add(sobelEdge);
 		filter.add(sharpImg);
 		filter.add(pixelateImg);
+		filter.add(invertImg);
 		
 		//main menu options
 		menuBar.add(file);
 		menuBar.add(edit);
 		menuBar.add(filter);
+		menuBar.add(extras);
 		
 		//all buttons events are intialized in this method
 		events();
@@ -123,7 +141,7 @@ public class MainFrame extends JFrame implements ActionListener{
 		//frame style and properties
 		setBackground(Color.GRAY);
 		setTitle("Lemon Image Editor");
-		setSize(screen.width - 200, screen.height - 200);
+		setSize(screen.width - 50, screen.height - 50);
 		setResizable(true);
 		setLayout(new BorderLayout());
 		setJMenuBar(menuBar);
@@ -145,6 +163,9 @@ public class MainFrame extends JFrame implements ActionListener{
 		blurImg.addActionListener(this);
 		sharpImg.addActionListener(this);
 		pixelateImg.addActionListener(this);
+		cropImg.addActionListener(this);
+		invertImg.addActionListener(this);
+		denoiseImg.addActionListener(this);
 	}
 	
 	//adding all required panels to frame
@@ -153,7 +174,7 @@ public class MainFrame extends JFrame implements ActionListener{
 		//editingPanel.add(new NewDrawingPanel());
 		
 		Container c = getContentPane();
-		
+		editingPanel.add(new NewImagePanel(this.choosenImage));
 		c.add(editingPanel, BorderLayout.CENTER);
 		c.add(new FilterPanel(this.impanel.getCurrentImg()), BorderLayout.EAST);
 		c.add(new ToolPanel(this.editingPanel, this.choosenColor), BorderLayout.WEST);
@@ -295,6 +316,32 @@ public class MainFrame extends JFrame implements ActionListener{
 			}
 		}
 		
+		//cropping image dialog
+		else if(action.getSource() == this.cropImg) {
+			if(this.choosenImage == null) {
+				this.noImgSelectedDialog();
+				return;
+			}
+				new ImageCropDg(this.choosenImage, this.editingPanel);
+		}
+		
+		else if(action.getSource() == this.invertImg) {
+			if(this.choosenImage == null) {
+				this.noImgSelectedDialog();
+				return;
+			}
+			new InvertColorDg(this.choosenImage, this.editingPanel);
+		}
+		
+		//brighting the image
+		else if(action.getSource() == this.denoiseImg) {
+			if(this.choosenImage == null) {
+				this.noImgSelectedDialog();
+				return;
+			}
+			new DenoiseImgDg(this.choosenImage);
+		}
+		
 		//choosing image from pc
 		else if(action.getSource() == this.openImage) {
 			//image panel
@@ -309,7 +356,8 @@ public class MainFrame extends JFrame implements ActionListener{
 				
 				
 				if(img.getWidth() > 600) {
-					impanel = new NewImagePanel(this.croppingImage(this.choosenImage));
+					this.choosenImage = this.resizingImage(this.choosenImage);
+					impanel = new NewImagePanel(this.choosenImage);
 					this.removeExistingPanel();
 					this.setImageOnLabel(impanel);
 				}
@@ -333,9 +381,9 @@ public class MainFrame extends JFrame implements ActionListener{
 		this.add(editingPanel, BorderLayout.CENTER);
 	}
 	//cropping image
-	private BufferedImage croppingImage(BufferedImage img) {
-		ImageCropDg imcdg = new ImageCropDg(img);
-		return imcdg.getCroppedImg();
+	private BufferedImage resizingImage(BufferedImage img) {
+		ResizeImg rimg = new ResizeImg(img);
+		return rimg.getScaledImage();
 	}
 	
 	//if image is selected, this dialog will pop up
@@ -345,12 +393,7 @@ public class MainFrame extends JFrame implements ActionListener{
 	
 	//removing existing panel before adding new
 	private void removeExistingPanel() {
-		Component[] comps = this.editingPanel.getComponents();
-		
-		//deleting all components attached to editing panel
-		for(Component c: comps) {
-			this.editingPanel.remove(c);
-		}
+		new AccessoriesRemover(this.editingPanel);
 		//finally removing the editing panel
 		this.remove(this.editingPanel);
 	}
