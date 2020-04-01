@@ -9,12 +9,14 @@ import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.border.Border;
+import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
 
 public class NewImagePanel extends JPanel{
 
 	private static final long serialVersionUID = 1L;
 	
-	//scroll pane
+	//scroll bar
 	@SuppressWarnings("unused")
 	private JSlider scrlBar = new JSlider(JSlider.HORIZONTAL);
 	
@@ -35,9 +37,27 @@ public class NewImagePanel extends JPanel{
 		iframe.setLayout(new BorderLayout());
 		iframe.add(new ImagePanel(file), BorderLayout.CENTER);
 		iframe.setClosable(true);
-		
+		iframe.addInternalFrameListener(new ImagePanelWindowListener(file));
 		add(iframe, BorderLayout.CENTER);
 	}
 
+	//helper class for jinternalframe
+	class ImagePanelWindowListener extends InternalFrameAdapter {
+		
+		BufferedImage img;
+		
+		public ImagePanelWindowListener(BufferedImage img) {
+			this.img = img;
+		}
+		
+		@Override
+		public void internalFrameClosing(InternalFrameEvent e) {
+			super.internalFrameClosing(e);
+			this.img = null;
+			
+		}
+	}
 	
 }
+
+

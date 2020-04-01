@@ -21,6 +21,7 @@ public class RemoveColorDialog {
 		
 		this.color = new Color(R, G, B);
 		
+		System.out.println(R + " " + G + " " + B);
 	}
 	
 	public Color getPreferredColor() {

@@ -1,6 +1,6 @@
 package org.lemon.frames.alert_dialogs;
 
-import java.awt.Color;
+import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -9,65 +9,76 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+import org.lemon.accessories.AccessoriesRemover;
+import org.lemon.frames.NewImagePanel;
 
 public class ImageCropDg extends JFrame implements MouseMotionListener, MouseListener, ActionListener{
 
 	private static final long serialVersionUID = 1L;
 	
 	private BufferedImage img;
-	private JLabel imgLabel;
+	private BufferedImage cropped;
+	private JLabel imgLabel, previewLabel;
+	private JPanel mainPanel;
 	private JButton okBttn;
 	
-	private int startX = 0, startY = 0, endX = 0, endY = 0;
+	//crop box
+	private int startX = 50, startY = 50;
+	private int height = 0, width = 0;
 	
-	public ImageCropDg(BufferedImage img) {
+	public ImageCropDg(BufferedImage img, JPanel mainPanel) {
 		this.img = img;
+		this.cropped = img;
+		this.mainPanel = mainPanel;
 		this.imgLabel = new JLabel(new ImageIcon(this.img));
+		this.previewLabel = new JLabel(new ImageIcon(this.img));
 		this.okBttn = new JButton("OK");
 		this.okBttn.addActionListener(this);
 		
 		int h = img.getHeight();
-		int w = img.getWidth();
+		int w = img.getWidth() * 2;
 		
 		setSize(w + 100, h);
 		setTitle("Crop Image");
-		setDefaultCloseOperation(ImageCropDg.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(ImageCropDg.DISPOSE_ON_CLOSE);
 		setResizable(false);
 		setVisible(true);
-		setLayout(new FlowLayout());
-		addMouseMotionListener(this);
-		add(this.imgLabel);
-		add(this.okBttn);
-	}
-	
-	private BufferedImage crop() {
-		int h = Math.abs(this.startY - this.endY);
-		int w = Math.abs(this.startX - this.endX);
-		
-		BufferedImage cropped = new BufferedImage(w, h, this.img.getType());
-		Color col;
-		
-		for(int y=this.startY; y<this.endY; y++) {
-			for(int x=this.startX; x<this.endX; x++) {
-				col = new Color(this.img.getRGB(x, y));
-				cropped.setRGB(x, y, col.getRGB());
-			}
-		}
-		return cropped;
+		this.imgLabel.addMouseMotionListener(this);
+		this.imgLabel.addMouseListener(this);
+
+		Container c = getContentPane();
+		c.setLayout(new FlowLayout());
+		c.add(this.imgLabel);
+		c.add(this.previewLabel);
+		c.add(this.okBttn);
 	}
 
 	public BufferedImage getCroppedImg() {
-		return this.img;
+		return this.cropped;
 	}
+	
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		this.startX = e.getX();
-		this.startY = e.getY();
+		try {
+			int finalX = e.getX(), finalY = e.getY();
+			this.width = Math.abs(this.startX - finalX);
+			this.height = Math.abs(this.startY - finalY);
+			
+			cropped = this.img.getSubimage(this.startX, this.startY, this.width, this.height);
+			
+			this.previewLabel.setIcon(new ImageIcon(cropped));
+			this.repaint();
+		} catch(Exception ex) {
+			
+		}
 	}
 
 	@Override
@@ -78,39 +89,43 @@ public class ImageCropDg extends JFrame implements MouseMotionListener, MouseLis
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		this.endX = e.getX();
-		this.endY = e.getY();
+		
+		
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == this.okBttn) {
-			this.img = this.crop();
+			try {
+				new AccessoriesRemover(this.mainPanel);
+				this.mainPanel.add(new NewImagePanel(getCroppedImg()));
+				this.img = this.getCroppedImg();
+				this.mainPanel.repaint();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 			this.dispose();
 		}
 	}
 	
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
+		this.startX = e.getX();
+		this.startY = e.getY();
+ 	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void mouseEntered(MouseEvent e) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
 		
 	}
 }
