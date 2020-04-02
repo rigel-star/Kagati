@@ -12,38 +12,40 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.lemon.accessories.AccessoriesRemover;
+import org.lemon.filters.BlurImg;
 import org.lemon.frames.NewImagePanel;
-import org.rampcv.rampcv.RampCV;
 
-public class DenoiseImgDg extends JFrame implements ChangeListener {
+public class BlurImgDg extends JFrame implements ChangeListener {
 
 	private static final long serialVersionUID = 1L;
-
+	
 	private JPanel imgPanel;
 	private JPanel editPanel;
 	private JSlider slider;
-	private BufferedImage img, copy;
+	private BufferedImage img;
 	
-	public DenoiseImgDg(BufferedImage img) {
+	//constructor
+	public BlurImgDg(BufferedImage img) {
 		this.init(img);
 		this.img = img;
 		//frame properties
 		setSize(600, 600);
+		setDefaultCloseOperation(BlurImgDg.DISPOSE_ON_CLOSE);
 		setResizable(false);
-		setDefaultCloseOperation(InvertColorDg.DISPOSE_ON_CLOSE);
-		setTitle("Denoise");
+		setTitle("Blur");
 		setVisible(true);
-				
+		
 		Container c = this.getContentPane();
 		c.add(this.imgPanel, BorderLayout.CENTER);
 		c.add(this.editPanel, BorderLayout.SOUTH);
 	}
 	
+	//init components
 	private void init(BufferedImage img) {
 		this.imgPanel = new JPanel();
 		this.editPanel = new JPanel();
 		//slider properties
-		this.slider = new JSlider(JSlider.HORIZONTAL, 0, 5, 0);
+		this.slider = new JSlider(JSlider.HORIZONTAL, 0, 3, 0);
 		this.slider.setPaintTicks(true);
 		this.slider.setMajorTickSpacing(1);
 		this.slider.setPaintLabels(true);
@@ -56,34 +58,35 @@ public class DenoiseImgDg extends JFrame implements ChangeListener {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
 	}
 
 	@Override
 	public void stateChanged(ChangeEvent e) {
-		if(e.getSource() == this.slider) {
-			
-			int curr = this.slider.getValue();
-			
-			copy = img;
-			
-			//starting another thread
-			//to denoise the image
-			new Thread(new Runnable() {
-				
-				@Override
-				public void run() {
-					new AccessoriesRemover(imgPanel);
-					RampCV.denoise(copy, curr);
-				}
-			}).start();
-			
-			try {
-				this.imgPanel.add(new NewImagePanel(copy));
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-		}
+		new Thread(new BlurringThread(this.slider.getValue())).start();;
 	}
 
+	//thread helper class
+	private class BlurringThread implements Runnable {
+
+		private int i;
+		public BlurringThread(int i) {
+			this.i = i;
+		}
+		@Override
+		public void run() {
+			//removes existing image from img panel and add new blurred img
+			new AccessoriesRemover(imgPanel);
+			BlurImg bimg = new BlurImg(img, i);
+			img = bimg.getBlurredImg();
+			
+			try {
+				imgPanel.add(new NewImagePanel(img));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+	}
+	
 }
+

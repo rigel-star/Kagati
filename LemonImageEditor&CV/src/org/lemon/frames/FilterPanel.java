@@ -7,7 +7,6 @@ import java.io.IOException;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
-import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 
@@ -16,9 +15,6 @@ public class FilterPanel extends JPanel {
 
 	//version id
 	private static final long serialVersionUID = 1L;
-
-	JButton btnColorRemover  = new JButton();
-	JButton btnMix2imgs = new JButton();
 	
 	public FilterPanel() {
 	}
@@ -33,8 +29,5 @@ public class FilterPanel extends JPanel {
 		
 		setLayout(layout);
 		setBorder(layoutBorder);
-		setSize(200, 300);
-		
-		add(new ImageFeaturesHandlerPanel());
 	}
 }

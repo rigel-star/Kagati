@@ -36,7 +36,7 @@ public class ColorRemover {
 						currentCol.getRed(), currentCol.getGreen(), currentCol.getBlue());
 				
 				if(this.colRange.is(diff).inRange(0, 100)) {
-					img.setRGB(x, y, new Color(255, 255, 255).getRGB());
+					img.setRGB(x, y, 0);
 				}
 				else
 					img.setRGB(x, y, img.getRGB(x, y));

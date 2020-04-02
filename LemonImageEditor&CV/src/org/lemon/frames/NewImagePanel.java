@@ -2,17 +2,17 @@ package org.lemon.frames;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.swing.BorderFactory;
 import javax.swing.JInternalFrame;
-import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.border.Border;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
-public class NewImagePanel extends JPanel{
+public class NewImagePanel extends JInternalFrame {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -20,7 +20,11 @@ public class NewImagePanel extends JPanel{
 	@SuppressWarnings("unused")
 	private JSlider scrlBar = new JSlider(JSlider.HORIZONTAL);
 	
-	public NewImagePanel(BufferedImage file) throws IOException {
+	public NewImagePanel(BufferedImage img) throws IOException {
+		this(img, null);
+	}
+	
+	public NewImagePanel(BufferedImage file, String title) throws IOException {
 		
 		//layout for panel
 		//BoxLayout layout = new BoxLayout(this, BoxLayout.Y_AXIS);
@@ -30,15 +34,13 @@ public class NewImagePanel extends JPanel{
 		
 		setLayout(new BorderLayout());
 		setBorder(layoutBorder);
-		
-		JInternalFrame iframe = new JInternalFrame();
-		iframe.setVisible(true);
-		iframe.setSize(500, 500);
-		iframe.setLayout(new BorderLayout());
-		iframe.add(new ImagePanel(file), BorderLayout.CENTER);
-		iframe.setClosable(true);
-		iframe.addInternalFrameListener(new ImagePanelWindowListener(file));
-		add(iframe, BorderLayout.CENTER);
+		setTitle(title);
+		setVisible(true);
+		setSize(new Dimension(file.getWidth(), file.getHeight()));
+		setLayout(new BorderLayout());
+		add(new ImagePanel(file), BorderLayout.CENTER);
+		setClosable(true);
+		addInternalFrameListener(new ImagePanelWindowListener(file));
 	}
 
 	//helper class for jinternalframe

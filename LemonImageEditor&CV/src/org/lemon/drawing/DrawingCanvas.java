@@ -50,11 +50,11 @@ public class DrawingCanvas extends MouseAdapter implements MouseMotionListener {
 		int x, y;
 		x = e.getX();
 		y = e.getY();
-//		
-//		Graphics g = canvas.getGraphics();
-//		g.setColor(this.choosenCol);
-//		
-//		g.fillOval(x, y, 5, 5);
+		
+		Graphics g = canvas.getGraphics();
+		g.setColor(this.choosenCol);
+		
+		g.fillOval(x, y, 5, 5);
 		
 		if(this.startX == 0 && this.startY == 0) {
 			this.startX = x;
@@ -75,17 +75,9 @@ public class DrawingCanvas extends MouseAdapter implements MouseMotionListener {
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		
-		this.endX = e.getX();
-		this.endY = e.getY();
-		
-		Graphics g = canvas.getGraphics();
-		g.setColor(this.choosenCol);
-		
-		g.drawLine(this.startX, this.startY, this.endX, this.endY);
-		
-		//reset startX and startY on mouse release
-		this.startX = 0;
-		this.startY = 0;
+//		this.endX = e.getX();
+//		this.endY = e.getY();
+
 	}
 
 }

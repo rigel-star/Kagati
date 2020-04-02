@@ -11,7 +11,6 @@ import java.io.IOException;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.lemon.accessories.AccessoriesRemover;
@@ -76,7 +75,6 @@ public class InvertColorDg extends JFrame {
 			this.imagePanel.add(new NewImagePanel(this.src));
 		} catch (IOException e) {
 			e.printStackTrace();
-			JOptionPane.showInternalMessageDialog(getContentPane(), "Error parsing image!");
 		}
 	}
 	
@@ -140,8 +138,14 @@ public class InvertColorDg extends JFrame {
 		
 		//inversing color
 		private void inverision(boolean r, boolean g, boolean b) {
-			RampCV.invertColors(src, r, g, b);
-			updateState(src, imagePanel);
+			new Thread(new Runnable() {		
+				@Override
+				public void run() {
+					RampCV.invertColors(src, r, g, b);
+					updateState(src, imagePanel);
+				}
+			}).start();
+			
 		}
 		
 	}

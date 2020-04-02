@@ -96,14 +96,14 @@ public class ImageCropDg extends JFrame implements MouseMotionListener, MouseLis
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == this.okBttn) {
+			new AccessoriesRemover(this.mainPanel);
 			try {
-				new AccessoriesRemover(this.mainPanel);
 				this.mainPanel.add(new NewImagePanel(getCroppedImg()));
-				this.img = this.getCroppedImg();
-				this.mainPanel.repaint();
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
+			this.img = this.getCroppedImg();
+			this.mainPanel.repaint();
 			this.dispose();
 		}
 	}

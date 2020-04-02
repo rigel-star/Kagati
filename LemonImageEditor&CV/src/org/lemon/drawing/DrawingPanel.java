@@ -12,11 +12,11 @@ public class DrawingPanel extends JInternalFrame {
 	private DrawingCanvas drawPanel;
 	private Color col;
 	
-	public DrawingPanel(Color col) {
+	public DrawingPanel(Color col, int w, int h) {
 		
 		this.col = col;
 		
-		setLocation(100, 50);
+		setSize(w, h);
 		setBackground(Color.WHITE);
 		setVisible(true);
 		setClosable(true);

@@ -12,12 +12,12 @@ public class NewDrawingPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	
-	private Color col;
+	//private Color col;
 
 	public NewDrawingPanel(Color col) {
 		
 		//button will show the selected color and properties of button
-		this.col = col;
+		//this.col = col;
 		
 		//layout for panel
 		BoxLayout layout = new BoxLayout(this, BoxLayout.Y_AXIS);
@@ -29,6 +29,6 @@ public class NewDrawingPanel extends JPanel {
 		setBorder(layoutBorder);
 		setSize(200, 300);
 		
-		add(new DrawingPanel(this.col));
+		//add(new DrawingPanel(this.col));
 	}
 }

@@ -23,13 +23,17 @@ public class ChooseImage {
 		
 	}
 	
-	public BufferedImage getChoosenFile() {
+	public BufferedImage getChoosenImage() {
 		try {
 			this.img = ImageIO.read(this.file);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return this.img;
+	}
+	
+	public File getChoosenFile() {
+		return this.file;
 	}
 
 }
