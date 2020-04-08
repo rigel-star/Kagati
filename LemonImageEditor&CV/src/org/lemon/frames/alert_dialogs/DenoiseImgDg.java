@@ -12,7 +12,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.lemon.accessories.AccessoriesRemover;
-import org.lemon.frames.NewImagePanel;
+import org.lemon.frames.ImageView;
 import org.rampcv.rampcv.RampCV;
 
 public class DenoiseImgDg extends JFrame implements ChangeListener {
@@ -52,7 +52,7 @@ public class DenoiseImgDg extends JFrame implements ChangeListener {
 		
 		this.editPanel.add(slider);
 		try {
-			this.imgPanel.add(new NewImagePanel(img));
+			this.imgPanel.add(new ImageView(img));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -79,7 +79,7 @@ public class DenoiseImgDg extends JFrame implements ChangeListener {
 			}).start();
 			
 			try {
-				this.imgPanel.add(new NewImagePanel(copy));
+				this.imgPanel.add(new ImageView(copy));
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}

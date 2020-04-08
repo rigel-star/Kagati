@@ -15,7 +15,7 @@ import javax.swing.JTextField;
 
 import org.lemon.accessories.AccessoriesRemover;
 import org.lemon.colors.ColorRemover;
-import org.lemon.frames.NewImagePanel;
+import org.lemon.frames.ImageView;
 
 public class ColorRemoverDg extends JFrame implements ActionListener {
 
@@ -49,7 +49,7 @@ public class ColorRemoverDg extends JFrame implements ActionListener {
 		this.btnPanel.add(this.closeBttn);
 		
 		try {
-			this.imgPanel.add(new NewImagePanel(img));
+			this.imgPanel.add(new ImageView(img));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -91,7 +91,7 @@ public class ColorRemoverDg extends JFrame implements ActionListener {
 			new ColorRemover(img, new Color(Integer.parseInt(col[0].trim()),
 					Integer.parseInt(col[1].trim()), Integer.parseInt(col[1].trim())));
 			try {
-				imgPanel.add(new NewImagePanel(img));
+				imgPanel.add(new ImageView(img));
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}

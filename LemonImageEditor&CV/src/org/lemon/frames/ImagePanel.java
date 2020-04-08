@@ -11,7 +11,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.border.Border;
 
-
 public class ImagePanel extends JLabel implements MouseMotionListener{
 	
 	private static final long serialVersionUID = 1L;

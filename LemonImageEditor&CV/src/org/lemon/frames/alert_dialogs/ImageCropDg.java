@@ -18,7 +18,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.lemon.accessories.AccessoriesRemover;
-import org.lemon.frames.NewImagePanel;
+import org.lemon.frames.ImageView;
 
 public class ImageCropDg extends JFrame implements MouseMotionListener, MouseListener, ActionListener{
 
@@ -98,7 +98,7 @@ public class ImageCropDg extends JFrame implements MouseMotionListener, MouseLis
 		if(e.getSource() == this.okBttn) {
 			new AccessoriesRemover(this.mainPanel);
 			try {
-				this.mainPanel.add(new NewImagePanel(getCroppedImg()));
+				this.mainPanel.add(new ImageView(getCroppedImg()));
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}

@@ -13,7 +13,7 @@ import javax.swing.event.ChangeListener;
 
 import org.lemon.accessories.AccessoriesRemover;
 import org.lemon.filters.BlurImg;
-import org.lemon.frames.NewImagePanel;
+import org.lemon.frames.ImageView;
 
 public class BlurImgDg extends JFrame implements ChangeListener {
 
@@ -54,7 +54,7 @@ public class BlurImgDg extends JFrame implements ChangeListener {
 		
 		this.editPanel.add(slider);
 		try {
-			this.imgPanel.add(new NewImagePanel(img));
+			this.imgPanel.add(new ImageView(img));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -80,7 +80,7 @@ public class BlurImgDg extends JFrame implements ChangeListener {
 			img = bimg.getBlurredImg();
 			
 			try {
-				imgPanel.add(new NewImagePanel(img));
+				imgPanel.add(new ImageView(img));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

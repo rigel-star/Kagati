@@ -1,6 +1,7 @@
 package org.lemon.frames.alert_dialogs;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -14,9 +15,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import org.lemon.accessories.AccessoriesRemover;
-import org.lemon.frames.NewImagePanel;
+import org.lemon.frames.ImageView;
 import org.rampcv.rampcv.RampCV;
-
 
 public class InvertColorDg extends JFrame {
 
@@ -37,10 +37,11 @@ public class InvertColorDg extends JFrame {
 		this.original = src;
 		this.main = panel;
 		//frame properties
-		setSize(600, 600);
+		setSize(src.getWidth() + 100, src.getHeight() + 100);
 		setResizable(false);
 		setDefaultCloseOperation(InvertColorDg.DISPOSE_ON_CLOSE);
 		setTitle("Invert image");
+		setBackground(Color.white);
 		setVisible(true);
 		
 		Container c = this.getContentPane();
@@ -72,7 +73,7 @@ public class InvertColorDg extends JFrame {
 		this.filterObserver(src);
 		
 		try {
-			this.imagePanel.add(new NewImagePanel(this.src));
+			this.imagePanel.add(new ImageView(this.src));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -105,7 +106,7 @@ public class InvertColorDg extends JFrame {
 	private void updateState(BufferedImage src, JPanel imagePanel) {
 		new AccessoriesRemover(imagePanel);
 		try {
-			this.imagePanel.add(new NewImagePanel(src));
+			this.imagePanel.add(new ImageView(src));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -151,7 +152,3 @@ public class InvertColorDg extends JFrame {
 	}
 	
 }
-
-
-
-
