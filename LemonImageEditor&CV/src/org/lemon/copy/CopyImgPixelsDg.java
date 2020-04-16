@@ -24,7 +24,8 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.lemon.frames.ImagePanel;
+import org.lemon.colors.ColorPanel;
+import org.lemon.image.ImagePanel;
 import org.rampcv.utils.Tools;
 
 public class CopyImgPixelsDg extends JFrame implements  MouseMotionListener, ChangeListener, ActionListener {
@@ -69,6 +70,7 @@ public class CopyImgPixelsDg extends JFrame implements  MouseMotionListener, Cha
 			e.printStackTrace();
 		}
 		
+		//frame properties
 		setSize(((w * 2) + 200), (h + 200));
 		setTitle("Copy Image Pixels");
 		setDefaultCloseOperation(CopyImgPixelsDg.DISPOSE_ON_CLOSE);
@@ -78,6 +80,7 @@ public class CopyImgPixelsDg extends JFrame implements  MouseMotionListener, Cha
 		//images panel to main panel
 		this.mainPanel.setBackground(Color.white);
 		this.mainPanel.add(this.imgPanel);
+		this.mainPanel.add(this.copyFullImageBttn);
 		this.mainPanel.add(this.copyImgPanel);
 		this.mainPanel.add(this.editingPanel);
 		
@@ -93,6 +96,7 @@ public class CopyImgPixelsDg extends JFrame implements  MouseMotionListener, Cha
 		this.mainPanel = new JPanel(new FlowLayout());
 		this.btnPanel = new JPanel(new FlowLayout());
 		this.okBttn = new JButton("OK");
+		this.okBttn.addActionListener(this);
 		this.cnclBttn = new JButton("Cancel");
 		this.copyFullImageBttn = new JButton();
 		this.copyFullImageBttn.setIcon(new ImageIcon("icons/copyIcon.png"));
@@ -126,11 +130,12 @@ public class CopyImgPixelsDg extends JFrame implements  MouseMotionListener, Cha
 		this.copyImgPanel.add(this.copyImgLbl);
 		
 		//on bttn panel
-		this.btnPanel.add(this.size);
+		//this.btnPanel.add(this.size);
 		this.btnPanel.add(this.okBttn);
 		this.btnPanel.add(this.cnclBttn);
 	}
 
+	//initing everything related to color chooser JComboBox
 	private void colorChooserInit() {
 		//color array for jcombobox
 		String[] s = {
@@ -138,7 +143,8 @@ public class CopyImgPixelsDg extends JFrame implements  MouseMotionListener, Cha
 				"White",
 				"Red",
 				"Green",
-				"Blue"
+				"Blue",
+				"Others..."
 		};
 		//actual color list
 		Color[] c = {
@@ -147,6 +153,7 @@ public class CopyImgPixelsDg extends JFrame implements  MouseMotionListener, Cha
 				new Color(255, 0, 0),
 				new Color(0, 255, 0),
 				new Color(0, 0, 255),
+				null
 		};
 		
 		//adding colors to hashMap
@@ -161,7 +168,7 @@ public class CopyImgPixelsDg extends JFrame implements  MouseMotionListener, Cha
 	private void initEditingPanel() {
 		this.editingPanel = new JPanel(new GridLayout(1, 1, 10, 10));
 		this.editingPanel.add(this.colorChooser);
-		this.editingPanel.add(this.copyFullImageBttn);
+		this.editingPanel.add(this.size);
 	}
 	
 	
@@ -220,6 +227,9 @@ public class CopyImgPixelsDg extends JFrame implements  MouseMotionListener, Cha
 		//color chooser
 		if(e.getSource() == this.colorChooser) {
 			this.choosenColor = this.colorMap.get(this.colorChooser.getSelectedItem());
+		}
+		else if(e.getSource() == this.okBttn) {
+			new ColorPanel();
 		}
 	}
 }

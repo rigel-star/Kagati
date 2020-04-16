@@ -4,17 +4,15 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 
-import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.lemon.frames.ImageView;
+import org.lemon.image.ImageView;
 import org.rampcv.rampcv.RampCV;
 import org.rampcv.utils.Tools;
 
@@ -51,10 +49,6 @@ public class PixelateImgDg extends JFrame implements ChangeListener {
 		c.add(this.editPanel, BorderLayout.SOUTH);
 	}
 	
-	public static void main(String[] args) throws IOException {
-		new PixelateImgDg(ImageIO.read(new File("C:\\Users\\Ramesh\\Desktop\\opencv\\flow.jpg")));
-	}
-	
 	private void init() {
 		this.imgPanel = new JPanel();
 		this.editPanel = new JPanel();
@@ -79,12 +73,16 @@ public class PixelateImgDg extends JFrame implements ChangeListener {
 		if(e.getSource() == this.slider) {
 			copy = Tools.copyImage(original);
 			this.value = this.slider.getValue();
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
+			}
 			new Thread(new Runnable() {
 				
 				@Override
 				public void run() {	
 					try {
-						Thread.sleep(2000);
 						RampCV.pixelate(copy, value);
 						imgPanel.remove(copyImagePan);
 						copyImagePan = new ImageView(copy, "Preview");
@@ -92,8 +90,6 @@ public class PixelateImgDg extends JFrame implements ChangeListener {
 						imgPanel.revalidate();
 					} catch (IOException e) {
 						e.getMessage();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
 					}
 				}
 			}).start();;

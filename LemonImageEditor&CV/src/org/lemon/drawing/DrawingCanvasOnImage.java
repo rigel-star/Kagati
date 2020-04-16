@@ -1,75 +1,49 @@
 package org.lemon.drawing;
 
-import java.awt.Canvas;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
-public class DrawingCanvasOnImage extends Canvas implements MouseListener, MouseMotionListener{
+import org.lemon.image.ImagePanel;
 
-	private static final long serialVersionUID = 1L;
+/**
+ * Class description: This class takes an image as param and applies canvas in it.
+ * This class is mainly used for drawing shapes in image using BufferedImage.
+ * Canvas is java class which is mainly used for drawing shapes.
+ * */
+public class DrawingCanvasOnImage implements MouseMotionListener{
 	
-	public DrawingCanvasOnImage() {
-		addMouseListener(this);
-		addMouseMotionListener(this);
+	//global
+	private Graphics g2d;
+	private ImagePanel ip;
+	
+	public DrawingCanvasOnImage(ImagePanel panel) {
+		//assigning globals
+		this.ip = panel;
+		this.g2d = ip.getCurrentImg().getGraphics();
 	}
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		
-		int x = getX();
-		int y = getY();
+		int x = e.getX();
+		int y = e.getY();
 		
-		Graphics g = getGraphics();
-		g.setColor(Color.RED);
+		Color c = new Color(255, 0, 0);
+		this.g2d.setColor(c);
 		
-		g.fillOval(x, y, 5, 5);
-		
+		//filling oval of size 3X3 wherever the mouse goes
+		this.g2d.fillOval(x, y, 10, 10);
+		//this.g2d.dispose();
+		this.ip.repaint();
 	}
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
+		Cursor cursor = new Cursor(Cursor.CROSSHAIR_CURSOR);
+		this.ip.setCursor(cursor);
 	}
-
-	@Override
-	public void mouseClicked(MouseEvent e) {
-		int x = getX();
-		int y = getY();
-		
-		Graphics g = getGraphics();
-		g.setColor(Color.RED);
-		
-		g.fillOval(x, y, 5, 5);
-	}
-
-	@Override
-	public void mousePressed(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mouseEntered(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	
 	
 }

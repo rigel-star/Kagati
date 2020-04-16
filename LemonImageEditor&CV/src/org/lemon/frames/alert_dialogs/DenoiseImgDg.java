@@ -12,7 +12,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.lemon.accessories.AccessoriesRemover;
-import org.lemon.frames.ImageView;
+import org.lemon.image.ImageView;
 import org.rampcv.rampcv.RampCV;
 
 public class DenoiseImgDg extends JFrame implements ChangeListener {

@@ -1,0 +1,6 @@
+Blend Mode are modes that multiply two or more images together. 
+This effects are used to multiply, add or even subtract images. Many popular graphics software uses
+this techniques to achieve image coorelation.
+
+In Computer Vision this techniques are used to smartly merge multiple images.
+Some examples of blend mode are panaroma effect where many images are added to make one.

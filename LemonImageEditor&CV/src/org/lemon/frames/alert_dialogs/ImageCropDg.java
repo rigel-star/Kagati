@@ -18,7 +18,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.lemon.accessories.AccessoriesRemover;
-import org.lemon.frames.ImageView;
+import org.lemon.image.ImageView;
 
 public class ImageCropDg extends JFrame implements MouseMotionListener, MouseListener, ActionListener{
 

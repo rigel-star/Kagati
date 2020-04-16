@@ -15,7 +15,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import org.lemon.accessories.AccessoriesRemover;
-import org.lemon.frames.ImageView;
+import org.lemon.image.ImageView;
 import org.rampcv.rampcv.RampCV;
 
 public class InvertColorDg extends JFrame {

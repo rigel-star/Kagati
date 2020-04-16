@@ -6,11 +6,12 @@ import java.io.IOException;
 
 import javax.swing.JDesktopPane;
 
-import org.lemon.drawing.DrawingPanel;
-import org.lemon.frames.ImageView;
+import org.lemon.drawing.PlainDrawingPanel;
+import org.lemon.image.ImagePanel;
+import org.lemon.image.ImageView;
+import org.piksel.piksel.PPInternalWindow;
 
-
-/*
+/**
  * Main background pane of application, which handles editing and drawing panels in application.
  * */
 public class MainBackgroundPane extends JDesktopPane {
@@ -23,22 +24,19 @@ public class MainBackgroundPane extends JDesktopPane {
 		setBackground(Color.white);
 		setVisible(true);
 		
-		ImageView p = null;
+		PPInternalWindow pp = new PPInternalWindow(300, 300, title);
+		pp.setClosable(true);
+		add(pp);
+		
+		ImageView v = null;
 		try {
-			p = new ImageView(img, title);
+			v = new ImageView(img, title, true, ImagePanel.STATE_SNAP);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		add(v);
 		
-		DrawingPanel d = new DrawingPanel(new Color(255, 0, 0), 350, 350);
+		PlainDrawingPanel p = new PlainDrawingPanel(null, 400, 400);
 		add(p);
-		add(d);
-		
-//		JInternalFrame f = new JInternalFrame("Draggable");
-//		f.setSize(500, 500);
-//		f.setClosable(true);
-//		f.setVisible(true);
-//		
-//		add(f);
 	}
 }

@@ -2,9 +2,9 @@ package org.lemon.math;
 
 public class Vector3D {
 
-	private int x;
-	private int y;
-	private int z;
+	int x;
+	int y;
+	int z;
 	
 	public Vector3D() {}
 	

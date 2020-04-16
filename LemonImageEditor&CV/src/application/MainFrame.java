@@ -26,7 +26,6 @@ import org.lemon.filters.GrayScale;
 import org.lemon.filters.RotateImg;
 import org.lemon.filters.SharpImg;
 import org.lemon.frames.FilterPanel;
-import org.lemon.frames.ImageView;
 import org.lemon.frames.ToolPanel;
 import org.lemon.frames.alert_dialogs.BlurImgDg;
 import org.lemon.frames.alert_dialogs.ColorRemoverDg;
@@ -36,14 +35,11 @@ import org.lemon.frames.alert_dialogs.InvertColorDg;
 import org.lemon.frames.alert_dialogs.PixelateImgDg;
 import org.lemon.image.ChooseImage;
 import org.lemon.image.ImageInfoPanel;
+import org.lemon.image.ImageView;
 import org.lemon.image.ResizeImg;
-
+import org.piksel.piksel.PPInternalWindow;
 
 public class MainFrame extends JFrame implements ActionListener{
-
-	/**
-	 * default version id
-	 */
 	private static final long serialVersionUID = 1L;
 	
 	//menus and submenus
@@ -52,7 +48,14 @@ public class MainFrame extends JFrame implements ActionListener{
 	//filters
 	private JMenuItem openImage, saveImg, grayScale, sobelEdge,
 				sharpImg, blurImg, rotate180, rotate90, pixelateImg, cropImg,
-				invertImg, denoiseImg, colorRemover, copyAndDrawImg, drawingPage;
+				invertImg, denoiseImg, colorRemover, copyAndDrawImg, plainDrawingPage, pixelDrawingPage;
+	
+	//blend modes
+	//To read more about blend mode go to text_files -> BlendModes.txt
+	//or wikipedia page https://en.wikipedia.org/wiki/Blend_Modes
+	private JMenu blendModes;
+	private JMenuItem multiplyBmode, addBmode, subtractBmode;
+	
 	private JMenuBar menuBar;
 
 	//shapes
@@ -102,6 +105,10 @@ public class MainFrame extends JFrame implements ActionListener{
 		noiseSubMenu = new JMenu("Noise");
 		shapesSubMenu = new JMenu("Shapes");
 		
+		//different blend modes
+		blendModes = new JMenu("Blend");
+		this.initBlendModes();
+		
 		//main menu items
 		file = new JMenu("File");
 		edit = new JMenu("Edit");
@@ -111,8 +118,9 @@ public class MainFrame extends JFrame implements ActionListener{
 		//file properties
 		saveImg = new JMenuItem("Save");
 		openImage = new JMenuItem("Open");
-		drawingPage = new JMenuItem("New Page");
-		
+		plainDrawingPage = new JMenuItem("New Page");
+		pixelDrawingPage = new JMenuItem("New Pixel Page");
+
 		//filter properties
 		grayScale = new JMenuItem("B&W");
 		sobelEdge = new JMenuItem("Edge Highlight");
@@ -137,7 +145,8 @@ public class MainFrame extends JFrame implements ActionListener{
 		editSubMenu.add(rotate180);
 		editSubMenu.add(rotate90);
 		//file sub menu
-		fileSubMenu.add(drawingPage);
+		fileSubMenu.add(plainDrawingPage);
+		fileSubMenu.add(pixelDrawingPage);
 		//noise sub menu
 		noiseSubMenu.add(denoiseImg);
 		//shapes sub menu
@@ -161,6 +170,7 @@ public class MainFrame extends JFrame implements ActionListener{
 		filter.add(sharpImg);
 		filter.add(pixelateImg);
 		filter.add(invertImg);
+		filter.add(blendModes);
 		//extras option
 		extras.add(shapesSubMenu);
 		extras.add(colorRemover);
@@ -189,10 +199,20 @@ public class MainFrame extends JFrame implements ActionListener{
 		
 
 	}
+	
+	private void initBlendModes() {
+		multiplyBmode = new JMenuItem("Multiply");
+		addBmode = new JMenuItem("Add");
+		subtractBmode = new JMenuItem("Difference");
+		blendModes.add(multiplyBmode);
+		blendModes.add(addBmode);
+		blendModes.add(subtractBmode);
+	}
 
+	//applying click event to every JMenuItem
 	private void events(){
 		openImage.addActionListener(this);
-		drawingPage.addActionListener(this);
+		plainDrawingPage.addActionListener(this);
 		grayScale.addActionListener(this);
 		rotate90.addActionListener(this);
 		saveImg.addActionListener(this);
@@ -206,6 +226,7 @@ public class MainFrame extends JFrame implements ActionListener{
 		denoiseImg.addActionListener(this);
 		colorRemover.addActionListener(this);
 		copyAndDrawImg.addActionListener(this);
+		pixelDrawingPage.addActionListener(this);
 	}
 	
 	//adding all required panels to frame
@@ -227,14 +248,8 @@ public class MainFrame extends JFrame implements ActionListener{
 	public void actionPerformed(ActionEvent action) {
 		
 		//new page in the editingPanel
-		if(action.getSource() == drawingPage) {
-			
-			//removing pre existing panel from frame to add new
-			//this.removeExistingPanel(action);
-			//panel
-			//where user can draw paintings
-			//this.editingPanel.add(drawPanel, BorderLayout.CENTER);
-			//this.add(editingPanel, BorderLayout.CENTER);
+		if(action.getSource() == plainDrawingPage) {
+			//panel where user can draw
 			new NewDrawingPanelSetup(this.mainPanel);
 			this.revalidate();
 		}
@@ -386,6 +401,16 @@ public class MainFrame extends JFrame implements ActionListener{
 			new CopyImgPixelsDg(this.choosenImage);	
 		}
 		
+		//pixel drawing panel using PikselPainter Library
+		else if(action.getSource() == this.pixelDrawingPage) {
+			if(this.choosenImage == null) {
+				this.noImgSelectedDialog();
+				return;
+			}
+			this.mainPanel.add(new PPInternalWindow(300, 300, "Pixel Drawing"));
+			this.mainPanel.repaint();
+		}
+		
 		//choosing image from pc
 		else if(action.getSource() == this.openImage) {
 			//img chooser which returns choosen file using JFileChooser class
@@ -401,7 +426,7 @@ public class MainFrame extends JFrame implements ActionListener{
 						
 						if(img.getWidth() > 600) {
 							choosenImage = resizingImage(choosenImage);
-							impanel = new ImageView(choosenImage, choosenImgName);
+							impanel = new ImageView(choosenImage, choosenImgName, true, true);
 							removeExistingPanel(action);
 							setImageOnLabel(impanel);
 						}
@@ -443,12 +468,9 @@ public class MainFrame extends JFrame implements ActionListener{
 	
 	//removing existing panel before adding new
 	private void removeExistingPanel(ActionEvent e) {
-		//new AccessoriesRemover(this.editingPanel);
-		//finally removing the editing panel
-		//this.remove(this.editingPanel);
 		//removing image info panel
 		//only while opening new image
-		if(e.getSource() == this.openImage || e.getSource() == this.drawingPage) {
+		if(e.getSource() == this.openImage || e.getSource() == this.plainDrawingPage) {
 			new AccessoriesRemover(filterPanel);
 			this.remove(this.filterPanel);
 		}

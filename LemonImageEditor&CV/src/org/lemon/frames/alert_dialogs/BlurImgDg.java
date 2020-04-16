@@ -3,17 +3,19 @@ package org.lemon.frames.alert_dialogs;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.lemon.accessories.AccessoriesRemover;
 import org.lemon.filters.BlurImg;
-import org.lemon.frames.ImageView;
+import org.lemon.image.ImageView;
+import org.rampcv.utils.Tools;
 
 public class BlurImgDg extends JFrame implements ChangeListener {
 
@@ -22,14 +24,17 @@ public class BlurImgDg extends JFrame implements ChangeListener {
 	private JPanel imgPanel;
 	private JPanel editPanel;
 	private JSlider slider;
-	private BufferedImage img;
+	private BufferedImage img, original;
+	private ImageView imgView;
 	
 	//constructor
 	public BlurImgDg(BufferedImage img) {
 		this.init(img);
 		this.img = img;
+		this.original = img;
+		
 		//frame properties
-		setSize(600, 600);
+		setSize(img.getWidth() + 50, img.getHeight() + 100);
 		setDefaultCloseOperation(BlurImgDg.DISPOSE_ON_CLOSE);
 		setResizable(false);
 		setTitle("Blur");
@@ -38,6 +43,11 @@ public class BlurImgDg extends JFrame implements ChangeListener {
 		Container c = this.getContentPane();
 		c.add(this.imgPanel, BorderLayout.CENTER);
 		c.add(this.editPanel, BorderLayout.SOUTH);
+		
+	}
+	
+	public static void main(String[] args) throws IOException {
+		new BlurImgDg(ImageIO.read(new File("C:\\Users\\Ramesh\\Desktop\\opencv\\flow.jpg")));
 	}
 	
 	//init components
@@ -54,15 +64,17 @@ public class BlurImgDg extends JFrame implements ChangeListener {
 		
 		this.editPanel.add(slider);
 		try {
-			this.imgPanel.add(new ImageView(img));
+			this.imgView = new ImageView(img, false);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		this.imgPanel.add(this.imgView);
 	}
 
 	@Override
 	public void stateChanged(ChangeEvent e) {
-		new Thread(new BlurringThread(this.slider.getValue())).start();;
+		if(e.getSource() == this.slider)
+			new Thread(new BlurringThread(this.slider.getValue())).start();
 	}
 
 	//thread helper class
@@ -75,15 +87,17 @@ public class BlurImgDg extends JFrame implements ChangeListener {
 		@Override
 		public void run() {
 			//removes existing image from img panel and add new blurred img
-			new AccessoriesRemover(imgPanel);
+			img = Tools.copyImage(original);
+			imgPanel.remove(imgView);
 			BlurImg bimg = new BlurImg(img, i);
 			img = bimg.getBlurredImg();
-			
 			try {
-				imgPanel.add(new ImageView(img));
+				imgView = new ImageView(img, false);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			imgPanel.add(imgView);
+			revalidate();
 		}
 		
 	}

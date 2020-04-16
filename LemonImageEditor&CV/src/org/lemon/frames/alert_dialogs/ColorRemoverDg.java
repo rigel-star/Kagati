@@ -15,7 +15,7 @@ import javax.swing.JTextField;
 
 import org.lemon.accessories.AccessoriesRemover;
 import org.lemon.colors.ColorRemover;
-import org.lemon.frames.ImageView;
+import org.lemon.image.ImageView;
 
 public class ColorRemoverDg extends JFrame implements ActionListener {
 
