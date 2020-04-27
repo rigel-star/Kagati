@@ -21,8 +21,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import org.lemon.accessories.AccessoriesRemover;
-import org.lemon.copy.CopyImgPixelsDg;
 import org.lemon.drawing.NewDrawingPanelSetup;
 import org.lemon.edge.SobelEdge;
 import org.lemon.filters.GrayScale;
@@ -41,6 +39,7 @@ import org.lemon.image.ImageInfoPanel;
 import org.lemon.image.ImageOpacityPanel;
 import org.lemon.image.ImagePanel;
 import org.lemon.image.ImagePanel.PanelMode;
+import org.lemon.utils.AccessoriesRemover;
 import org.lemon.image.ImageView;
 import org.lemon.image.ResizeImg;
 import org.piksel.piksel.PPInternalWindow;
@@ -54,7 +53,7 @@ public class MainFrame extends JFrame implements ActionListener {
 	//filters
 	private JMenuItem 			openImage, saveImg, grayScale, sobelEdge,
 				sharpImg, blurImg, rotate180, rotate90, pixelateImg, cropImg,
-				invertImg, denoiseImg, colorRemover, grabCutImg, imgOpacity, plainDrawingPage, pixelDrawingPage;
+				invertImg, denoiseImg, colorRemover, imgOpacity, plainDrawingPage, pixelDrawingPage;
 	
 	
 	//blend modes
@@ -155,7 +154,6 @@ public class MainFrame extends JFrame implements ActionListener {
 		blurImg = new JMenuItem("Blur");
 		denoiseImg = new JMenuItem("Denoise");
 		colorRemover = new JMenuItem("Smart Color Remover");
-		grabCutImg = new JMenuItem("Grab Cut");
 		imgOpacity = new JMenuItem("Opacity");
 		
 		//main menu bar
@@ -181,7 +179,6 @@ public class MainFrame extends JFrame implements ActionListener {
 		edit.add(cropImg);
 		edit.add(noiseSubMenu);
 		edit.add(imgOpacity);
-		edit.add(grabCutImg);
 		//filter options
 		filter.add(grayScale);
 		filter.add(sobelEdge);
@@ -246,7 +243,6 @@ public class MainFrame extends JFrame implements ActionListener {
 		invertImg.addActionListener(this);
 		denoiseImg.addActionListener(this);
 		colorRemover.addActionListener(this);
-		grabCutImg.addActionListener(this);
 		pixelDrawingPage.addActionListener(this);
 	}
 	
@@ -389,10 +385,6 @@ public class MainFrame extends JFrame implements ActionListener {
 			new ColorRemoverDg(this.choosenImage);	
 		}
 		
-		//drawing or copying image pixels on another image
-		else if(action.getSource() == this.grabCutImg) {
-			new CopyImgPixelsDg(this.choosenImage);	
-		}
 		
 		//pixel drawing panel using PikselPainter Library
 		else if(action.getSource() == this.pixelDrawingPage) {
@@ -424,6 +416,7 @@ public class MainFrame extends JFrame implements ActionListener {
 						revalidate();
 						mainPanel.refresh();
 						mainPanel.revalidate();
+						
 						/*Add new ImageView and BufferedImage to storage*/
 						selectedImgsStorage.put(impanel, choosenImage);
 					} catch (IOException e1) {

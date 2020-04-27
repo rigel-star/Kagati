@@ -10,17 +10,25 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.border.Border;
 
+import org.lemon.copy.SharePixelsDg;
 import org.lemon.image.ImagePanel.PanelMode;
 import org.lemon.tools.BrushToolOptions;
+import org.lemon.utils.ConnectionManager;
+
+import application.MainBackgroundPane;
 
 public class ImageView extends JInternalFrame {
 
@@ -34,7 +42,11 @@ public class ImageView extends JInternalFrame {
 	private BufferedImage 	src;
 	private String 			title = null;
 	private boolean 		close;
-	private List<String> 	conOptions = new ArrayList<String>();
+	
+	/*Connections for this imageview*/
+	private Map<String, ImageView> connections = new HashMap<String, ImageView>();
+	private List<String> 	conOptionsTitles = new ArrayList<String>();
+	private List<ImageView> conOptionsViews = new ArrayList<ImageView>();
 	
 	/*Note image can't be null*/
 	public ImageView(BufferedImage img) throws IOException {
@@ -110,15 +122,44 @@ public class ImageView extends JInternalFrame {
 	public void initOptionsMenu() {
 		this.pMenu = new JPopupMenu("Options");
 		
-		JMenu connect = new JMenu("Connect with...");
-		JMenuItem brushes = new JMenuItem("Brushes...");
-		JMenuItem options = new JMenuItem("Options...");
-		JMenuItem delete = new JMenuItem("Delete...");
+		var connect = new JMenu("Connect with...");
+		var brushes = new JMenuItem("Brushes...");
+		var options = new JMenu("Options...");
+		var delete = new JMenuItem("Delete...");
+		
+		
+		/*editing options after connection*/
+		initEditingOptions(options);
 		
 		/*For each connection option*/
-		for(int i=0; i<getConOptions().size(); i++) {
-			connect.add(getConOptions().get(i));
+		for(int i=0; i<getConOptionsTitles().size(); i++) {
+			var st = this.conOptionsTitles.get(i);
+			var item = new JCheckBoxMenuItem(st);
+			connect.add(item);
+			//connect.setComponentZOrder(item, i);
 		}
+		
+		
+		/*On connect items click*/
+		for(int i=0;i<connect.getItemCount(); i++) {
+			JCheckBoxMenuItem item = (JCheckBoxMenuItem) connect.getItem(i);
+			item.addActionListener(action -> {
+				
+				if(getConnection() != null) {
+					JOptionPane.showMessageDialog(self, "Already in connection");
+					return;
+				}
+				
+				String itemTitle = item.getText();
+				connection = connections.get(itemTitle);
+				if(setConnection(connection)) {
+					options.setEnabled(true);
+					createConnection(self, connection);
+				}
+				revalidate();
+			});
+		}
+		
 		
 		
 		/*If only this ImageView is connected with another component, set options enabled.*/
@@ -148,6 +189,30 @@ public class ImageView extends JInternalFrame {
 
 	
 	
+	/*Editing options, those will be available after connection*/
+	private void initEditingOptions(JMenu menu) {
+		var blend = new JMenuItem("Blend");
+		var sharePix = new JMenuItem("Share Pixels");
+		
+		sharePix.addActionListener(action -> {
+			new SharePixelsDg(self.getImage(), connection.getImage());
+		});
+		
+		menu.add(blend);
+		menu.add(sharePix);
+	}
+	
+	
+	/**
+	 * Creates connection between two components
+	 * */
+	private void createConnection(ImageView start, ImageView end) {
+		MainBackgroundPane parent = (MainBackgroundPane) getParent();
+		parent.makeConnection(new ConnectionManager.Pair(start, end));
+		parent.revalidate();
+	}
+	
+	
 	/**
 	 * Connect two ImageView to share data.<p>
 	 * @param {{@code ImageView} to connect with
@@ -174,8 +239,15 @@ public class ImageView extends JInternalFrame {
 	 * Set connection options for this ImageView.
 	 * @param {{@code List<String>}  of options
 	 * */
-	public void setConOptions(List<String> options) {
-		this.conOptions = options;
+	public void setConOptions(List<String> optionsTitle, List<ImageView> views) {
+		connections.clear();
+		this.conOptionsTitles = optionsTitle;
+		this.conOptionsViews = views;
+		
+		for(int i=0; i<views.size(); i++) {
+			connections.put(optionsTitle.get(i), views.get(i));
+		}
+		
 		this.initOptionsMenu();
 	}
 	
@@ -183,8 +255,13 @@ public class ImageView extends JInternalFrame {
 	/**
 	 * Get all the available connections for this ImageView.
 	 * */
-	public List<String> getConOptions() {
-		return this.conOptions;
+	public List<String> getConOptionsTitles() {
+		return this.conOptionsTitles;
+	}
+	
+	
+	public List<ImageView> getConOptionsViews(){
+		return this.conOptionsViews;
 	}
 	
 	
@@ -195,7 +272,7 @@ public class ImageView extends JInternalFrame {
 	public void setImagePanel(ImagePanel imgPan) {
 		this.imgPan.setImage(imgPan.getImage());
 		this.imgPan.setPanelMode(imgPan.getPanelMode());
-		repaint();
+		revalidate();
 	}
 	
 	
@@ -240,6 +317,8 @@ public class ImageView extends JInternalFrame {
 		}
 		
 	}
+	
+	
 }
 
 
