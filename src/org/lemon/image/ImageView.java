@@ -1,8 +1,10 @@
 package org.lemon.image;
 
+import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
@@ -30,6 +32,13 @@ import org.lemon.utils.ConnectionManager;
 
 import application.MainBackgroundPane;
 
+/**
+ * ImageView is for holding image opened by user in application. 
+ * ImageView has one main feature, connection. Connection is basically for connecting 
+ * two ImageViews. If two views connected, they can be blended, edited, etc. together.
+ * */
+
+
 public class ImageView extends JInternalFrame {
 
 	private static final long serialVersionUID = 1L;
@@ -44,9 +53,9 @@ public class ImageView extends JInternalFrame {
 	private boolean 		close;
 	
 	/*Connections for this imageview*/
-	private Map<String, ImageView> connections = new HashMap<String, ImageView>();
-	private List<String> 	conOptionsTitles = new ArrayList<String>();
-	private List<ImageView> conOptionsViews = new ArrayList<ImageView>();
+	private Map<String, ImageView> 	connections = new HashMap<String, ImageView>();
+	private List<String> 			conOptionsTitles = new ArrayList<String>();
+	private List<ImageView> 		conOptionsViews = new ArrayList<ImageView>();
 	
 	/*Note image can't be null*/
 	public ImageView(BufferedImage img) throws IOException {
@@ -135,7 +144,9 @@ public class ImageView extends JInternalFrame {
 		for(int i=0; i<getConOptionsTitles().size(); i++) {
 			var st = this.conOptionsTitles.get(i);
 			var item = new JCheckBoxMenuItem(st);
-			connect.add(item);
+			
+			if(getConOptionsViews().get(i) != self)
+				connect.add(item);
 			//connect.setComponentZOrder(item, i);
 		}
 		
@@ -198,13 +209,20 @@ public class ImageView extends JInternalFrame {
 			new SharePixelsDg(self.getImage(), connection.getImage());
 		});
 		
+		blend.addActionListener(action -> {
+			blend(self.getImage(), connection.getImage());
+			self.revalidate();
+		});
+		
 		menu.add(blend);
 		menu.add(sharePix);
 	}
 	
 	
 	/**
-	 * Creates connection between two components
+	 * draws connection between self and connection.
+	 * <p>
+	 * Parent is always {@code MainBackgroundPane} of {@code ImageView}.
 	 * */
 	private void createConnection(ImageView start, ImageView end) {
 		MainBackgroundPane parent = (MainBackgroundPane) getParent();
@@ -213,9 +231,18 @@ public class ImageView extends JInternalFrame {
 	}
 	
 	
+	/*TESTING*/
+	private void blend(BufferedImage src, BufferedImage target) {
+		Graphics2D g = src.createGraphics();
+		g.setComposite(AlphaComposite.SrcOver.derive(0.5f));
+		g.drawImage(target, 0, 0, null);
+		g.dispose();
+	}
+	
+	
 	/**
 	 * Connect two ImageView to share data.<p>
-	 * @param {{@code ImageView} to connect with
+	 * @param {@code ImageView} to connect with
 	 * @return {@code false} if connectTo is null else {@code true}.
 	 * */
 	public boolean setConnection(ImageView connectTo) {

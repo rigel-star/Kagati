@@ -90,7 +90,7 @@ public class ImagePanel extends JLabel implements MouseMotionListener {
 				
 		Border border = BorderFactory.createLineBorder(Color.GRAY, 1);
 		setBorder(border);
-		setSize(400, 400);
+		setSize(img.getWidth(), img.getHeight());
 		
 		setIcon(new ImageIcon(img));
 		setBackground(Color.WHITE);

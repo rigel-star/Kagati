@@ -5,7 +5,6 @@ import java.awt.Color;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
-import javax.swing.SpringLayout;
 import javax.swing.border.Border;
 
 public class ImageAnalyzeMenu extends JPanel {
@@ -23,9 +22,6 @@ public class ImageAnalyzeMenu extends JPanel {
 		
 		setLayout(layout);
 		setBorder(layoutBorder);
-		
-		SpringLayout sp = new SpringLayout();
-		//setLayout(sp);
 		
 
 	}
