@@ -28,15 +28,15 @@ import org.lemon.filters.RotateImg;
 import org.lemon.filters.SharpImg;
 import org.lemon.frames.ImageAnalyzeMenu;
 import org.lemon.frames.ToolPanel;
-import org.lemon.frames.alert_dialogs.BlurImgDg;
-import org.lemon.frames.alert_dialogs.ColorRemoverDg;
-import org.lemon.frames.alert_dialogs.DenoiseImgDg;
-import org.lemon.frames.alert_dialogs.ImageCropDg;
-import org.lemon.frames.alert_dialogs.InvertColorDg;
-import org.lemon.frames.alert_dialogs.PixelateImgDg;
+import org.lemon.frames.alert_dialogs.BlurImageDialog;
+import org.lemon.frames.alert_dialogs.ColorRemoverDialog;
+import org.lemon.frames.alert_dialogs.DenoiseImageDialog;
+import org.lemon.frames.alert_dialogs.CropImageDialog;
+import org.lemon.frames.alert_dialogs.NegativeImageDialog;
+import org.lemon.frames.alert_dialogs.PixelateImageDialog;
 import org.lemon.image.ChooseImage;
 import org.lemon.image.ImageInfoPanel;
-import org.lemon.image.ImageOpacityPanel;
+import org.lemon.image.ImageOpacityController;
 import org.lemon.image.ImagePanel;
 import org.lemon.image.ImagePanel.PanelMode;
 import org.lemon.utils.AccessoriesRemover;
@@ -52,8 +52,8 @@ public class MainFrame extends JFrame implements ActionListener {
 	
 	//filters
 	private JMenuItem 			openImage, saveImg, grayScale, sobelEdge,
-				sharpImg, blurImg, rotate180, rotate90, pixelateImg, cropImg,
-				invertImg, denoiseImg, colorRemover, imgOpacity, plainDrawingPage, pixelDrawingPage;
+								sharpImg, blurImg, rotate180, rotate90, pixelateImg, cropImg,
+								invertImg, denoiseImg, colorRemover, imgOpacity, plainDrawingPage, pixelDrawingPage;
 	
 	
 	//blend modes
@@ -87,7 +87,7 @@ public class MainFrame extends JFrame implements ActionListener {
 	Color 						choosenColor = new Color(0, 255, 0);
 	
 	//image controllers and analyze panels
-	private ImageOpacityPanel 	opacityPanel;
+	private ImageOpacityController 	opacityPanel;
 	private ImageInfoPanel 		imgInfoPanel;
 	private ImageView 			imageView;
 	
@@ -109,12 +109,12 @@ public class MainFrame extends JFrame implements ActionListener {
 		this.choosenImgName = f.getName();
 		
 		/*important panels in app*/
-		this.mainPanel = new MainBackgroundPane(choosenImage, this.choosenImgName);
+		this.mainPanel = new MainBackgroundPane();
 		this.mainToolPanel = new ToolPanel(mainPanel);
 		
 		this.imageView = new ImageView(this.choosenImage, this.choosenImgName, true, PanelMode.SNAP_MODE);
 		this.imgInfoPanel = new ImageInfoPanel(this.choosenImage);
-		this.opacityPanel = new ImageOpacityPanel(this.choosenImage, imageView);
+		this.opacityPanel = new ImageOpacityController(this.choosenImage);
 		
 		//analyze panel properties
 		analyzeMenu = new ImageAnalyzeMenu();
@@ -321,7 +321,7 @@ public class MainFrame extends JFrame implements ActionListener {
 		//blurring the image
 		else if(action.getSource() == this.blurImg) {
 			this.removeExistingPanel(action);
-			new BlurImgDg(this.choosenImage);
+			new BlurImageDialog(this.choosenImage);
 		}
 		
 		//gray scaling the image
@@ -355,7 +355,7 @@ public class MainFrame extends JFrame implements ActionListener {
 			if(this.mainPanel.getSelectedFrame() instanceof ImageView) {
 				/*Gets the currently selected ImageView object from selectedImgsStorage 
 				 * and pass its corresponding selected image*/
-				new PixelateImgDg(this.selectedImgsStorage.get(this.mainPanel.getSelectedFrame()));
+				new PixelateImageDialog(this.selectedImgsStorage.get(this.mainPanel.getSelectedFrame()));
 				return;
 			}
 			else
@@ -365,24 +365,24 @@ public class MainFrame extends JFrame implements ActionListener {
 		//cropping image dialog
 		else if(action.getSource() == this.cropImg) {
 			if(this.mainPanel.getSelectedFrame() instanceof ImageView) {
-				new ImageCropDg(this.selectedImgsStorage.get(this.mainPanel.getSelectedFrame()), this.editingPanel);
+				new CropImageDialog(this.selectedImgsStorage.get(this.mainPanel.getSelectedFrame()), this.editingPanel);
 			}
 			else
 				JOptionPane.showMessageDialog(this, "Please choose image panel");
 		}
 		
 		else if(action.getSource() == this.invertImg) {
-			new InvertColorDg(this.choosenImage, this.editingPanel);
+			new NegativeImageDialog(this.choosenImage, this.editingPanel);
 		}
 		
-		//brighting the image
+		//removing noise from image
 		else if(action.getSource() == this.denoiseImg) {
-			new DenoiseImgDg(this.choosenImage);
+			new DenoiseImageDialog(this.imageView, this.choosenImage);
 		}
 		
 		//removing color of image using simple AI
 		else if(action.getSource() == this.colorRemover) {
-			new ColorRemoverDg(this.choosenImage);	
+			new ColorRemoverDialog(this.choosenImage);
 		}
 		
 		
@@ -410,7 +410,6 @@ public class MainFrame extends JFrame implements ActionListener {
 						}
 						
 						impanel = new ImageView(img, choosenImgName, true, ImagePanel.CANVAS_MODE);
-						removeExistingPanel(action);
 						addNewImageView(impanel);
 						
 						revalidate();
@@ -433,7 +432,6 @@ public class MainFrame extends JFrame implements ActionListener {
 	private void addNewImageView(ImageView impanel) {
 		this.mainPanel.add(impanel);
 		this.analyzeMenu.add(new ImageInfoPanel(this.choosenImage), BorderLayout.CENTER);
-		this.add(this.analyzeMenu, BorderLayout.EAST);
 	}
 	
 	//resizing image
