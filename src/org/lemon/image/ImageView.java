@@ -28,9 +28,6 @@ import javax.swing.border.Border;
 import org.lemon.copy.SharePixelsDg;
 import org.lemon.image.ImagePanel.PanelMode;
 import org.lemon.tools.BrushToolOptions;
-import org.lemon.utils.ConnectionManager;
-
-import application.MainBackgroundPane;
 
 /**
  * ImageView is for holding image opened by user in application. 
@@ -165,7 +162,6 @@ public class ImageView extends JInternalFrame {
 				connection = connections.get(itemTitle);
 				if(setConnection(connection)) {
 					options.setEnabled(true);
-					createConnection(self, connection);
 				}
 				revalidate();
 			});
@@ -219,17 +215,6 @@ public class ImageView extends JInternalFrame {
 	}
 	
 	
-	/**
-	 * draws connection between self and connection.
-	 * <p>
-	 * Parent is always {@code MainBackgroundPane} of {@code ImageView}.
-	 * */
-	private void createConnection(ImageView start, ImageView end) {
-		MainBackgroundPane parent = (MainBackgroundPane) getParent();
-		parent.makeConnection(new ConnectionManager.Pair(start, end));
-		parent.revalidate();
-	}
-	
 	
 	/*TESTING*/
 	private void blend(BufferedImage src, BufferedImage target) {
@@ -248,6 +233,7 @@ public class ImageView extends JInternalFrame {
 	public boolean setConnection(ImageView connectTo) {
 		if(connectTo == null)
 			return false;	
+		/*set this imageviews connection*/
 		this.connection = connectTo;
 		return true;
 	}
