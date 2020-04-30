@@ -1,44 +1,38 @@
 package org.lemon.image;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 
-import javax.swing.JInternalFrame;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSlider;
+import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.lemon.filters.Opacity;
 
 public class ImageOpacityController extends JPanel implements ChangeListener {
 	private static final long serialVersionUID = 1L;
 	
-	private JSlider opacity;
+	private JTextField opacity;
 	
 	private BufferedImage img;
 	
 	public ImageOpacityController(BufferedImage img) {
 		this.img = img;
 		
-		this.opacity = new JSlider(JSlider.HORIZONTAL, 0, 10, 10);
-		this.opacity.setPaintTicks(true);
-		this.opacity.setMajorTickSpacing(1);
-		this.opacity.setPaintLabels(true);
-		this.opacity.setSize(150, 20);
-		this.opacity.addChangeListener(this);
+		this.opacity = new JTextField("100%");
 		
-		setLayout(new BorderLayout());
+		setBackground(Color.white);
 		
-		JInternalFrame iframe = new JInternalFrame("Opacity", true);
-		iframe.setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
-		iframe.setLayout(new BorderLayout());
-		iframe.setVisible(true);
-		iframe.setBackground(Color.white);
-		iframe.add(this.opacity, BorderLayout.NORTH);
+		Box box = new Box(BoxLayout.X_AXIS);
+		box.add(new JLabel("Opacity"));
+		box.add(this.opacity);
 		
-		add(iframe);
+		add(box);
+		
+		//add(iframe);
 		
 	}
 	
@@ -59,11 +53,7 @@ public class ImageOpacityController extends JPanel implements ChangeListener {
 
 	@Override
 	public void stateChanged(ChangeEvent e) {
-		if(e.getSource() == this.opacity) {
-			double op = (double) this.opacity.getValue() / 10.0;
-			System.out.println("from opacity slider: " + op);
-			new Opacity(img, (float) op);
-		}
+		
 	}
 	
 }
