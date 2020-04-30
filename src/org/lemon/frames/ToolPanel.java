@@ -8,7 +8,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 
-import application.MainBackgroundPane;
+import application.MainApplicationScene;
 
 
 public class ToolPanel extends JPanel {
@@ -24,11 +24,11 @@ public class ToolPanel extends JPanel {
 		this(null, null, null);
 	}
 	
-	public ToolPanel(MainBackgroundPane parent) {
+	public ToolPanel(MainApplicationScene parent) {
 		this(parent, null, null);
 	}
 	
-	public ToolPanel (MainBackgroundPane parent, Component tar, Color col) {
+	public ToolPanel (MainApplicationScene parent, Component tar, Color col) {
 		
 		if(tar != null)
 			target = tar;

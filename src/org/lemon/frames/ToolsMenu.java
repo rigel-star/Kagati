@@ -19,7 +19,7 @@ import org.lemon.image.ImagePanel.PanelMode;
 import org.lemon.image.ImageView;
 import org.piksel.piksel.PPInternalWindow;
 
-import application.MainBackgroundPane;
+import application.MainApplicationScene;
 
 
 public class ToolsMenu extends JInternalFrame implements ActionListener{
@@ -34,14 +34,14 @@ public class ToolsMenu extends JInternalFrame implements ActionListener{
 	JPanel right;
 	
 	private Component 		target;
-	MainBackgroundPane 		parent;
+	MainApplicationScene 		parent;
 	
 	/**
 	 * Tools menu for editing all sorts of canvas on application.
 	 * <p>
 	 * Only ImageView for now.
 	 * */
-	public ToolsMenu(MainBackgroundPane parent, Color col) {
+	public ToolsMenu(MainApplicationScene parent, Color col) {
 		
 		//this.col = col;
 		this.parent = parent;
