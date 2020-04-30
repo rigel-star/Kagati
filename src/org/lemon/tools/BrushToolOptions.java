@@ -5,6 +5,7 @@ import java.awt.Color;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
 import javax.swing.JWindow;
@@ -18,10 +19,13 @@ public class BrushToolOptions extends JWindow {
 	JLabel msg = new JLabel("Size");
 	JSlider sl;
 	
-	public BrushToolOptions(ImageView parent, int x, int y) {
+	public BrushToolOptions(JComponent container, int x, int y) {
 		
-		/*last param is for getting current penSize of panel*/
-		sl = new JSlider(JSlider.HORIZONTAL, 0, 10, parent.getImagePanel().getCanvasModeListener().getPenSize());
+		if(container == null)
+			return;
+		
+		//init slider as per container type
+		this.initSlider(container);
 		
 		setSize(200, 100);
 		setLocation(x, y);
@@ -41,11 +45,28 @@ public class BrushToolOptions extends JWindow {
 		
 		ok.addActionListener(action -> {
 			int size = Integer.valueOf(sl.getValue());
-			parent.getImagePanel().getCanvasModeListener().setPenSize(size);
-			parent.revalidate();
-			System.out.println(size);
-			dispose();
+			
+			if(container instanceof ImageView) {
+				ifImageView(container, size);
+			}
+			
 		});
 	}
+	
+	
+	private void initSlider(JComponent comp){
+		if(comp instanceof ImageView)
+			/*last param is for getting current penSize of panel*/
+			sl = new JSlider(JSlider.HORIZONTAL, 0, 10, ((ImageView) comp).getImagePanel().getCanvasModeListener().getPenSize()); 
+	}
+	
+	
+	private void ifImageView(JComponent comp, int size) {
+		ImageView view = (ImageView) comp;
+		view.getImagePanel().getCanvasModeListener().setPenSize(size);
+		view.revalidate();
+		dispose();
+	}
+	
 	
 }
