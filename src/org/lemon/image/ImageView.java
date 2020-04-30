@@ -3,6 +3,7 @@ package org.lemon.image;
 import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.MouseInfo;
@@ -30,23 +31,27 @@ import org.lemon.image.ImagePanel.PanelMode;
 import org.lemon.tools.BrushToolOptions;
 
 /**
+ * Parent of ImageView is always MainBackgroundPane class. 
  * ImageView is for holding image opened by user in application. 
  * ImageView has one main feature, connection. Connection is basically for connecting 
  * two ImageViews. If two views connected, they can be blended, edited, etc. together.
  * */
 
-
-public class ImageView extends JInternalFrame {
-
+public class ImageView extends JInternalFrame implements Cloneable {
 	private static final long serialVersionUID = 1L;
 	
 	private ImageView 		connection;
+	
 	private ImageView 		self = this;
+	
 	private JPopupMenu 		pMenu;
 	
 	private ImagePanel 		imgPan = null;
+	
 	private BufferedImage 	src;
+	
 	private String 			title = null;
+	
 	private boolean 		close;
 	
 	/*Connections for this imageview*/
@@ -90,7 +95,7 @@ public class ImageView extends JInternalFrame {
 	}
 	
 	
-	public ImageView(BufferedImage img, String title, boolean closeable, int panelMode) throws IOException {
+	public ImageView(BufferedImage img, String title, boolean closeable, int panelMode)  {
         
 		if(img == null)
 			throw new NullPointerException("Image can't be null.");
@@ -131,6 +136,7 @@ public class ImageView extends JInternalFrame {
 		var connect = new JMenu("Connect with...");
 		var brushes = new JMenuItem("Brushes...");
 		var options = new JMenu("Options...");
+		var duplicate = new JMenuItem("Duplicate...");
 		var delete = new JMenuItem("Delete...");
 		
 		
@@ -188,9 +194,21 @@ public class ImageView extends JInternalFrame {
 			dispose();
 		});
 		
+		
+		/*Duplicate*/
+		duplicate.addActionListener(action -> {
+			try {
+				getParent().add((Component) self.clone());
+			} catch (CloneNotSupportedException e) {
+				e.printStackTrace();
+			}
+		});
+		
+		
 		this.pMenu.add(connect);
 		this.pMenu.add(brushes);
 		this.pMenu.add(options);
+		this.pMenu.add(duplicate);
 		this.pMenu.add(delete);
 	}
 
@@ -225,8 +243,21 @@ public class ImageView extends JInternalFrame {
 	}
 	
 	
+	/*
+	 * Duplicates itself :D
+	 * Simply returning super.clone() was causing duplicate not to move from one place to another.
+	 * So, have to take this approach of making new ImageView object.
+	 * */
+	@Override
+	protected Object clone() throws CloneNotSupportedException {
+		ImageView duplicate = new ImageView(getImage(), getTitle(), getCloseableState(), getImagePanel().getPanelMode());
+		return duplicate;
+	}
+	
+	
+	
 	/**
-	 * Connect two ImageView to share data.<p>
+	 * Connect two ImageView.<p>
 	 * @param {@code ImageView} to connect with
 	 * @return {@code false} if connectTo is null else {@code true}.
 	 * */
@@ -266,13 +297,18 @@ public class ImageView extends JInternalFrame {
 	
 	
 	/**
-	 * Get all the available connections for this ImageView.
+	 * Get all the available connections titles for this ImageView.
+	 * @return list of connections titles
 	 * */
 	public List<String> getConOptionsTitles() {
 		return this.conOptionsTitles;
 	}
 	
 	
+	/**
+	 * Get all the available connections of this {@code ImageView}.
+	 * @return list of available ImageViews to connect with.
+	 * */
 	public List<ImageView> getConOptionsViews(){
 		return this.conOptionsViews;
 	}
