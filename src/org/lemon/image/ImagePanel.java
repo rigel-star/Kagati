@@ -20,24 +20,6 @@ public class ImagePanel extends JLabel implements MouseMotionListener {
 	
 	private static final long serialVersionUID = 1L;
 	
-	//flags
-	//default state
-	public static final int 	DEFAULT_MODE = 0;
-		
-	//for canvas on image
-	public static final int 	CANVAS_MODE = 1;
-	
-	//for snapping tool on image
-	public static final int 	SNAP_MODE = 2;
-	
-	//for drawing shapes in image
-	public static final int 	SHAPES_MODE = 3;
-	
-	public static final int 	defaultMode = DEFAULT_MODE;
-	public static final int 	canvasMode = CANVAS_MODE;
-	public static final int 	snapMode = SNAP_MODE;
-	public static final int 	shapesMode = SHAPES_MODE;
-	
 	private BufferedImage img;
 	private int panelMode;
 	
@@ -48,7 +30,6 @@ public class ImagePanel extends JLabel implements MouseMotionListener {
 	
 	//default constructor
 	public ImagePanel() {}
-	
 	
 	
 	/**
