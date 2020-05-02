@@ -78,7 +78,7 @@ public class MainApplicationFrame extends JFrame implements ActionListener {
 	private ImageAnalyzeMenu 	analyzeMenu;
 	
 	//main editing panel
-	private MainApplicationScene 	mainPanel;
+	private MainApplicationScene 	mainAppScene;
 	
 	//image panel
 	//where user can edit his/her photos
@@ -112,8 +112,8 @@ public class MainApplicationFrame extends JFrame implements ActionListener {
 		this.choosenImgName = f.getName();
 		
 		/*important panels in app*/
-		this.mainPanel = new MainApplicationScene();
-		this.mainToolPanel = new ToolPanel(mainPanel);
+		this.mainAppScene = new MainApplicationScene();
+		this.mainToolPanel = new ToolPanel(mainAppScene);
 		this.mainToolBar = new MainToolBar();
 		
 		this.imageView = new ImageView(this.choosenImage, this.choosenImgName, true, PanelMode.CANVAS_MODE);
@@ -255,13 +255,13 @@ public class MainApplicationFrame extends JFrame implements ActionListener {
 		Container c = this.getContentPane();
 		
 		/***********************************TESTING**************************************/
-		this.mainPanel.add(this.imageView);
+		this.mainAppScene.add(this.imageView);
 		this.analyzeMenu.add(this.imgInfoPanel);
 		this.analyzeMenu.add(this.opacityPanel);
 		/*************************************************************************/
 		
 		c.add(this.mainToolBar, BorderLayout.NORTH);
-		c.add(this.mainPanel, BorderLayout.CENTER);
+		c.add(this.mainAppScene, BorderLayout.CENTER);
 		c.add(this.analyzeMenu, BorderLayout.EAST);
 		c.add(this.mainToolPanel, BorderLayout.WEST);
 		
@@ -279,7 +279,7 @@ public class MainApplicationFrame extends JFrame implements ActionListener {
 		//new page in the editingPanel
 		if(action.getSource() == plainDrawingPage) {
 			//panel where user can draw
-			new NewDrawingPanelSetup(this.mainPanel);
+			new NewDrawingPanelSetup(this.mainAppScene);
 			this.revalidate();
 		}
 		
@@ -357,10 +357,10 @@ public class MainApplicationFrame extends JFrame implements ActionListener {
 		else if(action.getSource() == this.pixelateImg) {
 			this.removeExistingPanel(action);
 			//if only ImageView frame selected
-			if(this.mainPanel.getSelectedFrame() instanceof ImageView) {
+			if(this.mainAppScene.getSelectedFrame() instanceof ImageView) {
 				/*Gets the currently selected ImageView object from selectedImgsStorage 
 				 * and pass its corresponding selected image*/
-				new PixelateImageDialog(this.selectedImgsStorage.get(this.mainPanel.getSelectedFrame()));
+				new PixelateImageDialog(this.selectedImgsStorage.get(this.mainAppScene.getSelectedFrame()));
 				return;
 			}
 			else
@@ -369,8 +369,8 @@ public class MainApplicationFrame extends JFrame implements ActionListener {
 		
 		//cropping image dialog
 		else if(action.getSource() == this.cropImg) {
-			if(this.mainPanel.getSelectedFrame() instanceof ImageView) {
-				new CropImageDialog(this.selectedImgsStorage.get(this.mainPanel.getSelectedFrame()), this.editingPanel);
+			if(this.mainAppScene.getSelectedFrame() instanceof ImageView) {
+				new CropImageDialog(this.selectedImgsStorage.get(this.mainAppScene.getSelectedFrame()), this.editingPanel);
 			}
 			else
 				JOptionPane.showMessageDialog(this, "Please choose image panel");
@@ -393,8 +393,8 @@ public class MainApplicationFrame extends JFrame implements ActionListener {
 		
 		//pixel drawing panel using PikselPainter Library
 		else if(action.getSource() == this.pixelDrawingPage) {
-			this.mainPanel.add(new PPInternalWindow(300, 300, "Pixel Drawing"));
-			this.mainPanel.repaint();
+			this.mainAppScene.add(new PPInternalWindow(300, 300, "Pixel Drawing"));
+			this.mainAppScene.repaint();
 		}
 		
 		//choosing image from pc
@@ -418,8 +418,8 @@ public class MainApplicationFrame extends JFrame implements ActionListener {
 					addNewImageView(impanel);
 					
 					revalidate();
-					mainPanel.refresh();
-					mainPanel.revalidate();
+					mainAppScene.refresh();
+					mainAppScene.revalidate();
 					
 					/*Add new ImageView and BufferedImage to storage*/
 					selectedImgsStorage.put(impanel, choosenImage);
@@ -431,9 +431,29 @@ public class MainApplicationFrame extends JFrame implements ActionListener {
 		
 	}
 	
+	
+	/**
+	 * Get the main scene of application. Main scene of application is handled by main frame of application.
+	 * @return mainScene {@code MainApplicationScene}
+	 * */
+	public MainApplicationScene getMainScene() {
+		return this.mainAppScene;
+	}
+	
+	
+	
+	/**
+	 * Get main tool bar of application. Main tool bar of application is also handled by main frame.
+	 * @return mainToolBar {@code MainToolBar}
+	 * */
+	public MainToolBar getMainToolBar() {
+		return this.mainToolBar;
+	}
+	
+	
 	//setting image on label
 	private void addNewImageView(ImageView impanel) {
-		this.mainPanel.add(impanel);
+		this.mainAppScene.add(impanel);
 		this.analyzeMenu.add(new ImageInfoPanel(this.choosenImage), BorderLayout.CENTER);
 	}
 	
