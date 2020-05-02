@@ -29,6 +29,7 @@ import javax.swing.border.Border;
 import org.lemon.copy.SharePixelsDg;
 import org.lemon.image.ImagePanel.PanelMode;
 import org.lemon.tools.BrushToolOptions;
+import org.rampcv.utils.Tools;
 
 /**
  * Parent of ImageView is always MainBackgroundPane class. 
@@ -218,6 +219,7 @@ public class ImageView extends JInternalFrame implements Cloneable {
 	private void initEditingOptions(JMenu menu) {
 		var blend = new JMenuItem("Blend");
 		var sharePix = new JMenuItem("Share Pixels");
+		var disconnect = new JMenuItem("Disconnect");
 		
 		sharePix.addActionListener(action -> {
 			new SharePixelsDg(self.getImage(), connection.getImage());
@@ -228,6 +230,13 @@ public class ImageView extends JInternalFrame implements Cloneable {
 			self.revalidate();
 		});
 		
+		disconnect.addActionListener(action -> {
+			setConnection(null);
+			getParent().revalidate();
+			this.revalidate();
+		});
+		
+		menu.add(disconnect);
 		menu.add(blend);
 		menu.add(sharePix);
 	}
@@ -250,7 +259,8 @@ public class ImageView extends JInternalFrame implements Cloneable {
 	 * */
 	@Override
 	protected Object clone() throws CloneNotSupportedException {
-		ImageView duplicate = new ImageView(getImage(), getTitle(), getCloseableState(), getImagePanel().getPanelMode());
+		var newImg = Tools.copyImage(getImage());
+		ImageView duplicate = new ImageView(newImg, getTitle(), getCloseableState(), getImagePanel().getPanelMode());
 		return duplicate;
 	}
 	
@@ -262,8 +272,6 @@ public class ImageView extends JInternalFrame implements Cloneable {
 	 * @return {@code false} if connectTo is null else {@code true}.
 	 * */
 	public boolean setConnection(ImageView connectTo) {
-		if(connectTo == null)
-			return false;	
 		/*set this imageviews connection*/
 		this.connection = connectTo;
 		return true;
