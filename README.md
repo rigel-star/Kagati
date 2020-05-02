@@ -2,6 +2,8 @@
 Image editing software with some Smart Tools.
 Mini version of photoshop :D
 
+-> A work in progress by RigelStar.
+
 # Libs used
 1. RampCV
 2. PikselPainter
