@@ -4,7 +4,7 @@ import java.awt.Component;
 
 import javax.swing.JPanel;
 
-import org.lemon.image.ImageView;
+import org.lemon.gui.image.LemonImageView;
 
 public class AccessoriesRemover {
 
@@ -17,7 +17,7 @@ public class AccessoriesRemover {
 		}
 	}
 	
-	public AccessoriesRemover(ImageView panel) {
+	public AccessoriesRemover(LemonImageView panel) {
 		Component[] comps = panel.getComponents();
 		
 		//deleting all components attached to editing panel

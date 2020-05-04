@@ -3,6 +3,8 @@ package application;
 import java.io.IOException;
 
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+
 
 /**
  * @author Ramesh Poudel
@@ -17,10 +19,12 @@ public class MainApplication {
 			
 			@Override
 			public void run() {
+				
 				try {
+					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 					new MainApplicationFrame();
-				} catch (IOException e) {
-					e.printStackTrace();
+				} catch (Exception ex3) {
+					ex3.printStackTrace();
 				}	
 			}
 		});

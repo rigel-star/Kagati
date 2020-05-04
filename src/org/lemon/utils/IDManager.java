@@ -19,6 +19,12 @@ public class IDManager {
 	private NavigableMap<Integer, JComponent> idStorage = new TreeMap<Integer, JComponent>();
 	
 	
+	
+	public IDManager() {
+		
+	}
+	
+	
 	/**
 	 * Add new ID for new component.
 	 * */

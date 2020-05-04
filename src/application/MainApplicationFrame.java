@@ -21,28 +21,28 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import org.lemon.drawing.NewDrawingPanelSetup;
-import org.lemon.edge.SobelEdge;
-import org.lemon.filters.GrayScale;
-import org.lemon.filters.RotateImg;
-import org.lemon.filters.SharpImg;
-import org.lemon.frames.ImageAnalyzeMenu;
-import org.lemon.frames.MainToolBar;
-import org.lemon.frames.ToolPanel;
-import org.lemon.frames.alert_dialogs.BlurImageDialog;
-import org.lemon.frames.alert_dialogs.ColorRemoverDialog;
-import org.lemon.frames.alert_dialogs.DenoiseImageDialog;
-import org.lemon.frames.alert_dialogs.CropImageDialog;
-import org.lemon.frames.alert_dialogs.NegativeImageDialog;
-import org.lemon.frames.alert_dialogs.PixelateImageDialog;
-import org.lemon.image.ChooseImage;
-import org.lemon.image.ImageInfoPanel;
-import org.lemon.image.ImageOpacityController;
-import org.lemon.image.ImagePanel;
-import org.lemon.image.ImagePanel.PanelMode;
+import org.lemon.filters.basic_filters.GrayScale;
+import org.lemon.filters.basic_filters.ResizeImage;
+import org.lemon.filters.basic_filters.RotateImage;
+import org.lemon.filters.basic_filters.SharpImage;
+import org.lemon.filters.edges.SobelEdge;
+import org.lemon.gui.dialogs.BlurImageDialog;
+import org.lemon.gui.dialogs.ColorRemoverDialog;
+import org.lemon.gui.dialogs.CropImageDialog;
+import org.lemon.gui.dialogs.DenoiseImageDialog;
+import org.lemon.gui.dialogs.NegativeImageDialog;
+import org.lemon.gui.dialogs.PixelateImageDialog;
+import org.lemon.gui.drawing.NewDrawingPanelSetup;
+import org.lemon.gui.image.ChooseImage;
+import org.lemon.gui.image.ImageInfoPanel;
+import org.lemon.gui.image.ImagePanel;
+import org.lemon.gui.image.LemonImageView;
+import org.lemon.gui.image.ImagePanel.PanelMode;
+import org.lemon.gui.panels.ImageAnalyzeMenu;
+import org.lemon.gui.panels.LemonToolBar;
+import org.lemon.gui.panels.OpacityControlPanel;
+import org.lemon.gui.panels.LemonToolPanel;
 import org.lemon.utils.AccessoriesRemover;
-import org.lemon.image.ImageView;
-import org.lemon.image.ResizeImg;
 import org.piksel.piksel.PPInternalWindow;
 
 public class MainApplicationFrame extends JFrame implements ActionListener {
@@ -82,27 +82,27 @@ public class MainApplicationFrame extends JFrame implements ActionListener {
 	
 	//image panel
 	//where user can edit his/her photos
-	private ImageView 			impanel = null;
+	private LemonImageView 			impanel = null;
 	
 	//default color
 	Color 						choosenColor = new Color(0, 255, 0);
 	
 	//image controllers and analyze panels
-	private ImageOpacityController 	opacityPanel;
+	private OpacityControlPanel 	opacityPanel;
 	private ImageInfoPanel 		imgInfoPanel;
-	private ImageView 			imageView;
+	private LemonImageView 			imageView;
 	
 	/*All tools container*/
-	private ToolPanel 			mainToolPanel;
+	private LemonToolPanel 			mainToolPanel;
 	
-	private MainToolBar			mainToolBar;
+	private LemonToolBar			mainToolBar;
 	
 	/*
 	 * Map<ImageView, BufferedImage> selectedImgsStorage = new HashMap<>();
 	 * Stores currently opened images of mainPanel with their corresponding ImageView object.
 	 * When applying any filter, program needs to know which image is selected currently.
 	 * */
-	private Map<ImageView, BufferedImage> selectedImgsStorage = new HashMap<>();
+	private Map<LemonImageView, BufferedImage> selectedImgsStorage = new HashMap<>();
 	
 	public MainApplicationFrame() throws IOException {
 		
@@ -113,12 +113,12 @@ public class MainApplicationFrame extends JFrame implements ActionListener {
 		
 		/*important panels in app*/
 		this.mainAppScene = new MainApplicationScene();
-		this.mainToolPanel = new ToolPanel(mainAppScene);
-		this.mainToolBar = new MainToolBar();
+		this.mainToolPanel = new LemonToolPanel(mainAppScene);
+		this.mainToolBar = new LemonToolBar();
 		
-		this.imageView = new ImageView(this.choosenImage, this.choosenImgName, true, PanelMode.CANVAS_MODE);
+		this.imageView = new LemonImageView(this.choosenImage, this.choosenImgName, true, PanelMode.CANVAS_MODE);
 		this.imgInfoPanel = new ImageInfoPanel(this.choosenImage);
-		this.opacityPanel = new ImageOpacityController(this.choosenImage);
+		this.opacityPanel = new OpacityControlPanel(this.choosenImage);
 		
 		//analyze panel properties
 		analyzeMenu = new ImageAnalyzeMenu();
@@ -146,8 +146,8 @@ public class MainApplicationFrame extends JFrame implements ActionListener {
 
 		//filter properties
 		grayScale = new JMenuItem("B&W");
-		sobelEdge = new JMenuItem("Edge Highlight");
-		sharpImg = new JMenuItem("Sharp Img");
+		sobelEdge = new JMenuItem("Find Edges");
+		sharpImg = new JMenuItem("Sharp");
 		pixelateImg = new JMenuItem("Pixelate");
 		invertImg = new JMenuItem("Invert");
 		
@@ -288,7 +288,7 @@ public class MainApplicationFrame extends JFrame implements ActionListener {
 			this.removeExistingPanel(action);
 			
 			try {
-				this.editingPanel.add(new ImageView(new RotateImg(180, choosenImage).getRotatedImg(), this.choosenImgName));
+				this.editingPanel.add(new LemonImageView(new RotateImage(180, choosenImage).getRotatedImg(), this.choosenImgName));
 				this.add(this.editingPanel, BorderLayout.CENTER);
 				this.revalidate();
 			} catch (IOException e1) {
@@ -300,7 +300,7 @@ public class MainApplicationFrame extends JFrame implements ActionListener {
 		else if(action.getSource() == rotate90) {
 			this.removeExistingPanel(action);
 			try {
-				this.editingPanel.add(new ImageView(new RotateImg(90, choosenImage).getRotatedImg(), this.choosenImgName));
+				this.editingPanel.add(new LemonImageView(new RotateImage(90, choosenImage).getRotatedImg(), this.choosenImgName));
 				this.add(this.editingPanel, BorderLayout.CENTER);
 				this.revalidate();
 			} catch (IOException e1) {
@@ -312,8 +312,8 @@ public class MainApplicationFrame extends JFrame implements ActionListener {
 		else if(action.getSource() == this.sharpImg) {
 			this.removeExistingPanel(action);
 			try {
-				SharpImg simg = new SharpImg(this.choosenImage);
-				this.editingPanel.add(new ImageView(simg.getSharpedImg(), this.choosenImgName));
+				SharpImage simg = new SharpImage(this.choosenImage);
+				this.editingPanel.add(new LemonImageView(simg.getSharpedImg(), this.choosenImgName));
 				this.choosenImage = simg.getSharpedImg();
 			} catch (IOException e1) {
 				e1.printStackTrace();
@@ -333,7 +333,7 @@ public class MainApplicationFrame extends JFrame implements ActionListener {
 		else if(action.getSource() == this.grayScale) {
 			this.removeExistingPanel(action);
 			try {
-				this.editingPanel.add(new ImageView(new GrayScale(this.choosenImage).getGrayScaledImg(), this.choosenImgName));
+				this.editingPanel.add(new LemonImageView(new GrayScale(this.choosenImage).getGrayScaledImg(), this.choosenImgName));
 				this.add(editingPanel, BorderLayout.CENTER);
 			} catch (IOException e1) {
 				e1.printStackTrace();
@@ -346,7 +346,7 @@ public class MainApplicationFrame extends JFrame implements ActionListener {
 		else if(action.getSource() == this.sobelEdge) {
 			this.removeExistingPanel(action);
 			try {
-				this.editingPanel.add(new ImageView(new SobelEdge(this.choosenImage).getFinalImg(), this.choosenImgName));
+				this.editingPanel.add(new LemonImageView(new SobelEdge(this.choosenImage).getFinalImg(), this.choosenImgName));
 				this.add(editingPanel, BorderLayout.CENTER);
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -357,7 +357,7 @@ public class MainApplicationFrame extends JFrame implements ActionListener {
 		else if(action.getSource() == this.pixelateImg) {
 			this.removeExistingPanel(action);
 			//if only ImageView frame selected
-			if(this.mainAppScene.getSelectedFrame() instanceof ImageView) {
+			if(this.mainAppScene.getSelectedFrame() instanceof LemonImageView) {
 				/*Gets the currently selected ImageView object from selectedImgsStorage 
 				 * and pass its corresponding selected image*/
 				new PixelateImageDialog(this.selectedImgsStorage.get(this.mainAppScene.getSelectedFrame()));
@@ -369,7 +369,7 @@ public class MainApplicationFrame extends JFrame implements ActionListener {
 		
 		//cropping image dialog
 		else if(action.getSource() == this.cropImg) {
-			if(this.mainAppScene.getSelectedFrame() instanceof ImageView) {
+			if(this.mainAppScene.getSelectedFrame() instanceof LemonImageView) {
 				new CropImageDialog(this.selectedImgsStorage.get(this.mainAppScene.getSelectedFrame()), this.editingPanel);
 			}
 			else
@@ -414,7 +414,7 @@ public class MainApplicationFrame extends JFrame implements ActionListener {
 						choosenImage = resizeImage(choosenImage);
 					}
 					
-					impanel = new ImageView(img, choosenImgName, true, ImagePanel.CANVAS_MODE);
+					impanel = new LemonImageView(img, choosenImgName, true, ImagePanel.CANVAS_MODE);
 					addNewImageView(impanel);
 					
 					revalidate();
@@ -446,13 +446,13 @@ public class MainApplicationFrame extends JFrame implements ActionListener {
 	 * Get main tool bar of application. Main tool bar of application is also handled by main frame.
 	 * @return mainToolBar {@code MainToolBar}
 	 * */
-	public MainToolBar getMainToolBar() {
+	public LemonToolBar getMainToolBar() {
 		return this.mainToolBar;
 	}
 	
 	
 	//setting image on label
-	private void addNewImageView(ImageView impanel) {
+	private void addNewImageView(LemonImageView impanel) {
 		this.mainAppScene.add(impanel);
 		this.analyzeMenu.add(new ImageInfoPanel(this.choosenImage), BorderLayout.CENTER);
 	}
@@ -460,13 +460,12 @@ public class MainApplicationFrame extends JFrame implements ActionListener {
 	
 	/*resizing image*/
 	private BufferedImage resizeImage(BufferedImage img) {
-		var rimg = new ResizeImg(img, 0.7f);
+		var rimg = new ResizeImage(img, 0.7f);
 		return rimg.getScaledImage();
 	}
 	
 	
-	
-	/*if image is selected, this dialog will pop up*/
+	/*if image is not selected, this dialog will pop up*/
 	private void noImgSelectedDialog() {
 		JOptionPane.showMessageDialog(this, "No image selected!");
 	}
