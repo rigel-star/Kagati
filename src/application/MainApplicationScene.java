@@ -15,7 +15,7 @@ import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 
-import org.lemon.gui.image.LemonImageView;
+import org.lemon.gui.image.ImageView;
 import org.lemon.math.Vec2d;
 import org.lemon.utils.Pair;
 
@@ -44,21 +44,21 @@ public class MainApplicationScene extends JDesktopPane implements ComponentListe
 	 * */
 	public void refresh() {
 		
-		List<LemonImageView> views = new ArrayList<LemonImageView>();
+		List<ImageView> views = new ArrayList<ImageView>();
 		List<String> titles = new ArrayList<String>();
 		
 		for(Component c: getComponents()) {
-			if(c instanceof LemonImageView) {
+			if(c instanceof ImageView) {
 				
-				LemonImageView view = (LemonImageView) c;
+				ImageView view = (ImageView) c;
 				
 				view.addComponentListener(this);
-				views.add((LemonImageView) view);
-				titles.add(((LemonImageView) view).getTitle());
+				views.add((ImageView) view);
+				titles.add(((ImageView) view).getTitle());
 			}
 		}
 		
-		for(LemonImageView v: views) {
+		for(ImageView v: views) {
 			v.setConOptions(titles, views);
 		}
 		
@@ -70,8 +70,8 @@ public class MainApplicationScene extends JDesktopPane implements ComponentListe
 		super.paint(g);
 		
 		for(Component c: getComponents()) {
-			if(c instanceof LemonImageView) {
-				LemonImageView view = (LemonImageView) c;
+			if(c instanceof ImageView) {
+				ImageView view = (ImageView) c;
 				if(view.getConnection() != null) {
 					draw(g, new Pair(view, view.getConnection()));
 				}
