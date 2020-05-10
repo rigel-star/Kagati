@@ -28,7 +28,7 @@ import org.lemon.gui.dialogs.ColorRemoverDialog;
 import org.lemon.gui.dialogs.DenoiseImageDialog;
 import org.lemon.gui.dialogs.NegativeImageDialog;
 import org.lemon.gui.dialogs.PixelateImageDialog;
-import org.lemon.gui.drawing.NewDrawingPanelSetup;
+import org.lemon.gui.drawing.plain_canvas.NewDrawingPanelSetup;
 import org.lemon.gui.image.ImageInfoPanel;
 import org.lemon.gui.image.ImageView;
 import org.lemon.gui.image.ImagePanel.PanelMode;
@@ -100,6 +100,7 @@ public class MainApplicationFrame extends JFrame implements ActionListener {
 	 * When applying any filter, program needs to know which image is selected currently.
 	 * */
 	private Map<ImageView, BufferedImage> selectedImgsStorage = new HashMap<>();
+	
 	
 	public MainApplicationFrame() throws IOException {
 		
@@ -232,6 +233,7 @@ public class MainApplicationFrame extends JFrame implements ActionListener {
 		
 		/***********************************TESTING**************************************/
 		this.mainAppScene.add(this.imageView);
+		this.selectedImgsStorage.put(imageView, choosenImage);
 		this.analyzeMenu.add(this.imgInfoPanel);
 		this.analyzeMenu.add(this.opacityPanel);
 		/*************************************************************************/
@@ -322,7 +324,10 @@ public class MainApplicationFrame extends JFrame implements ActionListener {
 		
 		//removing color of image using simple AI
 		else if(action.getSource() == this.colorRemover) {
-			new ColorRemoverDialog(this.choosenImage);
+			
+			if(this.mainAppScene.getSelectedFrame() instanceof ImageView) {
+				new ColorRemoverDialog(this.selectedImgsStorage.get(this.mainAppScene.getSelectedFrame()));
+			}
 		}
 		
 		
