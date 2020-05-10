@@ -4,27 +4,24 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.FlowLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
-import javax.imageio.ImageIO;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.JWindow;
 
 import org.lemon.colors.ColorRemover;
 import org.lemon.gui.image.ImagePanel;
-import org.lemon.gui.image.LemonImageView;
+import org.lemon.gui.image.ImagePanel.PanelMode;
 import org.lemon.gui.image.MiniImageView;
 
-public class ColorRemoverDialog extends JFrame implements ActionListener {
+public class ColorRemoverDialog extends JWindow implements ActionListener {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -41,11 +38,10 @@ public class ColorRemoverDialog extends JFrame implements ActionListener {
 	public ColorRemoverDialog(BufferedImage img) {
 		this.img = img;
 		this.init();
+		
 		setSize(img.getWidth() + 100, img.getHeight() + 100);
-		setTitle("Smart Color Remover");
-		setDefaultCloseOperation(ColorRemoverDialog.DISPOSE_ON_CLOSE);
-		setResizable(false);
 		setVisible(true);
+		setLocation(new Point(200, 100));
 		
 		Container c = this.getContentPane();
 		c.add(this.preferredColor, BorderLayout.NORTH);
@@ -57,27 +53,22 @@ public class ColorRemoverDialog extends JFrame implements ActionListener {
 		this.btnPanel.add(this.closeBttn);
 		
 		try {
-			var view = new LemonImageView(img);
+			var pan = new ImagePanel(img, PanelMode.defaultMode);
 			
-			var motion = new RemoverMouseListener();
-			ImagePanel pan = view.getImagePanel();
-			pan.addMouseListener(motion);
-			pan.addMouseMotionListener(motion);
+			var handler = new MouseEventHandler();
+			pan.addMouseListener(handler);
+			new MiniImageView(pan);
 			
-			this.imgPanel.add(view);
+			this.imgPanel.add(pan);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
 	}
 	
-	public static void main(String[] args) throws IOException {
-		new ColorRemoverDialog(ImageIO.read(new File("C:\\Users\\Ramesh\\Desktop\\opencv\\mack.jpg")));
-	}
-	
 	//init widgets
 	private void init() {
-		this.preferredColor = new JTextField("Click on image to remove specific color or type here. eg. 255, 255, 255");
+		this.preferredColor = new JTextField("255, 255, 255");
 		this.imgPanel = new JPanel();
 		this.btnPanel = new JPanel(new FlowLayout());
 		this.okBttn = new JButton("Remove");
@@ -106,15 +97,18 @@ public class ColorRemoverDialog extends JFrame implements ActionListener {
 		public void run() {
 			String[] col = preferredColor.getText().toString().split(",");
 			
-			new ColorRemover(img, new Color(Integer.parseInt(col[0].trim()),
-					Integer.parseInt(col[1].trim()), Integer.parseInt(col[1].trim())));
+			var r = Integer.parseInt(col[0].trim());
+			var g = Integer.parseInt(col[1].trim());
+			var b = Integer.parseInt(col[2].trim());
+			
+			new ColorRemover(img, new Color(r, g, b));
+			
 			imgPanel.repaint();
 		}
 	}
 	
-	/*Class which implements MouseAdapter.
-	 * Helper class for color remover.*/
-	private class RemoverMouseListener extends MouseAdapter {
+	
+	private class MouseEventHandler extends MouseAdapter {
 		
 		@Override
 		public void mouseClicked(MouseEvent e) {
@@ -124,37 +118,14 @@ public class ColorRemoverDialog extends JFrame implements ActionListener {
 			var y = e.getY();
 			
 			var c = new Color(img.getRGB(x, y));
-			var col = String.valueOf(c.getRed() + ", " + c.getGreen() + ", " + c.getBlue());
-			preferredColor.setText(col);
-		}
-		
-		int mx = 0, my = 0;
-		MiniImageView mini = new MiniImageView(img, mx, my, 100, 100);
-		
-		@Override
-		public void mouseMoved(MouseEvent e) {
-			super.mouseMoved(e);
-			
-			//mx = e.getX();
-			//my = e.getY();
-			
-			if(mx != e.getX() && my != e.getY()) {
-				
-				mini.dispose();
-				mini = new MiniImageView(img, e.getX(), e.getY(), 100, 100);
-			}
-			
-			try {
-				TimeUnit.SECONDS.sleep(1 / 2);
-			}
-			catch (InterruptedException ex) {
-				ex.printStackTrace();
-			}
-			finally {
-				mx = e.getX();
-				my = e.getY();
-			}
+			var cStr = String.valueOf(c.getRed() + ", " + c.getGreen() + ", " + c.getBlue());
+			preferredColor.setText(cStr);
 		}
 	}
+	
+	
+	
+	
+	
 	
 }
