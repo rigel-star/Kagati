@@ -1,6 +1,14 @@
 package org.lemon.tools.brush;
 
-public class LemonBrushTool {
+import java.awt.Color;
 
-	public int brushSize = 5;
+public interface LemonBrushTool {
+	
+	public static final int defaultStrokeSize = 5;
+	public static final Color defaultStrokeColor = Color.black;
+	
+	void setStrokeSize(int size);
+	int getStrokeSize();
+	void setColor(Color color);
+	Color getColor();
 }

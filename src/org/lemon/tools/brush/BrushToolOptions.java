@@ -10,7 +10,7 @@ import javax.swing.JLabel;
 import javax.swing.JSlider;
 import javax.swing.JWindow;
 
-import org.lemon.gui.image.LemonImageView;
+import org.lemon.gui.image.ImageView;
 
 public class BrushToolOptions extends JWindow {
 	private static final long serialVersionUID = 1L;
@@ -46,7 +46,7 @@ public class BrushToolOptions extends JWindow {
 		ok.addActionListener(action -> {
 			int size = Integer.valueOf(sl.getValue());
 			
-			if(container instanceof LemonImageView) {
+			if(container instanceof ImageView) {
 				ifImageView(container, size);
 			}
 			
@@ -55,15 +55,16 @@ public class BrushToolOptions extends JWindow {
 	
 	
 	private void initSlider(JComponent comp){
-		if(comp instanceof LemonImageView)
+		if(comp instanceof ImageView)
 			/*last param is for getting current penSize of panel*/
-			sl = new JSlider(JSlider.HORIZONTAL, 0, 10, ((LemonImageView) comp).getImagePanel().getCanvasModeListener().getPenSize()); 
+			sl = new JSlider(JSlider.HORIZONTAL, 0, 10, ((ImageView) comp).
+													getImagePanel().getCanvasModeListener().getBrush().getStrokeSize()); 
 	}
 	
 	
 	private void ifImageView(JComponent comp, int size) {
-		LemonImageView view = (LemonImageView) comp;
-		view.getImagePanel().getCanvasModeListener().setPenSize(size);
+		ImageView view = (ImageView) comp;
+		view.getImagePanel().getCanvasModeListener().getBrush().setStrokeSize(size);
 		view.revalidate();
 		dispose();
 	}
