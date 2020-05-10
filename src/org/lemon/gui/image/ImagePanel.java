@@ -2,6 +2,7 @@ package org.lemon.gui.image;
 
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
@@ -10,7 +11,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.border.Border;
 
-import org.lemon.gui.drawing.DrawingCanvasOnImage;
+import org.lemon.gui.drawing.image.DrawingCanvasOnImage;
 import org.lemon.tools.select.PolygonalSelectTool;
 
 /**
@@ -44,7 +45,12 @@ public class ImagePanel extends JLabel implements MouseMotionListener {
 	
 	/*Different types of mouseListeners*/
 	private DrawingCanvasOnImage dcoi;
-	private PolygonalSelectTool snap;
+	private PolygonalSelectTool polySnap;
+	
+	
+	/*current mouse listener in this panel*/
+	private MouseAdapter currentMouseListsner;
+	
 	
 	//default constructor
 	public ImagePanel() {}
@@ -107,8 +113,9 @@ public class ImagePanel extends JLabel implements MouseMotionListener {
 		
 		case SNAP_MODE: {
 			//snapping mode in image i.e grab area of image
-			snap = new PolygonalSelectTool(img, this);
-			snap.apply();
+			polySnap = new PolygonalSelectTool(img, this);
+			addMouseListener(polySnap);
+			currentMouseListsner = polySnap;
 		}
 		break;
 		
@@ -128,6 +135,23 @@ public class ImagePanel extends JLabel implements MouseMotionListener {
 	 * */
 	public DrawingCanvasOnImage getCanvasModeListener() {
 		return this.dcoi;
+	}
+	
+	
+	/**
+	 * Returns currently applied polygonal select mouse listener if applied else returns {@code null}.
+	 * @return {@code PolygonalSelectionTool} current select tool mouse listener.
+	 * */
+	public MouseAdapter getPolygonalSelectionModeListener() {
+		return this.polySnap;
+	}
+	
+	
+	/**
+	 * @return {@code MouseAdapter} currently applied mouse listener.
+	 * */
+	public MouseAdapter getCurrentMouseListener() {
+		return currentMouseListsner;
 	}
 	
 	

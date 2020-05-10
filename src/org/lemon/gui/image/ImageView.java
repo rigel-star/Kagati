@@ -29,24 +29,28 @@ import org.rampcv.utils.Tools;
 public class ImageView extends JInternalFrame implements Cloneable {
 	private static final long serialVersionUID = 1L;
 	
-	private ImageView 		connection;
+	private ImageView 				connection;
 	
-	private ImageView 		self = this;
+	private ImageView 				self = this;
 	
-	private ImagePanel 		imgPan = null;
+	private ImagePanel 				imgPan = null;
 	
-	private BufferedImage 	src;
+	private BufferedImage 			src;
 	
-	private String 			title = null;
+	private String 					title = null;
 	
-	private boolean 		close;
+	private boolean 				close;
 	
-	private ImageViewMenu	menu;
+	private ImageViewMenu			menu;
 	
 	/*Connections for this imageview*/
 	private Map<String, ImageView> 	connections = new HashMap<String, ImageView>();
 	private List<String> 			conOptionsTitles = new ArrayList<String>();
 	private List<ImageView> 		conOptionsViews = new ArrayList<ImageView>();
+	
+	
+	private MouseEventsHandler 		meh;
+	
 	
 	/*Note image can't be null*/
 	public ImageView(BufferedImage img) throws IOException {
@@ -106,9 +110,14 @@ public class ImageView extends JInternalFrame implements Cloneable {
 		setLayout(new BorderLayout());
 		add(this.imgPan, BorderLayout.CENTER);
 		
-		MouseEventsHandler meh = new MouseEventsHandler();
-		getImagePanel().addMouseListener(meh);
-		getImagePanel().addMouseMotionListener(meh);
+		/* Revalidatng simply re-adds the listeners to this ImageView.
+		 * I'm calling revalidate here even im not revalidating is cause 
+		 * even for the first time i have to first of all add listener
+		 * and if all of the listeners removed from this ImageView, on
+		 * calling this method, again default mouse listeners will be applied.
+		 * BADDDDDDDDD ENGLISSSSSSSSSSHHHHHHHHHH
+		 * */
+		revalidateListeners();
 		
 	}
 	
@@ -123,6 +132,17 @@ public class ImageView extends JInternalFrame implements Cloneable {
 		var newImg = Tools.copyImage(getImage());
 		ImageView duplicate = new ImageView(newImg, getTitle(), getCloseableState(), getImagePanel().getPanelMode());
 		return duplicate;
+	}
+	
+	
+	
+	/**
+	 * Revalidate every listener applied to this ImageView
+	 * */
+	public void revalidateListeners() {
+		meh = new MouseEventsHandler();
+		getImagePanel().addMouseListener(meh);
+		getImagePanel().addMouseMotionListener(meh);
 	}
 	
 	
