@@ -26,13 +26,14 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.lemon.gui.image.ImagePanel;
+import org.rampcv.utils.Tools;
 
 public class SharePixelsDialog extends JWindow implements  MouseMotionListener, ChangeListener, ActionListener {
 
 	private static final long serialVersionUID = 1L;
 
 	//original and copy of image
-	private BufferedImage original, copy;
+	private BufferedImage original, copy, originalsCopy;
 	//main image panels to add all sub image panels
 	private JPanel imgPanel, copyImgPanel, mainPanel;
 	//panels to add buttons
@@ -62,6 +63,14 @@ public class SharePixelsDialog extends JWindow implements  MouseMotionListener, 
 		int w = img.getWidth();
 		this.copy = img2;
 		this.original = img;
+		
+		new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				originalsCopy = Tools.copyImage(copy);
+			}
+		}).start();
 		
 		try {
 			this.init();
@@ -242,6 +251,7 @@ public class SharePixelsDialog extends JWindow implements  MouseMotionListener, 
 			this.dispose();
 		}
 		else if(e.getSource() == this.cnclBttn) {
+			copy = originalsCopy;
 			this.dispose();
 		}
 	}
