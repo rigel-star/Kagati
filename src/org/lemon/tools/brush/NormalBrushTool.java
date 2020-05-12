@@ -1,29 +1,12 @@
 package org.lemon.tools.brush;
 
-import java.awt.Color;
+import java.awt.Graphics2D;
 
-public class NormalBrushTool implements LemonBrushTool {
-
-	@Override
-	public void setStrokeSize(int size) {
-		
-	}
-
-	@Override
-	public int getStrokeSize() {
-		
-		return 0;
-	}
-
-	@Override
-	public void setColor(Color color) {
-		
-	}
-
-	@Override
-	public Color getColor() {
-		
-		return null;
+public class NormalBrushTool extends BrushToolAdapter {
+	
+	
+	public NormalBrushTool(Graphics2D context) {
+		super(context);
 	}
 
 }
