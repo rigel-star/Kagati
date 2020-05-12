@@ -1,13 +1,12 @@
 package org.lemon.gui.drawing.image;
 
-import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 
 import org.lemon.gui.image.ImagePanel;
-import org.lemon.tools.brush.LemonBrushTool;
+import org.lemon.tools.brush.BrushTool;
 import org.lemon.tools.brush.NormalBrushTool;
 
 /**
@@ -18,26 +17,27 @@ import org.lemon.tools.brush.NormalBrushTool;
 public class DrawingCanvasOnImage implements MouseMotionListener{
 	
 	//global
-	private Graphics g2d;
+	private Graphics2D g2d;
 	private ImagePanel ip;
 	
-	private LemonBrushTool brushTool = new NormalBrushTool();
+	private BrushTool brushTool;
 	
 	
 	public DrawingCanvasOnImage(ImagePanel panel) {
 		//assigning globals
 		this.ip = panel;
 		this.g2d = ip.getImage().createGraphics();
+		brushTool = new NormalBrushTool(g2d);
 	}
 	
 	
 	
-	public void setBrush(LemonBrushTool brush) {
+	public void setBrush(BrushTool brush) {
 		this.brushTool = brush;
 	}
 	
 	
-	public LemonBrushTool getBrush() {
+	public BrushTool getBrush() {
 		return brushTool;
 	}
 	
@@ -48,11 +48,10 @@ public class DrawingCanvasOnImage implements MouseMotionListener{
 		var x = e.getX();
 		var y = e.getY();
 		
-		var c = new Color(255, 0, 0);
-		this.g2d.setColor(c);
+		brushTool.setStrokeSize(10);
 		
 		//filling oval of size 10X10 wherever the mouse goes
-		this.g2d.fillOval(x, y, this.brushTool.getStrokeSize(), this.brushTool.getStrokeSize());
+		brushTool.draw(x, y);
 		//this.g2d.dispose();
 		this.ip.repaint();
 		
