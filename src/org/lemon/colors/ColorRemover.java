@@ -3,6 +3,8 @@ package org.lemon.colors;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 
+import org.lemon.math.BasicMath;
+
 public class ColorRemover {
 
 	private Color removeCol;
@@ -32,7 +34,7 @@ public class ColorRemover {
 				
 				currentCol = new Color(this.img.getRGB(x, y));
 				
-				diff = dist(removeCol.getRed(), removeCol.getGreen(), removeCol.getBlue(),
+				diff = BasicMath.dist(removeCol.getRed(), removeCol.getGreen(), removeCol.getBlue(),
 						currentCol.getRed(), currentCol.getGreen(), currentCol.getBlue());
 				
 				if(this.colRange.is(diff).inRange(0, 100)) {
@@ -43,11 +45,6 @@ public class ColorRemover {
 				
 			}
 		}
-	}
-	
-	//euclidian distance of two RGB_color_space
-	static double dist(double r1, double g1, double b1, double r2, double g2, double b2) {	
-		return Math.sqrt(Math.pow((r1-r2), 2) + Math.pow((b1-b2), 2) + Math.pow((g1-g2), 2));
 	}
 	
 }
