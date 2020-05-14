@@ -28,6 +28,7 @@ public class SelectedColorPreview  {
 	}
 	
 	
+	
 	/**
 	 * Add new color to change or remove from image. This method takes {@code Color} as parameter and
 	 * tries to find that color in image in specific range.
@@ -39,6 +40,10 @@ public class SelectedColorPreview  {
 	}
 	
 	
+	
+	/**
+	 * Update the preview with new colors.
+	 * */
 	public boolean updatePreview() {
 		
 		final Range range = new Range();
@@ -70,7 +75,7 @@ public class SelectedColorPreview  {
 					
 					double dist = BasicMath.dist(r1, g1, b1, r2, g2, b2);
 					
-					if(range.is(dist).inRange(0, 100)) {
+					if(range.is(dist).inRange(0, 5)) {
 						preview.setRGB(dx, dy, new Color(255, 255, 255).getRGB());
 					}
 					
@@ -83,12 +88,18 @@ public class SelectedColorPreview  {
 		
 	
 	
+	/**
+	 * Make new preview erasing all previous data.
+	 * */
 	public void remakePreview() {
 		list.clear();
 		preview = Tools.createBlankImageLike(source, BufferedImage.TYPE_3BYTE_BGR);
 	}
 	
 	
+	/**
+	 * Get final rendered preview image.
+	 * */
 	public BufferedImage getRenderedPreview() {
 		return preview;
 	}

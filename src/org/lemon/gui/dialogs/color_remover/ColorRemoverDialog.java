@@ -11,6 +11,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -21,6 +22,7 @@ import org.lemon.colors.ColorRemover;
 import org.lemon.gui.image.ImagePanel;
 import org.lemon.gui.image.ImagePanel.PanelMode;
 import org.lemon.gui.image.MiniImageView;
+import org.rampcv.utils.Tools;
 
 public class ColorRemoverDialog extends JWindow implements ActionListener {
 
@@ -31,7 +33,7 @@ public class ColorRemoverDialog extends JWindow implements ActionListener {
 	private JPanel imgPanel, btnPanel;
 	
 	//ok button
-	private JButton processBttn, removeBttn, closeBttn;
+	private JButton processBttn, removeBttn, remakeBttn, closeBttn;
 	
 	
 	private SelectedColorPreview preview;
@@ -52,17 +54,17 @@ public class ColorRemoverDialog extends JWindow implements ActionListener {
 		
 		this.init();
 		
-		setSize((img.getWidth() * 2) + 100, img.getHeight() + 100);
+		setSize((img.getWidth() * 2) + 250, img.getHeight() + 100);
 		setVisible(true);
 		setLocation(new Point(200, 100));
 		
 		Container c = this.getContentPane();
 		c.add(this.preferredColor, BorderLayout.NORTH);
 		c.add(this.imgPanel);
-		c.add(this.btnPanel, BorderLayout.SOUTH);
+		
 		
 		//adding bttn
-		this.btnPanel.add(this.processBttn);
+		this.btnPanel.add(this.remakeBttn);
 		this.btnPanel.add(this.removeBttn);
 		this.btnPanel.add(this.closeBttn);
 		
@@ -76,8 +78,9 @@ public class ColorRemoverDialog extends JWindow implements ActionListener {
 		new MiniImageView(panelOriginal);
 		
 		this.imgPanel.add(panelOriginal);
+		this.imgPanel.add(processBttn);
 		this.imgPanel.add(panelPreview);
-		
+		this.imgPanel.add(btnPanel);
 	}
 	
 	
@@ -87,15 +90,24 @@ public class ColorRemoverDialog extends JWindow implements ActionListener {
 	private void init() {
 		this.preferredColor = new JLabel("Select color in image and click on process to see preview.");
 		this.imgPanel = new JPanel(new FlowLayout());
-		this.btnPanel = new JPanel(new FlowLayout());
+		
+		this.btnPanel = new JPanel();
+		this.btnPanel.setLayout(new BoxLayout(this.btnPanel, BoxLayout.Y_AXIS));
+		
 		this.removeBttn = new JButton("Remove");
 		this.closeBttn = new JButton("Close");
-		this.processBttn = new JButton("Process");
+		
+		this.processBttn = new JButton();
+		this.processBttn.setIcon(new ImageIcon("icons/process.png"));
+		
+		this.remakeBttn = new JButton();
+		this.remakeBttn.setIcon(new ImageIcon("icons/remake.png"));
+		
+		this.remakeBttn.addActionListener(this);
 		this.removeBttn.addActionListener(this);
 		this.closeBttn.addActionListener(this);
 		this.processBttn.addActionListener(this);
 	}
-
 	
 	
 	
@@ -106,6 +118,11 @@ public class ColorRemoverDialog extends JWindow implements ActionListener {
 			//start remove thread
 			//new Thread(new RemoverThread()).start();
 			
+		}
+		
+		else if(e.getSource() == this.remakeBttn) {
+			imgPreview = Tools.createBlankImageLike(imgOriginal, BufferedImage.TYPE_3BYTE_BGR);
+			panelPreview.setIcon(new ImageIcon(imgPreview));
 		}
 		
 		else if(e.getSource() == this.processBttn) {
