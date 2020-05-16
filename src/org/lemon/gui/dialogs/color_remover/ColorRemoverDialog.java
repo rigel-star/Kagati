@@ -11,6 +11,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -30,10 +31,11 @@ public class ColorRemoverDialog extends JWindow implements ActionListener {
 	
 	//input fields
 	private JLabel preferredColor;
-	private JPanel imgPanel, btnPanel;
+	private JPanel imgPanel, btnPanel, undoRedoBtnPanel;
 	
 	//ok button
 	private JButton processBttn, removeBttn, remakeBttn, closeBttn;
+	private JButton undoBtn, redoBtn;
 	
 	
 	private SelectedColorPreview preview;
@@ -46,22 +48,60 @@ public class ColorRemoverDialog extends JWindow implements ActionListener {
 	
 	
 	public ColorRemoverDialog(BufferedImage img) {
-		
 		this.imgOriginal = img;
 		
-		preview = new SelectedColorPreview(img);
+		this.preview = new SelectedColorPreview(img);
 		this.imgPreview = preview.getRenderedPreview();
+		
+		this.makeOriginalImageCopy();
 		
 		this.init();
 		
 		setSize((img.getWidth() * 2) + 250, img.getHeight() + 100);
 		setVisible(true);
 		setLocation(new Point(200, 100));
+		makeBorder();
 		
 		Container c = this.getContentPane();
 		c.add(this.preferredColor, BorderLayout.NORTH);
-		c.add(this.imgPanel);
+		c.add(this.imgPanel, BorderLayout.CENTER);
+		c.add(this.undoRedoBtnPanel, BorderLayout.SOUTH);
 		
+		addAll();
+		
+	}
+	
+	
+	
+	/**
+	 * Makes copy of original image in new thread
+	 * */
+	private void makeOriginalImageCopy() {
+		new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				imgCopy = Tools.copyImage(imgOriginal);
+			}
+		}).start();
+	}
+	
+	
+	
+	/**
+	 * Making border for this window
+	 * */
+	private void makeBorder() {
+		var b = BorderFactory.createLineBorder(Color.black, 1);
+		this.getRootPane().setBorder(b);
+	}
+	
+	
+	
+	/**
+	 * Adding all components to where it should be
+	 * */
+	private void addAll() {
 		
 		//adding bttn
 		this.btnPanel.add(this.remakeBttn);
@@ -70,7 +110,7 @@ public class ColorRemoverDialog extends JWindow implements ActionListener {
 		
 		
 		var meh = new MouseEventHandler();
-		panelOriginal = new ImagePanel(img, PanelMode.defaultMode);
+		panelOriginal = new ImagePanel(imgOriginal, PanelMode.defaultMode);
 		panelOriginal.addMouseListener(meh);
 		
 		panelPreview = new ImagePanel(imgPreview, PanelMode.DEFAULT_MODE);
@@ -81,8 +121,8 @@ public class ColorRemoverDialog extends JWindow implements ActionListener {
 		this.imgPanel.add(processBttn);
 		this.imgPanel.add(panelPreview);
 		this.imgPanel.add(btnPanel);
+		
 	}
-	
 	
 	
 	
@@ -103,10 +143,18 @@ public class ColorRemoverDialog extends JWindow implements ActionListener {
 		this.remakeBttn = new JButton();
 		this.remakeBttn.setIcon(new ImageIcon("icons/remake.png"));
 		
+		this.undoRedoBtnPanel = new JPanel(new FlowLayout());
+		this.undoBtn = new JButton("Undo");
+		this.redoBtn = new JButton("Redo");
+		this.undoRedoBtnPanel.add(undoBtn);
+		this.undoRedoBtnPanel.add(redoBtn);
+		
 		this.remakeBttn.addActionListener(this);
 		this.removeBttn.addActionListener(this);
 		this.closeBttn.addActionListener(this);
 		this.processBttn.addActionListener(this);
+		this.undoBtn.addActionListener(this);
+		this.redoBtn.addActionListener(this);
 	}
 	
 	
@@ -126,7 +174,25 @@ public class ColorRemoverDialog extends JWindow implements ActionListener {
 		}
 		
 		else if(e.getSource() == this.processBttn) {
-			showPreview();
+			/*stop main thread and start preview process thread.
+			 * making preview takes a lot of time so we have to stop main/UI thread
+			 * for sometime so user can't do other task while processing. Same 
+			 * goes for undo and redo action.
+			 * */
+			try {
+				Thread.sleep(1000);
+				showPreview();
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
+			}
+		}
+		
+		else if(e.getSource() == this.undoBtn) {
+			doUndo();
+		}
+		
+		else if(e.getSource() == this.redoBtn) {
+			doRedo();
 		}
 		
 		else if(e.getSource() == this.closeBttn) {
@@ -136,6 +202,57 @@ public class ColorRemoverDialog extends JWindow implements ActionListener {
 
 	
 	
+	/**Undoing the image edit*/
+	private void doUndo() {
+		/*if undo stack 0, return*/
+		if(preview.getUndoRedoManager().getUndoStack().size() == 0)
+			return;
+
+		preview.getUndoRedoManager().undo();
+		
+		/*creating new blank image to paint undone colors*/
+		imgPreview = Tools.createBlankImageLike(imgOriginal, BufferedImage.TYPE_3BYTE_BGR);
+		preview.setImage(imgPreview);
+		
+		try {
+			Thread.sleep(1000);
+			showPreview();
+			revalidate();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
+	}
+	
+	
+	
+	/**Undoing the image edit*/
+	private void doRedo() {
+		/*if redo stack 0, return*/
+		if(preview.getUndoRedoManager().getRedoStack().size() == 0)
+			return;
+
+		preview.getUndoRedoManager().redo();
+		
+		/*creating new blank image to paint undone colors*/
+		imgPreview = Tools.createBlankImageLike(imgOriginal, BufferedImage.TYPE_3BYTE_BGR);
+		preview.setImage(imgPreview);
+		
+		try {
+			Thread.sleep(1000);
+			showPreview();
+			revalidate();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
+	}
+	
+	
+	
+	/**
+	 * Runs different thread to find all the colors that user have selected and to paint
+	 * on the preview image. Finding all colors in image takes a lot of time so i used different thread.
+	 * WHATEVERRR -_-
+	 * */
 	private void showPreview() {
 		new Thread(new Runnable() {
 			
@@ -188,8 +305,7 @@ public class ColorRemoverDialog extends JWindow implements ActionListener {
 			var color = new Color(imgOriginal.getRGB(x, y));
 			
 			preview.addNewColor(color);
-			
-			System.out.println("X: " + x + "___ Y: " + y);
+			System.out.printf("Adding to stack: %d\n", preview.getUndoRedoManager().getUndoStack().size());
 		}
 		
 	}

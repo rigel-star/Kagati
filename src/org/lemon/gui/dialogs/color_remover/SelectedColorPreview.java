@@ -3,19 +3,19 @@ package org.lemon.gui.dialogs.color_remover;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.lemon.math.BasicMath;
+import org.lemon.utils.UndoRedo;
 import org.rampcv.color.Range;
 import org.rampcv.utils.Tools;
 
 public class SelectedColorPreview  {
-
 	
-	private List<Color> list = new ArrayList<Color>();
 	private BufferedImage preview;
 	private final BufferedImage source;
+	
+	
+	private UndoRedo undoRedoManager = new UndoRedo();
 	
 	
 	public SelectedColorPreview(final BufferedImage src) {
@@ -35,8 +35,7 @@ public class SelectedColorPreview  {
 	 * @param color to find in image
 	 * */
 	public void addNewColor(Color c) {
-		list.add(c);
-		System.out.println("From SelectedColorPreview.class: " + c.getRGB());
+		undoRedoManager.addToUndo(c);
 	}
 	
 	
@@ -48,7 +47,7 @@ public class SelectedColorPreview  {
 		
 		final Range range = new Range();
 		
-			
+		
 		for(int x=0; x<preview.getWidth(); x++) {
 			for(int y=0; y<preview.getHeight(); y++) {
 				
@@ -67,7 +66,12 @@ public class SelectedColorPreview  {
 				int g1 = curr.getGreen();
 				int b1 = curr.getBlue();
 				
-				list.forEach(color -> {
+				
+				/*undo stack stores all the previous colors selected in it so just calling
+				 * the getUndoStack gives all the previous selected colors and we can process it.*/
+				undoRedoManager.getUndoStack().forEach(obj -> {
+					
+					var color = (Color) obj;
 					
 					int r2 = color.getRed();
 					int g2 = color.getGreen();
@@ -80,6 +84,7 @@ public class SelectedColorPreview  {
 					}
 					
 				});
+				
 			}
 		}
 		
@@ -92,7 +97,8 @@ public class SelectedColorPreview  {
 	 * Make new preview erasing all previous data.
 	 * */
 	public void remakePreview() {
-		list.clear();
+		undoRedoManager.getRedoStack().clear();
+		undoRedoManager.getUndoStack().clear();
 		preview = Tools.createBlankImageLike(source, BufferedImage.TYPE_3BYTE_BGR);
 	}
 	
@@ -105,7 +111,19 @@ public class SelectedColorPreview  {
 	}
 	
 	
+	public UndoRedo getUndoRedoManager() {
+		return undoRedoManager;
+	}
 	
+	
+	public void setImage(BufferedImage newImg) {
+		this.preview = newImg;
+	}
+	
+	
+	public BufferedImage getImage() {
+		return source;
+	}
 	
 	
 }
