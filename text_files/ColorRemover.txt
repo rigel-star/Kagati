@@ -1,0 +1,19 @@
+
+Location >>> org.lemon.gui.dialogs.color_remover
+
+
+Color remover is not only for removing color but also to change particular image in image.
+Select any color in image by clicking which you want to remove or change then after that 
+click on process button to see preview which color from which co-ordinate of image is going 
+to be removed or changed. Click on cross to replace current preview image with new image with 
+new data. Click on redo to unselect the last color you selected.
+
+
+Technique >>>
+
+The point where user click on image, store that point's RGB value in stack. And on process button
+click check for every other color in image and calculate euclidean distance between stack colors 
+and other colors from image and if the dist is less than 100 then mark it as user selected color's
+neighbo (Do it for every stack color). And from where dist comes less than 100, mark that point 
+in preview image with white color. Then preview image will show which other colors in the image
+are close to user choosen colors. 
