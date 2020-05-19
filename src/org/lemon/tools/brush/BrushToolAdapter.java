@@ -1,29 +1,35 @@
 package org.lemon.tools.brush;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
-import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
 
 public class BrushToolAdapter implements BrushTool {
 
 	
-	public Stroke stroke = defaultStroke;
 	public Color strokeColor = defaultStrokeColor;
 	public int strokeSize = defaultStrokeSize;
+	public Stroke stroke = new BasicStroke(getStrokeSize());
+	
 	
 	private Graphics2D context;
 	
 	public BrushToolAdapter(Graphics2D context) {
 		this.context = context;
+		
+		if(strokeSize == 0)
+			strokeSize = 1;
+		
 		context.setStroke(getStroke());
 		context.setColor(getStrokeColor());
 	}
 	
 	
 	@Override
-	public void draw(int x, int y) {
-		context.fill(new Ellipse2D.Double(x, y, getStrokeSize(), getStrokeSize()));
+	public void draw(int newX, int newY, int oldX, int oldY) {
+		context.draw(new Line2D.Double(newX, newY, oldX, oldY));
 	}
 	
 	
@@ -45,11 +51,6 @@ public class BrushToolAdapter implements BrushTool {
 	@Override
 	public Color getStrokeColor() {
 		return strokeColor;
-	}
-
-	@Override
-	public void setStroke(Stroke stroke) {
-		this.stroke = stroke;
 	}
 
 	@Override

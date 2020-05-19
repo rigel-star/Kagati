@@ -19,11 +19,9 @@ public interface BrushTool {
 	
 	Color getStrokeColor();
 	
-	void setStroke(Stroke stroke);
-	
 	Stroke getStroke();
 	
-	void draw(int x, int y);
+	void draw(int newX, int newY, int oldX, int oldY);
 	
 	
 	
