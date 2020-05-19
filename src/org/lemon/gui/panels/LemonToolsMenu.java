@@ -25,6 +25,8 @@ public class LemonToolsMenu extends JInternalFrame implements ActionListener{
 
 	private static final long serialVersionUID = 1L;
 	
+	
+	private JButton						pencilTool;
 	private JButton 					brushTool;
 	private JButton 					polySnappingTool;
 	private JButton						cropTool;
@@ -76,9 +78,19 @@ public class LemonToolsMenu extends JInternalFrame implements ActionListener{
 	
 	/*add all buttons (tools) to menu*/
 	private void addAll() {
+		right.add(createPencilTool());
 		right.add(createBrushTool());
 		right.add(createPolySelectTool());
 		right.add(createCropTool());
+	}
+	
+	
+	
+	/*create pencil tool button*/
+	private JButton createPencilTool() {
+		this.pencilTool = new JButton();
+		pencilTool.setIcon(new ImageIcon("icons/tools/pencil.png"));
+		return pencilTool;
 	}
 	
 	
