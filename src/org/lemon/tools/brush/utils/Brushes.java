@@ -6,6 +6,7 @@ import org.lemon.tools.brush.BrushTool;
 import org.lemon.tools.brush.NormalBrushTool;
 import org.lemon.tools.brush.SoftBrushTool;
 import org.lemon.tools.brush.WobbleBrush;
+import org.lemon.tools.brush.ZigzagBrush;
 
 public class Brushes {
 	
@@ -19,5 +20,9 @@ public class Brushes {
 	
 	public static BrushTool createWobbleBrush(Graphics2D context) {
 		return new WobbleBrush(context);
+	}
+	
+	public static BrushTool createZigzagBrush(Graphics2D context) {
+		return new ZigzagBrush(context);
 	}
 }
