@@ -11,8 +11,8 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.lemon.filters.basic_filters.BlurImage;
-import org.lemon.gui.image.LemonImageView;
+import org.lemon.filters.basic.BlurImage;
+import org.lemon.gui.image.ImageView;
 import org.rampcv.utils.Tools;
 
 public class BlurImageDialog extends JFrame implements ChangeListener {
@@ -23,7 +23,7 @@ public class BlurImageDialog extends JFrame implements ChangeListener {
 	private JPanel editPanel;
 	private JSlider slider;
 	private BufferedImage img, original;
-	private LemonImageView imgView;
+	private ImageView imgView;
 	
 	//constructor
 	public BlurImageDialog(BufferedImage img) {
@@ -59,7 +59,7 @@ public class BlurImageDialog extends JFrame implements ChangeListener {
 		
 		this.editPanel.add(slider);
 		try {
-			this.imgView = new LemonImageView(img, false);
+			this.imgView = new ImageView(img, false);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -87,7 +87,7 @@ public class BlurImageDialog extends JFrame implements ChangeListener {
 			BlurImage bimg = new BlurImage(img, i);
 			img = bimg.getBlurredImg();
 			try {
-				imgView = new LemonImageView(img, false);
+				imgView = new ImageView(img, false);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
