@@ -12,7 +12,9 @@ import javax.swing.JLabel;
 import javax.swing.border.Border;
 
 import org.lemon.gui.drawing.image.DrawingCanvasOnImage;
+import org.lemon.tools.select.LassoSelectionTool;
 import org.lemon.tools.select.PolygonalSelectTool;
+import org.lemon.utils.AppGlobalProperties;
 
 /**
  * Class description: This class extends JLabel and takes image as param and apply it as its icon.
@@ -21,35 +23,23 @@ public class ImagePanel extends JLabel implements MouseMotionListener {
 	
 	private static final long serialVersionUID = 1L;
 	
-	//flags
-	//default state
-	public static final int 	DEFAULT_MODE = 0;
-		
-	//for canvas on image
-	public static final int 	CANVAS_MODE = 1;
-	
-	//for snapping tool on image
-	public static final int 	SNAP_MODE = 2;
-	
-	//for drawing shapes in image
-	public static final int 	SHAPES_MODE = 3;
-	
-	public static final int 	defaultMode = DEFAULT_MODE;
-	public static final int 	canvasMode = CANVAS_MODE;
-	public static final int 	snapMode = SNAP_MODE;
-	public static final int 	shapesMode = SHAPES_MODE;
 	
 	private BufferedImage img;
 	private int panelMode;
 	
 	
-	/*Different types of mouseListeners*/
-	private DrawingCanvasOnImage dcoi;
-	private PolygonalSelectTool polySnap;
+	/*Different types of mouseListeners for different tools*/
+	private DrawingCanvasOnImage brushToolListener;
+	private PolygonalSelectTool polySelectionToolListener;
+	private LassoSelectionTool lassoSelectionToolListener;
+	
 	
 	
 	/*current mouse listener in this panel*/
 	private MouseAdapter currentMouseListsner;
+	
+	
+	private AppGlobalProperties agp;
 	
 	
 	//default constructor
@@ -84,12 +74,14 @@ public class ImagePanel extends JLabel implements MouseMotionListener {
 	
 	//if only image is passed as param then by default set canvas false.
 	public ImagePanel(BufferedImage img) {
-		this(img, PanelMode.DEFAULT_MODE);
+		this(img, null, PanelMode.DEFAULT_MODE);
 	}
 	
-	public ImagePanel(BufferedImage img, int panelMode) {
+	
+	public ImagePanel(BufferedImage img, AppGlobalProperties agp, int panelMode) {
 		this.img = img;
 		this.panelMode = panelMode;
+		this.agp = agp;
 		
 		//layout for panel
 		//BoxLayout layout = new BoxLayout(getContentPane(), BoxLayout.Y_AXIS);
@@ -101,25 +93,34 @@ public class ImagePanel extends JLabel implements MouseMotionListener {
 		setIcon(new ImageIcon(img));
 		setBackground(Color.WHITE);
 		
+		initCurrentTool(this.panelMode);
+	}
+	
+	
+	
+	
+	private void initCurrentTool(int tool) {
 		//panelMode switching
-		switch(this.panelMode) {
+		switch(tool) {
 		
-		case CANVAS_MODE: {
+		case PanelMode.CANVAS_MODE: {
 			//canvas mode on image i.e drawing on image
-			dcoi = new DrawingCanvasOnImage(this);
-			addMouseMotionListener(dcoi);
+			brushToolListener = new DrawingCanvasOnImage(this, agp.getGLobalColor());
+			addMouseMotionListener(brushToolListener);
+			addMouseListener(brushToolListener);
 		}
 		break;
 		
-		case SNAP_MODE: {
+		case PanelMode.SNAP_MODE: {
 			//snapping mode in image i.e grab area of image
-			polySnap = new PolygonalSelectTool(img, this);
-			addMouseListener(polySnap);
-			currentMouseListsner = polySnap;
+			polySelectionToolListener = new PolygonalSelectTool(img, this);
+			lassoSelectionToolListener = new LassoSelectionTool(img, this);
+			addMouseListener(lassoSelectionToolListener);
+			addMouseMotionListener(lassoSelectionToolListener);
 		}
 		break;
 		
-		case DEFAULT_MODE: {
+		case PanelMode.DEFAULT_MODE: {
 			//default mode. do nothing
 			addMouseMotionListener(this);
 		}
@@ -129,13 +130,15 @@ public class ImagePanel extends JLabel implements MouseMotionListener {
 	}
 	
 	
+	
 	/**
 	 * Returns currently applied canvas mouse listener if applied else returns {@code null}.
 	 * @return {@code DrawingCanvasOnImage} current canvas mouse listener.
 	 * */
 	public DrawingCanvasOnImage getCanvasModeListener() {
-		return this.dcoi;
+		return this.brushToolListener;
 	}
+	
 	
 	
 	/**
@@ -143,8 +146,9 @@ public class ImagePanel extends JLabel implements MouseMotionListener {
 	 * @return {@code PolygonalSelectionTool} current select tool mouse listener.
 	 * */
 	public MouseAdapter getPolygonalSelectionModeListener() {
-		return this.polySnap;
+		return this.polySelectionToolListener;
 	}
+	
 	
 	
 	/**
@@ -153,6 +157,7 @@ public class ImagePanel extends JLabel implements MouseMotionListener {
 	public MouseAdapter getCurrentMouseListener() {
 		return currentMouseListsner;
 	}
+	
 	
 	
 	/**
@@ -164,6 +169,7 @@ public class ImagePanel extends JLabel implements MouseMotionListener {
 	}
 	
 	
+	
 	/** 
 	 * @return {@code this} {@code ImagePanel} 's panelMode (int).
 	 * */
@@ -172,12 +178,14 @@ public class ImagePanel extends JLabel implements MouseMotionListener {
 	}
 	
 	
+	
 	/**
 	 * @return	Current image which is applied to {@code this} {@code ImagePanel}.
 	 * */
 	public BufferedImage getImage() {
 		return this.img;
 	}
+	
 	
 	
 	/**
@@ -191,7 +199,7 @@ public class ImagePanel extends JLabel implements MouseMotionListener {
 	
 	@Override
 	public String toString() {
-		return "Image info: H=" + this.img.getHeight() + " W=" + this.img.getWidth();
+		return "Image info: H = " + this.img.getHeight() + " W = " + this.img.getWidth();
 	}
 	
 	

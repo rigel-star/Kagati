@@ -62,7 +62,7 @@ public class DenoiseImageDialog extends JWindow implements ChangeListener, Actio
 	
 	private void init(BufferedImage img) {
 		
-		this.impanel = new ImagePanel(img, PanelMode.defaultMode);
+		this.impanel = new ImagePanel(img, null, PanelMode.defaultMode);
 		this.editPanel = new JPanel();
 		this.imgPanel = new JPanel();
 		this.bttnPanel = new JPanel();

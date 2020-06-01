@@ -1,24 +1,34 @@
 package org.lemon.gui.panels;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JColorChooser;
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JToolBar;
 
+import org.lemon.gui.drawing.canvas.DrawingPanel;
 import org.lemon.gui.drawing.image.DrawingCanvasOnImage;
 import org.lemon.gui.image.ImageView;
+import org.lemon.gui.toolbars.BrushToolBar;
+import org.lemon.tools.BrushTool;
+import org.lemon.tools.LemonTool;
+import org.lemon.tools.brush.BrushToolAdapter;
 import org.lemon.tools.select.PolygonalSelectTool;
 
-import application.MainApplicationScene;
+import application.ApplicationFrame;
+import application.Workspace;
 
 
 public class LemonToolsMenu extends JInternalFrame implements ActionListener{
@@ -30,6 +40,7 @@ public class LemonToolsMenu extends JInternalFrame implements ActionListener{
 	private JButton 					brushTool;
 	private JButton 					polySnappingTool;
 	private JButton						cropTool;
+	private JButton						colPickerTool;
 	
 	
 	
@@ -41,18 +52,32 @@ public class LemonToolsMenu extends JInternalFrame implements ActionListener{
 	//panels
 	private JPanel 						right;
 	
-	private Component 					target;
-	MainApplicationScene 				parent;
+	private ApplicationFrame 			parent;
+	private JInternalFrame[]			contexts;
+	
+	
+	/**
+	 * All toolbars of application stored in a list.
+	 * */
+	private Map<JButton, JToolBar> 		toolMap = new HashMap<>();
+	
+	
+	/**
+	 * All tools of application stored in a list.
+	 * */
+	private List<LemonTool> 			tools = new ArrayList<>();
+	
 	
 	/**
 	 * Tools menu for editing all sorts of canvas on application.
 	 * <p>
 	 * Only ImageView for now.
 	 * */
-	public LemonToolsMenu(MainApplicationScene parent, Color col) {
+	public LemonToolsMenu(ApplicationFrame parent) {
 		
 		//this.col = col;
 		this.parent = parent;
+		this.initTools();
 		
 		right = new JPanel();
 		
@@ -69,6 +94,7 @@ public class LemonToolsMenu extends JInternalFrame implements ActionListener{
 		
 		addAll();
 		initListeners();
+		initToolMap();
 		
 		Container c = getContentPane();
 		c.add(right);
@@ -82,8 +108,20 @@ public class LemonToolsMenu extends JInternalFrame implements ActionListener{
 		right.add(createBrushTool());
 		right.add(createPolySelectTool());
 		right.add(createCropTool());
+		right.add(createColorPickerTool());
 	}
 	
+	
+	
+	private void initTools() {
+		tools.add(new BrushToolAdapter());
+	}
+	
+	
+	
+	private void initToolMap() {
+		toolMap.put(brushTool, new BrushToolBar(parent.getGlobalProperties(), null));
+	}
 	
 	
 	/*create pencil tool button*/
@@ -118,10 +156,24 @@ public class LemonToolsMenu extends JInternalFrame implements ActionListener{
 	}
 	
 	
+	/*create color picker tool*/
+	private JButton createColorPickerTool() {
+		this.colPickerTool = new JButton("COLOR");
+		
+		var color = this.parent.getGlobalProperties().getGLobalColor();
+		colPickerTool.setBackground(color);
+		colPickerTool.setForeground(color);
+		
+		return colPickerTool;
+	}
+	
+	
+	
 	/*init all components listeners*/
 	private void initListeners() {
 		this.brushTool.addActionListener(this);
 		this.polySnappingTool.addActionListener(this);
+		this.colPickerTool.addActionListener(this);
 	}
 
 	
@@ -129,46 +181,87 @@ public class LemonToolsMenu extends JInternalFrame implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		
 		ImageView view = null;
-		
-		if(parent == null)
-			return;
-		else {
-			if(parent.getSelectedFrame() != null)
-				target = parent.getSelectedFrame();
-			else {
-				JOptionPane.showMessageDialog(this, "Choose panel to work with");
-				return;
-			}
-		}
+		Workspace workspace = parent.getMainScene();
+		this.contexts = workspace.getAllFrames();
 		
 		if(e.getSource() == this.brushTool) {
-			if(target instanceof ImageView) {
-				view = (ImageView) target;
-				var pan = view.getImagePanel();
-				brushToolListener = new DrawingCanvasOnImage(pan);
-				ifImageView(pan, brushToolListener);
-				view.revalidateListeners();
-				return;
-			} 
+			
+			for(JInternalFrame c: contexts) {
+				if(c instanceof ImageView) {
+					view = (ImageView) c;
+					var pan = view.getImagePanel();
+					brushToolListener = new DrawingCanvasOnImage(pan, parent.getGlobalProperties().getGLobalColor());
+					ifImageView(pan, brushToolListener);
+					view.revalidateListeners();
+				} 
+			}
 		}
 		
 		else if(e.getSource() == this.polySnappingTool) {
-			if(target instanceof ImageView) {
-				view = (ImageView) target;
-				var pan = view.getImagePanel();
-				polyToolListener = new PolygonalSelectTool(pan.getImage(), pan);
-				ifImageView(pan, polyToolListener);
-				view.revalidateListeners();
-				return;
+			
+			for(JInternalFrame c: contexts) {
+				if(c instanceof ImageView) {
+					view = (ImageView) c;
+					var pan = view.getImagePanel();
+					polyToolListener = new PolygonalSelectTool(pan.getImage(), pan);
+					ifImageView(pan, polyToolListener);
+					view.revalidateListeners();
+				}
 			}
 		}
+		
+		else if(e.getSource() == this.colPickerTool) {
+			pickColor();
+		}
+		
+		parent.revalidate();
 		
 	}
 	
 	
+	
+	/**
+	 * Change the global color of application including BrushTool, PencilTool color
+	 * */
+	private void pickColor() {
+		var col = JColorChooser.showDialog(parent, "Color Picker", Color.white);
+		parent.getGlobalProperties().setGlobalColor(col);
+		colPickerTool.setForeground(col);
+		colPickerTool.setBackground(col);
+		
+		var tool = parent.getTool();
+		
+		/*if the currently selected tool is brush*/
+		if(tool instanceof BrushTool) {
+			
+			var t = (BrushTool) tool;
+			t.setStrokeColor(col);
+			
+			/*for all the frame of workspace*/
+			for(JInternalFrame c: contexts) {
+				
+				/*if the frame of workspace is ImageView*/
+				if(c instanceof ImageView) {
+					var view = (ImageView) c;
+					var pan = view.getImagePanel();
+					pan.getCanvasModeListener().getBrush().setStrokeColor(col);
+					pan.revalidate();
+				}
+				/*else if frame is DrawingPanel*/
+				else if(c instanceof DrawingPanel) {
+					System.out.println("Drawing panel");
+				}
+				
+			}
+			
+		}
+	}
+	
+	
+	
 	/*if the context is imageview*/
 	private void ifImageView(JComponent context, Object adp) {
-		removeAllListeners(context);
+		removePrevListeners(context);
 		
 		if(adp instanceof DrawingCanvasOnImage) {
 			applyBrushTool(context, (DrawingCanvasOnImage) adp);
@@ -182,8 +275,8 @@ public class LemonToolsMenu extends JInternalFrame implements ActionListener{
 	
 	
 	/*apply brush tool to the specific container*/
-	private void applyBrushTool(JComponent container, DrawingCanvasOnImage tool) {
-		container.addMouseMotionListener(tool);
+	private void applyBrushTool(JComponent context, DrawingCanvasOnImage tool) {
+		context.addMouseMotionListener(tool);
 	}
 	
 	
@@ -195,7 +288,7 @@ public class LemonToolsMenu extends JInternalFrame implements ActionListener{
 	
 	
 	/*remove each and every mouse listener which is applied to the specific container*/
-	private void removeAllListeners(JComponent container) {
+	private void removePrevListeners(JComponent container) {
 		var l1 = container.getMouseListeners();
 		var l2 = container.getMouseMotionListeners();
 		

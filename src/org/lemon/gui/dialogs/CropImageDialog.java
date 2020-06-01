@@ -17,7 +17,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.lemon.gui.image.LemonImageView;
+import org.lemon.gui.image.ImageView;
 import org.lemon.utils.AccessoriesRemover;
 
 public class CropImageDialog extends JFrame implements MouseMotionListener, MouseListener, ActionListener{
@@ -98,7 +98,7 @@ public class CropImageDialog extends JFrame implements MouseMotionListener, Mous
 		if(e.getSource() == this.okBttn) {
 			new AccessoriesRemover(this.mainPanel);
 			try {
-				this.mainPanel.add(new LemonImageView(getCroppedImg()));
+				this.mainPanel.add(new ImageView(getCroppedImg()));
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}

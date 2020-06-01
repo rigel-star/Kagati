@@ -16,7 +16,9 @@ import javax.swing.BorderFactory;
 import javax.swing.JInternalFrame;
 import javax.swing.border.Border;
 
+import org.lemon.gui.image.ImagePanel.PanelMode;
 import org.lemon.gui.image.menus.ImageViewMenu;
+import org.lemon.utils.AppGlobalProperties;
 import org.rampcv.utils.Tools;
 
 /**
@@ -52,49 +54,53 @@ public class ImageView extends JInternalFrame implements Cloneable {
 	private MouseEventsHandler 		meh;
 	
 	
+	private AppGlobalProperties		agp;
+	
 	/*Note image can't be null*/
 	public ImageView(BufferedImage img) throws IOException {
-		this(img, null, false, ImagePanel.DEFAULT_MODE);
+		this(img, null, null, false, PanelMode.DEFAULT_MODE);
 	}
 	
 	
 	public ImageView(BufferedImage img, String title) throws IOException {
-		this(img, title, false, ImagePanel.DEFAULT_MODE);
+		this(img, null, title, false, PanelMode.DEFAULT_MODE);
 	}
 	
 	
 	public ImageView(BufferedImage img, boolean closeable) throws IOException {
-		this(img, null, closeable, ImagePanel.DEFAULT_MODE);
+		this(img, null, null, closeable, PanelMode.DEFAULT_MODE);
 	}
 	
 	
 	public ImageView(BufferedImage img, int panelMode) throws IOException {
-		this(img, null, false, panelMode);
+		this(img, null, null, false, panelMode);
 	}
 	
 	
 	public ImageView(BufferedImage img, String title, int panelMode) throws IOException {
-		this(img, title, false, panelMode);
+		this(img, null, title, false, panelMode);
 	}
 	
 	
 	public ImageView(BufferedImage img, boolean closeable, int panelMode) throws IOException {
-		this(img, null, closeable, panelMode);
+		this(img, null, null, closeable, panelMode);
 	}
 	
 	
 	public ImageView(BufferedImage img, String title, boolean closeable) throws IOException {
-		this(img, title, closeable, ImagePanel.DEFAULT_MODE);
+		this(img, null, title, closeable, PanelMode.DEFAULT_MODE);
 	}
 	
 	
-	public ImageView(BufferedImage img, String title, boolean closeable, int panelMode)  {
+	public ImageView(BufferedImage img, AppGlobalProperties agp, String title, boolean closeable, int panelMode)  {
         
 		if(img == null)
 			throw new NullPointerException("Image can't be null.");
 		
+		this.agp = agp;
+		
 		this.src = img;
-		this.imgPan = new ImagePanel(img, panelMode);
+		this.imgPan = new ImagePanel(img, agp, panelMode);
 		this.title = title;
 		this.close = closeable;
 		
@@ -130,7 +136,7 @@ public class ImageView extends JInternalFrame implements Cloneable {
 	@Override
 	public Object clone() throws CloneNotSupportedException {
 		var newImg = Tools.copyImage(getImage());
-		ImageView duplicate = new ImageView(newImg, getTitle(), getCloseableState(), getImagePanel().getPanelMode());
+		ImageView duplicate = new ImageView(newImg, this.agp, getTitle(), getCloseableState(), getImagePanel().getPanelMode());
 		return duplicate;
 	}
 	

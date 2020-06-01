@@ -14,7 +14,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import org.lemon.gui.image.LemonImageView;
+import org.lemon.gui.image.ImageView;
 import org.lemon.utils.AccessoriesRemover;
 import org.rampcv.rampcv.RampCV;
 
@@ -73,7 +73,7 @@ public class NegativeImageDialog extends JFrame {
 		this.filterObserver(src);
 		
 		try {
-			this.imagePanel.add(new LemonImageView(this.src));
+			this.imagePanel.add(new ImageView(this.src));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -82,13 +82,13 @@ public class NegativeImageDialog extends JFrame {
 	
 	private void filterObserver(BufferedImage src) {
 		if(this.redcb.isEnabled()) {
-			RampCV.invertColors(src, true, false, false);
+			RampCV.invert(src, true, false, false);
 		}
 		if(this.greencb.isEnabled()) {
-			RampCV.invertColors(src, false, true, false);
+			RampCV.invert(src, false, true, false);
 		}
 		if(this.bluecb.isEnabled()) {
-			RampCV.invertColors(src, false, false, true);
+			RampCV.invert(src, false, false, true);
 		}
 	}
 	
@@ -106,7 +106,7 @@ public class NegativeImageDialog extends JFrame {
 	private void updateState(BufferedImage src, JPanel imagePanel) {
 		new AccessoriesRemover(imagePanel);
 		try {
-			this.imagePanel.add(new LemonImageView(src));
+			this.imagePanel.add(new ImageView(src));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -142,7 +142,7 @@ public class NegativeImageDialog extends JFrame {
 			new Thread(new Runnable() {		
 				@Override
 				public void run() {
-					RampCV.invertColors(src, r, g, b);
+					RampCV.invert(src, r, g, b);
 					updateState(src, imagePanel);
 				}
 			}).start();

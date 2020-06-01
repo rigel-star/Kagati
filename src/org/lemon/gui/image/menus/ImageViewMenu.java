@@ -11,7 +11,7 @@ import javax.swing.JPopupMenu;
 
 import org.lemon.gui.dialogs.SharePixelsDialog;
 import org.lemon.gui.image.ImagePanel.PanelMode;
-import org.lemon.tools.brush.BrushToolOptions;
+import org.lemon.tools.brush.gui.BrushGUI;
 import org.lemon.gui.image.ImageView;
 
 
@@ -135,7 +135,8 @@ public class ImageViewMenu extends JPopupMenu {
 		if(context.getImagePanel().getPanelMode() == PanelMode.CANVAS_MODE) {
 			brush.addActionListener(action -> {
 				var mouse = MouseInfo.getPointerInfo().getLocation();
-				new BrushToolOptions(context, mouse.x, mouse.y);
+				//new BrushToolOptions(context, mouse.x, mouse.y);
+				new BrushGUI(context, mouse.x, mouse.y);
 			});
 		} else brush.setEnabled(false);
 		

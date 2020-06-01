@@ -35,6 +35,11 @@ public class ZigzagBrushTool implements BrushTool {
 	}
 	
 	
+	@Override
+	public Graphics2D getContext() {
+		return context;
+	}
+	
 	
 	@Override
 	public void setStrokeSize(int size) {

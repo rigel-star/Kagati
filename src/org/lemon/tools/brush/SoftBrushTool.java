@@ -1,22 +1,17 @@
 package org.lemon.tools.brush;
 
 import java.awt.BasicStroke;
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.Stroke;
-import java.awt.geom.Line2D;
 
-import org.lemon.tools.BrushTool;
-
-public class SoftBrushTool implements BrushTool {
+public class SoftBrushTool extends BrushToolAdapter {
 	
 	
-	private int strokeSize = BrushTool.defaultStrokeSize;
-	private Color strokeColor = BrushTool.defaultStrokeColor;
-	private Stroke stroke;
-	
-	private Graphics2D context;
+//	private int strokeSize = BrushTool.defaultStrokeSize;
+//	private Color strokeColor = BrushTool.defaultStrokeColor;
+//	private Stroke stroke;
+//	
+//	private Graphics2D context;
 	
 	/**
 	 * Soft Brush is brush with feature of anti aliasing. After brushing, the brushed part will be
@@ -40,36 +35,42 @@ public class SoftBrushTool implements BrushTool {
 	}
 	
 	
-	@Override
-	public void draw(int newX, int newY, int oldX, int oldY) {
-		context.draw(new Line2D.Double(newX, newY, oldX, oldY));
-	}
-	
-	
-	@Override
-	public void setStrokeSize(int size) {
-		this.strokeSize = size;
-	}
-
-	@Override
-	public int getStrokeSize() {
-		return strokeSize;
-	}
-
-	@Override
-	public void setStrokeColor(Color color) {
-		this.context.setColor(color);
-	}
-
-	@Override
-	public Color getStrokeColor() {
-		return strokeColor;
-	}
-
-	@Override
-	public Stroke getStroke() {
-		return stroke;
-	}
+//	@Override
+//	public void draw(int newX, int newY, int oldX, int oldY) {
+//		context.draw(new Line2D.Double(newX, newY, oldX, oldY));
+//	}
+//	
+//	
+//	@Override
+//	public Graphics2D getContext() {
+//		return context;
+//	}
+//	
+//	
+//	@Override
+//	public void setStrokeSize(int size) {
+//		this.strokeSize = size;
+//	}
+//
+//	@Override
+//	public int getStrokeSize() {
+//		return strokeSize;
+//	}
+//
+//	@Override
+//	public void setStrokeColor(Color color) {
+//		this.context.setColor(color);
+//	}
+//
+//	@Override
+//	public Color getStrokeColor() {
+//		return strokeColor;
+//	}
+//
+//	@Override
+//	public Stroke getStroke() {
+//		return stroke;
+//	}
 
 
 }

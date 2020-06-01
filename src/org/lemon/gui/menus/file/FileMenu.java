@@ -10,7 +10,7 @@ import org.lemon.gui.image.ChooseImage;
 import org.lemon.gui.image.ImagePanel.PanelMode;
 import org.lemon.gui.image.ImageView;
 
-import application.MainApplicationFrame;
+import application.ApplicationFrame;
 
 /**
  * FileMenu is for opening, saving etc files in application, saving files etc.
@@ -71,9 +71,9 @@ public class FileMenu extends JMenu implements ActionListener {
 		var img = imgChoose.getChoosenImage();
 		var title = imgChoose.getChoosenFile().getName();
 		
-		var imgView = new ImageView(img, title, true, PanelMode.canvasMode);
+		var imgView = new ImageView(img, null, title, true, PanelMode.snapMode);
 
-		var frame = (MainApplicationFrame) this.container;
+		var frame = (ApplicationFrame) this.container;
 		frame.getMainScene().add(imgView);
 		frame.getMainScene().refresh();
 		frame.getImageStorage().put(imgView, img);

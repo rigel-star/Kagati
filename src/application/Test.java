@@ -7,9 +7,9 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import org.lemon.filters.basic_filters.ImageHSB;
-import org.lemon.gui.dialogs.color_remover.SelectedColorPreview;
-import org.rampcv.utils.Tools;
+import org.lemon.gui.dialogs.colremover.SelectedColorPreview;
+import org.rampcv.color.Range;
+import org.rampcv.math.BasicMath;
 
 
 public class Test {
@@ -19,7 +19,11 @@ public class Test {
 		
 		var s = new SelectedColorPreview(img);
 		s.addNewColor(new Color(20, 20, 160));
+		s.addNewColor(Color.red);
+		s.addNewColor(new Color(250, 250, 0));
+		s.addNewColor(new Color(128, 128, 128));
 		
+		var lerp = new Color(0, 255, 0);
 		
 		new Thread(new Runnable() {
 			
@@ -32,20 +36,14 @@ public class Test {
 				if(done) {
 					out = s.getRenderedPreview();
 					
-					
 					for(int x=0; x<img.getWidth(); x++) {
 						for(int y=0; y<img.getHeight(); y++) {
 							
 							if(out.getRGB(x, y) > Color.black.getRGB()) {
 								
-								Color c = new Color(img.getRGB(x, y));
-								float hsb[] = Tools.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue());
+								var val = Range.constrain(BasicMath.lerp(1.0f, img.getRGB(x, y), lerp.getRGB()), 0, 255);
 								
-								hsb[1] = ImageHSB.incSaturation(img, x, y, 0.1f);
-								
-								int rgb = Tools.HSBtoRGB(hsb[0], hsb[1], hsb[2]);
-								
-								img.setRGB(x, y, rgb);
+								img.setRGB(x, y, (int) val);
 								
 							}
 							
@@ -58,6 +56,8 @@ public class Test {
 								!ImageIO.write(img, "jpg", new File("C:\\Users\\Ramesh\\Desktop\\incSatr.jpg"))) {
 							System.out.println("LOL mistake somewhere. finddd iittttttt");
 						}
+						else
+							System.out.println("Done.");
 					} catch (IOException e) {
 						e.printStackTrace();
 					}

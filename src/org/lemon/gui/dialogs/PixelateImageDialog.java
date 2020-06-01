@@ -12,7 +12,7 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.lemon.gui.image.LemonImageView;
+import org.lemon.gui.image.ImageView;
 import org.rampcv.rampcv.RampCV;
 import org.rampcv.utils.Tools;
 
@@ -24,7 +24,7 @@ public class PixelateImageDialog extends JFrame implements ChangeListener {
 	private JPanel imgPanel, editPanel;
 	private BufferedImage original, copy;
 	private JSlider slider;
-	private LemonImageView copyImagePan;
+	private ImageView copyImagePan;
 	
 	public PixelateImageDialog(BufferedImage img) {
 		this.original = img;
@@ -39,7 +39,7 @@ public class PixelateImageDialog extends JFrame implements ChangeListener {
 		
 		try {
 			//for preview
-			this.copyImagePan = new LemonImageView(this.original, "Preview");
+			this.copyImagePan = new ImageView(this.original, "Preview");
 			this.imgPanel.add(this.copyImagePan);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -85,7 +85,7 @@ public class PixelateImageDialog extends JFrame implements ChangeListener {
 					try {
 						RampCV.pixelate(copy, value);
 						imgPanel.remove(copyImagePan);
-						copyImagePan = new LemonImageView(copy, "Preview");
+						copyImagePan = new ImageView(copy, "Preview");
 						imgPanel.add(copyImagePan);
 						imgPanel.revalidate();
 					} catch (IOException e) {

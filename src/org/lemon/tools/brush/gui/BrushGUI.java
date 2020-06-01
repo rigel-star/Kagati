@@ -22,9 +22,9 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.lemon.gui.drawing.plain_canvas.PlainDrawingPanel;
+import org.lemon.gui.drawing.canvas.DrawingPanel;
 import org.lemon.gui.image.ImageView;
-import org.lemon.tools.brush.BrushTool;
+import org.lemon.tools.BrushTool;
 import org.lemon.tools.brush.utils.Brushes;
 
 
@@ -154,13 +154,14 @@ public class BrushGUI extends JWindow implements ActionListener, ChangeListener 
 		gbc.gridx = 20;
 		gbc.gridy = 85;
 		
-		var brushNames = new String[]{"Normal", "Soft", "Wooble"};
+		var brushNames = new String[]{"Normal", "Soft", "Wooble", "Zigzag"};
 		
 		initPaintContext();
 		
 		brushMap.put(brushNames[0], Brushes.createNormalBrush(g2d));
 		brushMap.put(brushNames[1], Brushes.createSoftBrush(g2d));
 		brushMap.put(brushNames[2], Brushes.createWobbleBrush(g2d));
+		brushMap.put(brushNames[3], Brushes.createZigzagBrush(g2d));
 		
 		brushes = new JComboBox<String>(brushNames);
 		brushes.setFont(font);
@@ -176,8 +177,8 @@ public class BrushGUI extends JWindow implements ActionListener, ChangeListener 
 		if(context instanceof ImageView) {
 			g2d = ((ImageView) context).getImagePanel().getImage().createGraphics();
 		}
-		else if(context instanceof PlainDrawingPanel) {
-			g2d = (Graphics2D) ((PlainDrawingPanel) context).getCanvas().getGraphics();
+		else if(context instanceof DrawingPanel) {
+			g2d = (Graphics2D) ((DrawingPanel) context).getCanvas().getGraphics();
 		}
 		
 	}
@@ -226,6 +227,8 @@ public class BrushGUI extends JWindow implements ActionListener, ChangeListener 
 		
 	}
 
+	
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		

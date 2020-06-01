@@ -10,7 +10,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import org.lemon.gui.image.ImageView;
-import org.lemon.tools.brush.BrushTool;
+import org.lemon.tools.BrushTool;
 import org.lemon.tools.brush.utils.Brushes;
 
 public class BrushChooser extends JPanel implements ActionListener {

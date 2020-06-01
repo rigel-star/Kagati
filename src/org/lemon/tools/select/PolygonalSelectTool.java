@@ -18,8 +18,10 @@ import java.util.List;
 
 import javax.swing.JLabel;
 
+import org.lemon.tools.SelectionTool;
+
 //Basic image snapping tool
-public class PolygonalSelectTool extends MouseAdapter {
+public class PolygonalSelectTool extends MouseAdapter implements SelectionTool {
 	
 	private JLabel context;
 	

@@ -90,7 +90,7 @@ public class NewDrawingPanelSetup extends JFrame implements ActionListener {
 			int h = Integer.parseInt(this.width.getText());
 			int w = Integer.parseInt(this.height.getText());
 			String title = name.getText().toString();
-			this.pane.add(new PlainDrawingPanel(title, w, h));
+			this.pane.add(new DrawingPanel(title, w, h));
 			this.pane.revalidate();
 			this.dispose();
 		}

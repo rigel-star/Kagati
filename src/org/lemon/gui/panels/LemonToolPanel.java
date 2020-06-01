@@ -8,7 +8,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 
-import application.MainApplicationScene;
+import application.ApplicationFrame;
 
 
 public class LemonToolPanel extends JPanel {
@@ -21,14 +21,14 @@ public class LemonToolPanel extends JPanel {
 	private LemonToolsMenu toolMenu;
 	
 	public LemonToolPanel() {
-		this(null, null, null);
+		this(null, null);
 	}
 	
-	public LemonToolPanel(MainApplicationScene parent) {
-		this(parent, null, null);
+	public LemonToolPanel(ApplicationFrame parent) {
+		this(parent, null);
 	}
 	
-	public LemonToolPanel (MainApplicationScene parent, Component tar, Color col) {
+	public LemonToolPanel (ApplicationFrame parent, Component tar) {
 		
 		if(tar != null)
 			target = tar;
@@ -43,7 +43,7 @@ public class LemonToolPanel extends JPanel {
 		setBorder(layoutBorder);
 		setSize(200, 300);
 		
-		this.toolMenu = new LemonToolsMenu(parent, null);
+		this.toolMenu = new LemonToolsMenu(parent);
 		
 		add(toolMenu);
 				
