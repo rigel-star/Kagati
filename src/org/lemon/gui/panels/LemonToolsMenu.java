@@ -4,9 +4,7 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.swing.BoxLayout;
@@ -18,13 +16,9 @@ import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
-import org.lemon.gui.drawing.canvas.DrawingPanel;
 import org.lemon.gui.drawing.image.DrawingCanvasOnImage;
 import org.lemon.gui.image.ImageView;
 import org.lemon.gui.toolbars.BrushToolBar;
-import org.lemon.tools.BrushTool;
-import org.lemon.tools.LemonTool;
-import org.lemon.tools.brush.BrushToolAdapter;
 import org.lemon.tools.select.PolygonalSelectTool;
 
 import application.ApplicationFrame;
@@ -41,6 +35,7 @@ public class LemonToolsMenu extends JInternalFrame implements ActionListener{
 	private JButton 					polySnappingTool;
 	private JButton						cropTool;
 	private JButton						colPickerTool;
+	private JButton						moveTool;
 	
 	
 	
@@ -63,12 +58,6 @@ public class LemonToolsMenu extends JInternalFrame implements ActionListener{
 	
 	
 	/**
-	 * All tools of application stored in a list.
-	 * */
-	private List<LemonTool> 			tools = new ArrayList<>();
-	
-	
-	/**
 	 * Tools menu for editing all sorts of canvas on application.
 	 * <p>
 	 * Only ImageView for now.
@@ -77,7 +66,6 @@ public class LemonToolsMenu extends JInternalFrame implements ActionListener{
 		
 		//this.col = col;
 		this.parent = parent;
-		this.initTools();
 		
 		right = new JPanel();
 		
@@ -104,6 +92,7 @@ public class LemonToolsMenu extends JInternalFrame implements ActionListener{
 	
 	/*add all buttons (tools) to menu*/
 	private void addAll() {
+		right.add(createMoveTool());
 		right.add(createPencilTool());
 		right.add(createBrushTool());
 		right.add(createPolySelectTool());
@@ -113,15 +102,18 @@ public class LemonToolsMenu extends JInternalFrame implements ActionListener{
 	
 	
 	
-	private void initTools() {
-		tools.add(new BrushToolAdapter());
-	}
-	
-	
-	
 	private void initToolMap() {
 		toolMap.put(brushTool, new BrushToolBar(parent.getGlobalProperties(), null));
 	}
+	
+	
+	/*create move tool*/
+	private JButton createMoveTool() {
+		this.moveTool = new JButton();
+		moveTool.setIcon(new ImageIcon("icons/tools/move.png"));
+		return moveTool;
+	}
+	
 	
 	
 	/*create pencil tool button*/
@@ -171,6 +163,7 @@ public class LemonToolsMenu extends JInternalFrame implements ActionListener{
 	
 	/*init all components listeners*/
 	private void initListeners() {
+		this.moveTool.addActionListener(this);
 		this.brushTool.addActionListener(this);
 		this.polySnappingTool.addActionListener(this);
 		this.colPickerTool.addActionListener(this);
@@ -184,7 +177,18 @@ public class LemonToolsMenu extends JInternalFrame implements ActionListener{
 		Workspace workspace = parent.getMainScene();
 		this.contexts = workspace.getAllFrames();
 		
-		if(e.getSource() == this.brushTool) {
+		
+		if(e.getSource() == this.moveTool) {
+			
+			for(JInternalFrame c: contexts) {
+				
+				if(c instanceof ImageView) {
+					
+				}
+			}
+		}
+		
+		else if(e.getSource() == this.brushTool) {
 			
 			for(JInternalFrame c: contexts) {
 				if(c instanceof ImageView) {
@@ -228,33 +232,6 @@ public class LemonToolsMenu extends JInternalFrame implements ActionListener{
 		parent.getGlobalProperties().setGlobalColor(col);
 		colPickerTool.setForeground(col);
 		colPickerTool.setBackground(col);
-		
-		var tool = parent.getTool();
-		
-		/*if the currently selected tool is brush*/
-		if(tool instanceof BrushTool) {
-			
-			var t = (BrushTool) tool;
-			t.setStrokeColor(col);
-			
-			/*for all the frame of workspace*/
-			for(JInternalFrame c: contexts) {
-				
-				/*if the frame of workspace is ImageView*/
-				if(c instanceof ImageView) {
-					var view = (ImageView) c;
-					var pan = view.getImagePanel();
-					pan.getCanvasModeListener().getBrush().setStrokeColor(col);
-					pan.revalidate();
-				}
-				/*else if frame is DrawingPanel*/
-				else if(c instanceof DrawingPanel) {
-					System.out.println("Drawing panel");
-				}
-				
-			}
-			
-		}
 	}
 	
 	
