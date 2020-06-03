@@ -135,7 +135,7 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 		this.initToolBar(currentTool);
 		
 		
-		this.imageView = new ImageView(this.choosenImage, gProperties, this.choosenImgName, true, PanelMode.snapMode);
+		this.imageView = new ImageView(this.choosenImage, gProperties, this.choosenImgName, true, PanelMode.canvasMode);
 		this.imgInfoPanel = new ImageInfoPanel(this.choosenImage);
 		this.opacityPanel = new OpacityControlPanel(this.choosenImage);
 		
