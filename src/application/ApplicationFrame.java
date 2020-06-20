@@ -25,6 +25,7 @@ import javax.swing.JToolBar;
 import org.lemon.filters.basic.GrayScale;
 import org.lemon.filters.basic.SharpImage;
 import org.lemon.filters.basic.SobelEdge;
+import org.lemon.filters.transformations.gui.VanishingPointFilterGUI;
 import org.lemon.gui.dialogs.DenoiseImageDialog;
 import org.lemon.gui.dialogs.NegativeImageDialog;
 import org.lemon.gui.dialogs.PixelateImageDialog;
@@ -34,7 +35,7 @@ import org.lemon.gui.image.ImageInfoPanel;
 import org.lemon.gui.image.ImageView;
 import org.lemon.gui.image.ImagePanel.PanelMode;
 import org.lemon.gui.menus.EditMenu;
-import org.lemon.gui.menus.file.FileMenu;
+import org.lemon.gui.menus.FileMenu;
 import org.lemon.gui.panels.ImageAnalyzePanel;
 import org.lemon.gui.panels.OpacityControlPanel;
 import org.lemon.gui.toolbars.BrushToolBar;
@@ -61,7 +62,7 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 	//filters
 	private JMenuItem 			grayScale, sobelEdge,
 								sharpImg, pixelateImg, cropImg,
-								invertImg, denoiseImg, colorRange, plainDrawingPage, pixelDrawingPage;
+								invertImg, denoiseImg, colorRange, plainDrawingPage, pixelDrawingPage, vanishingPoint;
 	
 	
 	//blend modes
@@ -160,6 +161,7 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 
 		//filter properties
 		grayScale = new JMenuItem("B&W");
+		vanishingPoint = new JMenuItem("Vanishing Point");
 		sobelEdge = new JMenuItem("Find Edges");
 		sharpImg = new JMenuItem("Sharp");
 		pixelateImg = new JMenuItem("Pixelate");
@@ -183,10 +185,11 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 		fileMenu.add(fileSubMenu);
 		//filter options
 		filter.add(grayScale);
-		filter.add(sobelEdge);
 		filter.add(sharpImg);
+		filter.add(vanishingPoint);
 		filter.add(pixelateImg);
 		filter.add(noiseSubMenu);
+		filter.add(sobelEdge);
 		filter.add(invertImg);
 		filter.add(blendModes);
 		//filter.add(specialEffects);
@@ -259,6 +262,7 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 		denoiseImg.addActionListener(this);
 		colorRange.addActionListener(this);
 		pixelDrawingPage.addActionListener(this);
+		vanishingPoint.addActionListener(this);
 	}
 	
 	
@@ -328,6 +332,11 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 			}
 		}
 		
+		//vanishing point filter
+		else if(action.getSource() == this.vanishingPoint) {
+			new VanishingPointFilterGUI();
+		}
+		
 		//detecting edges of image
 		else if(action.getSource() == this.sobelEdge) {
 			try {
@@ -358,7 +367,9 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 		
 		//removing noise from image
 		else if(action.getSource() == this.denoiseImg) {
-			new DenoiseImageDialog(this.imageView, this.choosenImage);
+			if(this.mainWorkspace.getSelectedFrame() instanceof ImageView) {
+				new DenoiseImageDialog(this.imageView, this.selectedImgsStorage.get(this.mainWorkspace.getSelectedFrame()));
+			}
 		}
 		
 		//removing color of image using simple AI
