@@ -1,5 +1,9 @@
 package org.lemon.filters.transformations.gui;
 
+import java.awt.Color;
+
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -16,44 +20,57 @@ public class TransformationToolPanel extends JPanel {
 	
 	public TransformationToolPanel() {
 		
-		openFileButton = createOpenFileButton();
-		drawPlaneButton = createDrawPlaneButton();
-		eraserToolButton = createEraserToolButton();
-		brushToolButton = createBrushToolButton();
+		var boxL = new BoxLayout(this, BoxLayout.Y_AXIS);
+		var border = BorderFactory.createLineBorder(Color.black, 1);
+		
+		setLayout(boxL);
+		setBorder(border);
+		
+		add(createOpenFileButton());
+		add(createDrawPlaneButton());
+		add(createEraserToolButton());
+		add(createBrushToolButton());
 	}
+	
 	
 	
 	private JButton createOpenFileButton() {
-		var op = new JButton("Open...");
+		this.openFileButton = new JButton("Open...");
 		
-		op.addActionListener(action -> {
+		openFileButton.addActionListener(action -> {
 			
 		});
 		
-		return op;
+		return openFileButton;
 	}
+	
+	
 	
 	private JButton createDrawPlaneButton() {
-		var pl = new JButton();
-		pl.setIcon(new ImageIcon("icons/transformations/perspective.png"));
+		this.drawPlaneButton = new JButton();
+		drawPlaneButton.setIcon(new ImageIcon("icons/tools/transformation/perspective.png"));
 		
-		pl.addActionListener(action -> {
+		drawPlaneButton.addActionListener(action -> {
 			
 		});
 		
-		return pl;
+		return drawPlaneButton;
 	}
+	
+	
 	
 	private JButton createEraserToolButton() {
-		var er = new JButton();
-		er.setIcon(new ImageIcon("icons/eraser.png"));
-		return er;
+		this.eraserToolButton = new JButton();
+		eraserToolButton.setIcon(new ImageIcon("icons/tools/eraser.png"));
+		return eraserToolButton;
 	}
 	
+	
+	
 	private JButton createBrushToolButton() {
-		var br = new JButton();
-		br.setIcon(new ImageIcon("icons/brush.png"));
-		return br;
+		this.brushToolButton = new JButton();
+		brushToolButton.setIcon(new ImageIcon("icons/tools/brush.png"));
+		return brushToolButton;
 	}
 
 }
