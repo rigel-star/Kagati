@@ -1,6 +1,7 @@
 package org.lemon.gui.image;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 
 import javax.swing.ImageIcon;
@@ -8,14 +9,14 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.lemon.filters.ResizeImage;
-import org.rampcv.utils.Tools;
+import org.lemon.utils.Utils;
 
 
 /**
  * Preview the image after applying filter.
  * */
 
-public class ImagePreviewPanel extends JPanel implements Runnable {
+public class ImagePreviewPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 
 	
@@ -39,10 +40,22 @@ public class ImagePreviewPanel extends JPanel implements Runnable {
 	
 	
 	public ImagePreviewPanel(final BufferedImage drawable){
+		/*if width and height are not given, then resize image to size of 450 X 450*/
+		this(drawable, 500, 500);
+	}
+	
+	
+	/**
+	 * Image will be resized to given size and will be displayed.
+	 * */
+	public ImagePreviewPanel(BufferedImage drawable, int width, int height) {
 		
 		original = drawable;
+		copy = Utils.getImageCopy(original);
 		
-		new Thread(this).start();
+		copy = resize(copy, width, height);
+		
+		this.imgContainer = new JLabel(new ImageIcon(copy));
 		
 		final int w = drawable.getWidth();
 		final int h = drawable.getHeight();
@@ -52,17 +65,21 @@ public class ImagePreviewPanel extends JPanel implements Runnable {
 		
 		setSize(w, h);
 		setLayout(new BorderLayout());
+		setBackground(Color.white);
 		
 		add(this.imgContainer, BorderLayout.CENTER);
 	}
-	
 	
 	
 	/*
 	 * Resize image to required size.
 	 * */
 	public BufferedImage resize(BufferedImage img, int w, int h) {
-		return new ResizeImage(img, w, h).getScaledImage();
+		
+		if(img.getHeight() == h && img.getWidth() == w) {
+			return img;
+		}
+		return new ResizeImage(img).getImageSizeOf(w, h);
 	}
 	
 	
@@ -107,17 +124,6 @@ public class ImagePreviewPanel extends JPanel implements Runnable {
 	 * */
 	public BufferedImage getFinalImage() {
 		return resize(copy, WIDTH, HEIGHT);
-	}
-	
-	
-
-	@Override
-	public void run() {
-		
-		/*copy original image*/
-		copy = Tools.copyImage(original);
-		copy = resize(copy, 300, 300);
-		imgContainer.setIcon(new ImageIcon(copy));
 	}
 	
 	
