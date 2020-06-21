@@ -3,8 +3,10 @@ package org.lemon.gui.dialogs.colremover;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -20,14 +22,18 @@ import javax.swing.JPanel;
 import javax.swing.JWindow;
 
 import org.lemon.colors.ColorRemover;
-import org.lemon.gui.image.ImagePanel;
-import org.lemon.gui.image.ImagePanel.PanelMode;
+import org.lemon.filters.ResizeImage;
+import org.lemon.utils.Utils;
+import org.lemon.gui.image.ImagePreviewPanel;
 import org.lemon.gui.image.MiniImageView;
 import org.rampcv.utils.Tools;
 
 public class ColorRemoverDialog extends JWindow implements ActionListener {
 
 	private static final long serialVersionUID = 1L;
+	
+	private final int DEFAULT_RESIZE_HEIGHT = 500;
+	private final int DEFAULT_RESIZE_WIDTH = 500;
 	
 	//input fields
 	private JLabel preferredColor;
@@ -44,22 +50,30 @@ public class ColorRemoverDialog extends JWindow implements ActionListener {
 	BufferedImage imgOriginal, imgCopy, imgPreview;
 	
 	
-	private ImagePanel panelOriginal, panelPreview;
+	private ImagePreviewPanel panelOriginal;
+	private ImagePreviewPanel panelPreview;
+	
+	
+	/*size of screen*/
+	private final Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 	
 	
 	public ColorRemoverDialog(BufferedImage img) {
 		this.imgOriginal = img;
 		
+		imgCopy = Utils.getImageCopy(imgOriginal);
+		imgCopy = new ResizeImage(imgCopy).getImageSizeOf(DEFAULT_RESIZE_WIDTH, DEFAULT_RESIZE_HEIGHT);
+		
 		this.preview = new SelectedColorPreview(img);
 		this.imgPreview = preview.getRenderedPreview();
-		
-		this.makeOriginalImageCopy();
+		this.imgPreview = new ResizeImage(imgPreview).getImageSizeOf(DEFAULT_RESIZE_WIDTH, DEFAULT_RESIZE_HEIGHT);
 		
 		this.init();
 		
-		setSize((img.getWidth() * 2) + 250, img.getHeight() + 100);
+		setSize(screen.width - 50, screen.height - 100);
 		setVisible(true);
-		setLocation(new Point(200, 100));
+		//setLocation(new Point(50, 50));
+		setLocationRelativeTo(null);
 		makeBorder();
 		
 		Container c = this.getContentPane();
@@ -69,21 +83,6 @@ public class ColorRemoverDialog extends JWindow implements ActionListener {
 		
 		addAll();
 		
-	}
-	
-	
-	
-	/**
-	 * Makes copy of original image in new thread
-	 * */
-	private void makeOriginalImageCopy() {
-		new Thread(new Runnable() {
-			
-			@Override
-			public void run() {
-				imgCopy = Tools.copyImage(imgOriginal);
-			}
-		}).start();
 	}
 	
 	
@@ -110,10 +109,10 @@ public class ColorRemoverDialog extends JWindow implements ActionListener {
 		
 		
 		var meh = new MouseEventHandler();
-		panelOriginal = new ImagePanel(imgOriginal, null, PanelMode.defaultMode);
+		panelOriginal = new ImagePreviewPanel(imgOriginal, 500, 500);
 		panelOriginal.addMouseListener(meh);
 		
-		panelPreview = new ImagePanel(imgPreview, null, PanelMode.DEFAULT_MODE);
+		panelPreview = new ImagePreviewPanel(imgPreview, 500, 500);
 		
 		new MiniImageView(panelOriginal);
 		
@@ -170,7 +169,7 @@ public class ColorRemoverDialog extends JWindow implements ActionListener {
 		
 		else if(e.getSource() == this.remakeBttn) {
 			imgPreview = Tools.createBlankImageLike(imgOriginal, BufferedImage.TYPE_3BYTE_BGR);
-			panelPreview.setIcon(new ImageIcon(imgPreview));
+			//panelPreview.setIcon(new ImageIcon(imgPreview));
 		}
 		
 		else if(e.getSource() == this.processBttn) {
@@ -217,7 +216,7 @@ public class ColorRemoverDialog extends JWindow implements ActionListener {
 		try {
 			Thread.sleep(1000);
 			showPreview();
-			revalidate();
+			panelPreview.repaint();
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		}
@@ -234,13 +233,13 @@ public class ColorRemoverDialog extends JWindow implements ActionListener {
 		preview.getUndoRedoManager().redo();
 		
 		/*creating new blank image to paint undone colors*/
-		imgPreview = Tools.createBlankImageLike(imgOriginal, BufferedImage.TYPE_3BYTE_BGR);
+		imgPreview = Tools.createBlankImageLike(imgOriginal, BufferedImage.TYPE_INT_ARGB);
 		preview.setImage(imgPreview);
 		
 		try {
 			Thread.sleep(1000);
 			showPreview();
-			revalidate();
+			panelPreview.repaint();
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		}
@@ -261,12 +260,14 @@ public class ColorRemoverDialog extends JWindow implements ActionListener {
 				
 				boolean updated = preview.updatePreview();
 				
-				if(updated)
+				if(updated) {
 					imgPreview = preview.getRenderedPreview();
+					imgPreview = new ResizeImage(imgPreview).getImageSizeOf(DEFAULT_RESIZE_WIDTH, DEFAULT_RESIZE_HEIGHT);
+				}
 				else
 					System.out.println("Problem updating preview");
 				
-				panelPreview.setIcon(new ImageIcon(imgPreview));
+				panelPreview.repaint();
 				
 			}
 		}).start();
@@ -302,7 +303,7 @@ public class ColorRemoverDialog extends JWindow implements ActionListener {
 			var x = e.getX();
 			var y = e.getY();
 			
-			var color = new Color(imgOriginal.getRGB(x, y));
+			var color = new Color(imgCopy.getRGB(x, y));
 			
 			preview.addNewColor(color);
 			System.out.printf("Adding to stack: %d\n", preview.getUndoRedoManager().getUndoStack().size());
