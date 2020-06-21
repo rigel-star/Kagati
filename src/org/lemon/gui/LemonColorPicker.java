@@ -7,6 +7,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
 import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -19,6 +20,7 @@ import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -36,8 +38,10 @@ public class LemonColorPicker extends JFrame {
 	private BufferedImage colWheelImage;
 	
 	/*tf = text filed*/
+	private JLabel rlbl, glbl, blbl;
 	private JTextField rtf, gtf, btf;
 	
+	private GridBagConstraints gbc = new GridBagConstraints();
 	
 	public static void main(String[] args) {
 		new LemonColorPicker();
@@ -79,8 +83,12 @@ public class LemonColorPicker extends JFrame {
 	private void init() {
 		this.colWheelPanel = new ColorWheelPanel();
 		this.rgbControlPanel = new JPanel();
+		
+		this.rlbl = new JLabel("R");
 		this.rtf = new JTextField(255);
+		this.glbl = new JLabel("G");
 		this.gtf = new JTextField(255);
+		this.blbl = new JLabel("B");
 		this.btf = new JTextField(255);
 		this.colWheelAndBtnPanel = new JPanel(new FlowLayout());
 		
@@ -123,7 +131,7 @@ public class LemonColorPicker extends JFrame {
 			super.paintComponent(g);
 			var g2d = (Graphics2D) g;
 			
-			RenderingHints rhs = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			var rhs = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			g2d.setRenderingHints(rhs);
 			g2d.drawImage(colWheelImage, 0, 0, null);
 			g2d.setPaint(Color.black);
