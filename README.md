@@ -28,10 +28,10 @@ both are mine easy to use libraries
 # Screenshots
 
 # Home View
-![pic1](icons/scrnshot/scrns1c.PNG)
+![pic1](icons/scrnshot/scrns1c.png)
 
 # Vanishing Point Filter
-![pic2](icons/scrnshot/scrns2c.PNG)
+![pic2](icons/scrnshot/scrns2c.png)
 
 # Color Range Tool
 ![pic3](icons/scrnshot/scrns3c.PNG)
