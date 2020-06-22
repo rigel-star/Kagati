@@ -1,8 +1,21 @@
 # Lemon
 
-## Note: Screenshots are not updated since the first commit. Many things have changed recently.
+## Note: Screenshots may not be up to date.
 
 Image editing software with some Smart Tools.
+
+## What can this software do:
+1. Vanishing Point Filter (Currently under construction. Does not work right now).
+2. Color Range Tool
+3. Many basic filters
+4. Not much artistic filter
+5. Crop, resize images
+6. Blend images
+
+## Upcoming features
+1. Layer System
+2. Fully working Vanishing Point Filter
+
 Mini version of photoshop :D
 
 -> A work in progress by RigelStar.
@@ -14,5 +27,11 @@ both are mine easy to use libraries
 
 # Screenshots
 
+# Home View
 ![pic1](icons/scrnshot/scrns1c.png)
+
+# Vanishing Point Filter
 ![pic2](icons/scrnshot/scrns2c.png)
+
+# Color Range Tool
+![pic3](icons/scrnshot/scrns3c.png)
