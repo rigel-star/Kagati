@@ -4,10 +4,14 @@ import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Polygon;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -28,6 +32,7 @@ import javax.swing.JPanel;
 import javax.swing.JWindow;
 
 import org.lemon.filters.ResizeImage;
+import org.lemon.filters.transformations.PerspectivePlane;
 import org.lemon.filters.transformations.VanishingPointFilter;
 import org.lemon.utils.Utils;
 
@@ -44,6 +49,15 @@ public class VanishingPointFilterGUI extends JWindow {
 	private List<Ellipse2D> eps = new ArrayList<Ellipse2D>();
 	private List<LineLocation> lloc = new ArrayList<LineLocation>();
 	
+	private List<PerspectivePlane> persPlanes = new ArrayList<>();
+	
+	private Graphics2D g2d = null;
+	
+	final int MAX_ZOOM_LEVEL = 700;
+	final int MIN_ZOOM_LEVEL = 500;
+	
+	private final Dimension DEFAULT_RESIZED_IMAGE_SIZE = new Dimension(600, 600);
+	
 	private Point draggedPoint;
 	
 	private BufferedImage target;
@@ -52,7 +66,7 @@ public class VanishingPointFilterGUI extends JWindow {
 	
 	
 	private Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-	private TransformationToolPanel toolPanel = new TransformationToolPanel();
+	private TransformationToolPanel toolPanel;
 	
 	private JPanel btnPanel;
 	private JButton saveBtn;
@@ -61,29 +75,32 @@ public class VanishingPointFilterGUI extends JWindow {
 	
 	public VanishingPointFilterGUI() {
 		
-		setSize(screen.width - 100, screen.height - 100);
-		setLayout(new BorderLayout());
-		setLocation(50, 50);
-		getRootPane().setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
-		
-		this.init();
-		
-		Container c = getContentPane();
-		c.add(toolPanel, BorderLayout.WEST);
-		c.add(btnPanel, BorderLayout.EAST);
-		
 		try {
 			mainSrc = ImageIO.read(new File("C:\\Users\\Ramesh\\Desktop\\pers_homog\\boxes.jpg"));
 			target = ImageIO.read(new File("C:\\Users\\Ramesh\\Desktop\\pers_homog\\book2.jpg"));
 			
 			src = Utils.getImageCopy(mainSrc);
-			copy = new ResizeImage(src).getImageSizeOf(800, 800);
+			copy = new ResizeImage(src).getImageSizeOf(DEFAULT_RESIZED_IMAGE_SIZE.width, DEFAULT_RESIZED_IMAGE_SIZE.height);
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
 		
+		setSize(screen.width - 50, screen.height - 50);
+		setLayout(new BorderLayout());
+		setLocationRelativeTo(null);
+		getRootPane().setBorder(BorderFactory.createLineBorder(Color.GRAY, 4));
+		
 		var ppanel = new CanvasPanel();
-		c.add(ppanel, BorderLayout.CENTER);
+		toolPanel = new TransformationToolPanel(ppanel, persPlanes);
+		
+		this.init();
+		
+		Container c = getContentPane();
+		c.setLayout(new FlowLayout(FlowLayout.LEFT, 100, 5));
+		
+		c.add(toolPanel);
+		c.add(ppanel);
+		c.add(btnPanel);
 		
 		var mh = new MouseHandler(ppanel, copy.createGraphics());
 		
@@ -99,7 +116,11 @@ public class VanishingPointFilterGUI extends JWindow {
 		btnPanel.setLayout(new BoxLayout(btnPanel, BoxLayout.Y_AXIS));
 		
 		this.saveBtn = new JButton("Save");
+		
 		this.cancelBtn = new JButton("Cancel");
+		cancelBtn.addActionListener(action -> {
+			dispose();
+		});
 		
 		btnPanel.add(saveBtn);
 		btnPanel.add(cancelBtn);
@@ -111,12 +132,17 @@ public class VanishingPointFilterGUI extends JWindow {
 		private static final long serialVersionUID = 1L;
 		
 		
+		public CanvasPanel() {
+			setLocationRelativeTo(null);
+		}
+		
+		
 		@Override
 		protected void paintComponent(Graphics g) {
 			super.paintComponent(g);
 			g.drawImage(copy, 0, 0, null);
 			
-			var g2d = (Graphics2D) g;
+			g2d = (Graphics2D) g;
 			g2d.setStroke(new BasicStroke(3));
 			g2d.setPaint(Color.yellow);
 			
@@ -128,9 +154,15 @@ public class VanishingPointFilterGUI extends JWindow {
 				var pp2 = pts.get(1);
 				var pp3 = pts.get(2);
 				var pp4 = pts.get(3);
+				
+				persPlanes.add(new PerspectivePlane(pts));
+				
 				computedImage = VanishingPointFilter.Pseudo3D.computeImage(target,
 						pp1, pp2, pp3, pp4);
-				g2d.drawImage(computedImage, 0, 0, null);
+				//g2d.drawImage(computedImage, 0, 0, null);
+				
+				g2d.setPaint(Color.red);
+				g2d.draw(quadToRect(pts));
 			}
 			
 			/*when 3 points are selected*/
@@ -149,32 +181,38 @@ public class VanishingPointFilterGUI extends JWindow {
 			}
 		}
 		
+		
+		@Override
+		public Dimension getPreferredSize() {
+			return new Dimension(DEFAULT_RESIZED_IMAGE_SIZE.width, DEFAULT_RESIZED_IMAGE_SIZE.height);
+		};
+		
+	}
+	
+	
+	/*
+	 * Makes rectangle out of given points.
+	 * */
+	private Rectangle quadToRect(final List<Point> pts) {
+		Polygon poly = new Polygon();
+		
+		for(Point pt: pts) {
+			poly.addPoint(pt.x, pt.y);
+		}
+		
+		var bound = poly.getBounds();
+		return bound;
 	}
 	
 	
 	
-	
-	class LineLocation {
-			
-			private Point p1;
-			private Point p2;
-			
-			public LineLocation(Point p1, Point p2) {
-				this.p1 = p1;
-				this.p2 = p2;
-			}
-			
-			public Point getP1() {
-				return p1;
-			}
-			public Point getP2() {
-				return p2;
-			}
-	}
-	
-	
-	public List<Point> getCoords(){
-		return pts;
+	private class ImageAlignmentMouseHandler extends MouseAdapter{
+		
+		@Override
+		public void mousePressed(MouseEvent e) {
+			super.mousePressed(e);
+		}
+		
 	}
 	
 	
@@ -284,6 +322,8 @@ public class VanishingPointFilterGUI extends JWindow {
 				super.mouseMoved(e);
 				
 				var cpt = e.getPoint();
+				var cursor = new Cursor(Cursor.CROSSHAIR_CURSOR);
+				context.setCursor(cursor);
 				
 				if(pts.size() == 1) {
 					startP = pts.get(0);
@@ -311,7 +351,8 @@ public class VanishingPointFilterGUI extends JWindow {
 			
 			
 			private void clearAll() {
-				copy = new ResizeImage(src).getImageSizeOf(800, 800);
+				copy = new ResizeImage(src).getImageSizeOf(DEFAULT_RESIZED_IMAGE_SIZE.width,
+						DEFAULT_RESIZED_IMAGE_SIZE.height);
 				startP = null;
 				endP = null;
 				extraEndP = null;
@@ -331,5 +372,27 @@ public class VanishingPointFilterGUI extends JWindow {
 		}
 	
 	
+	class LineLocation {
+		
+		private Point p1;
+		private Point p2;
+		
+		public LineLocation(Point p1, Point p2) {
+			this.p1 = p1;
+			this.p2 = p2;
+		}
+		
+		public Point getP1() {
+			return p1;
+		}
+		public Point getP2() {
+			return p2;
+		}
+}
+
+
+	public List<Point> getCoords(){
+		return pts;
+	}
 	
 }
