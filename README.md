@@ -34,4 +34,4 @@ both are mine easy to use libraries
 ![pic2](icons/scrnshot/scrns2c.png)
 
 # Color Range Tool
-![pic3](icons/scrnshot/scrns3c.png)
+![pic3](icons/scrnshot/scrns3c.PNG)
