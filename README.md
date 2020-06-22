@@ -15,6 +15,7 @@ Image editing software with some Smart Tools.
 ## Upcoming features
 1. Layer System
 2. Fully working Vanishing Point Filter
+3. Custom Color Picker
 
 Mini version of photoshop :D
 
