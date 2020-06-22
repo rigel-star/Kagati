@@ -1,4 +1,7 @@
 # Lemon
+
+## Note: Screenshots are not updated since the first commit. Many things have changed recently.
+
 Image editing software with some Smart Tools.
 Mini version of photoshop :D
 
