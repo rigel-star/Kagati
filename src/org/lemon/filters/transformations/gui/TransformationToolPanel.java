@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
@@ -11,6 +12,7 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -24,6 +26,7 @@ import javax.swing.JPanel;
 import org.lemon.filters.transformations.PerspectivePlane;
 import org.lemon.filters.transformations.VanishingPointFilter;
 import org.lemon.gui.image.ChooseImage;
+import org.lemon.utils.Utils;
 
 public class TransformationToolPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -37,24 +40,35 @@ public class TransformationToolPanel extends JPanel {
 	private JComponent context = null;
 	
 	private Rectangle imgBounds = null;
-	private List<PerspectivePlane> persPlanes;
-	private PerspectivePlane overlappedPersPlane;
+	private List<PerspectivePlane> persPlanes = null;
+	private PerspectivePlane overlappedPersPlane = null;
+	
+	/*Image which user is currently dragging*/
+	private BufferedImage target = null;
+	private BufferedImage targetCopy = null;
+	
+	/*check if image is already in perspective*/
+	private boolean alreadyInPerspective = false;
+	
+	private Graphics2D g2d;
 	
 	
-	public TransformationToolPanel(JComponent context, List<PerspectivePlane> persPlanes) {
+	public TransformationToolPanel(JComponent context, Graphics2D g2d, List<PerspectivePlane> persPlanes) {
 		
+		this.g2d = g2d;
 		this.context = context;
 		this.persPlanes = persPlanes;
 		
 		try {
-			var img = ImageIO.read(new FileInputStream(new File("C:\\Users\\Ramesh\\Desktop\\opencv\\pepper.jpg")));
+			var img = ImageIO.read(new FileInputStream(new File("C:\\Users\\Ramesh\\Desktop\\opencv\\sponge.jpg")));
+			target = Utils.getImageCopy(img);
+			targetCopy = Utils.getImageCopy(img);
+			
 			var lbl = new JLabel(new ImageIcon(img));
 			
 			var dml = new DragMouseHandler();
 			lbl.addMouseListener(dml);
 			lbl.addMouseMotionListener(dml);
-			
-			imgBounds = lbl.getBounds();
 			
 			context.add(lbl);
 			context.revalidate();
@@ -139,6 +153,7 @@ public class TransformationToolPanel extends JPanel {
 	private class DragMouseHandler extends MouseAdapter {
 		
 		private Point offset = null;
+		private BufferedImage computedImg = null;
 		
 		@Override
 		public void mousePressed(MouseEvent e) {
@@ -159,16 +174,37 @@ public class TransformationToolPanel extends JPanel {
             location.x += x;
             location.y += y;
             component.setLocation(location);
+            imgBounds = component.getBounds();
             
             if(checkOverlap(imgBounds, persPlanes)) {
-            	var img = (BufferedImage) ((JLabel) component).getIcon();
-            	var computedImg = VanishingPointFilter.Pseudo3D.computeImage(img,
-            			overlappedPersPlane.p0, overlappedPersPlane.p1,
-            			overlappedPersPlane.p2, overlappedPersPlane.p3);
             	
-            	((JLabel) component).setIcon(new ImageIcon(computedImg));
-            	context.repaint();
+            	targetCopy = Utils.getImageCopy(target);
+            	
+            	if(!alreadyInPerspective) {
+	            	computedImg = VanishingPointFilter.Pseudo3D.computeImage(targetCopy,
+	            			overlappedPersPlane.p0, overlappedPersPlane.p1,
+	            			overlappedPersPlane.p2, overlappedPersPlane.p3);
+	            	alreadyInPerspective = true;
+	            	System.out.println("Computing image");
+	            	
+//	            	try {
+//	            		ImageIO.write(computedImg, "png", new File("C:\\Users\\Ramesh\\Desktop\\lalala.png"));
+//	            	} catch (IOException ex) {
+//	            		ex.printStackTrace();
+//	            	}
+            	}
+            	
+            	if(computedImg != null)
+            		((JLabel) component).setIcon(new ImageIcon(computedImg));
+
             }
+            else {
+            	((JLabel) component).setIcon(new ImageIcon(target));
+            	alreadyInPerspective = false;
+            	computedImg = null;
+            }
+            
+            component.repaint();
             
 		}
 		
@@ -179,7 +215,6 @@ public class TransformationToolPanel extends JPanel {
 			for(PerspectivePlane pp: pplanes) {
 				if(r1.intersects(pp.getBound())) {
 					overlappedPersPlane = pp;
-					System.out.println("Overlapping");
 					return true;
 				}
 			}
