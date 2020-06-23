@@ -77,10 +77,10 @@ public class VanishingPointFilterGUI extends JWindow {
 		
 		try {
 			mainSrc = ImageIO.read(new File("C:\\Users\\Ramesh\\Desktop\\pers_homog\\boxes.jpg"));
-			target = ImageIO.read(new File("C:\\Users\\Ramesh\\Desktop\\pers_homog\\book2.jpg"));
+			target = ImageIO.read(new File("C:\\Users\\Ramesh\\Desktop\\opencv\\sponge.jpg"));
 			
 			src = Utils.getImageCopy(mainSrc);
-			copy = new ResizeImage(src).getImageSizeOf(DEFAULT_RESIZED_IMAGE_SIZE.width, DEFAULT_RESIZED_IMAGE_SIZE.height);
+			copy = Utils.getImageCopy(src);//new ResizeImage(src).getImageSizeOf(DEFAULT_RESIZED_IMAGE_SIZE.width, DEFAULT_RESIZED_IMAGE_SIZE.height);
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
@@ -91,7 +91,7 @@ public class VanishingPointFilterGUI extends JWindow {
 		getRootPane().setBorder(BorderFactory.createLineBorder(Color.GRAY, 4));
 		
 		var ppanel = new CanvasPanel();
-		toolPanel = new TransformationToolPanel(ppanel, persPlanes);
+		toolPanel = new TransformationToolPanel(ppanel, g2d, persPlanes);
 		
 		this.init();
 		
@@ -163,6 +163,7 @@ public class VanishingPointFilterGUI extends JWindow {
 				
 				g2d.setPaint(Color.red);
 				g2d.draw(quadToRect(pts));
+				g2d.setPaint(Color.yellow);
 			}
 			
 			/*when 3 points are selected*/
@@ -366,6 +367,7 @@ public class VanishingPointFilterGUI extends JWindow {
 				actLns.clear();
 				eps.clear();
 				lloc.clear();
+				persPlanes.clear();
 			}
 			
 			
