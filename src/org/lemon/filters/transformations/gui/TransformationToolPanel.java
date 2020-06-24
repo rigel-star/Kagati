@@ -13,7 +13,9 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -51,6 +53,8 @@ public class TransformationToolPanel extends JPanel {
 	private boolean alreadyInPerspective = false;
 	
 	Graphics2D g2d;
+	
+	private Map<Integer, BufferedImage> allImgs = new HashMap<>();
 	
 	
 	public TransformationToolPanel(JComponent context, Graphics2D g2d, List<PerspectivePlane> persPlanes) {
@@ -105,6 +109,8 @@ public class TransformationToolPanel extends JPanel {
 			lbl.setLocation(0, 0);
 			lbl.addMouseListener(mh);
 			lbl.addMouseMotionListener(mh);
+			
+			allImgs.put(lbl.hashCode(), img);
 			
 			context.add(lbl);
 			context.revalidate();
@@ -192,7 +198,7 @@ public class TransformationToolPanel extends JPanel {
             icon.paintIcon(null, target.createGraphics(), 0, 0);
             
             if(checkOverlap(imgBounds, persPlanes)) {
-            	
+                
             	targetCopy = Utils.getImageCopy(target);
             	
             	if(!alreadyInPerspective) {
@@ -209,9 +215,11 @@ public class TransformationToolPanel extends JPanel {
 
             }
             else {
-            	((JLabel) component).setIcon(new ImageIcon(target));
-            	alreadyInPerspective = false;
-            	computedImg = null;
+            	if(allImgs.containsKey(component.hashCode())) {
+            		((JLabel) component).setIcon(new ImageIcon(allImgs.get(component.hashCode())));
+            		alreadyInPerspective = false;
+            		computedImg = null;
+            	}
             }
             
             component.repaint();
