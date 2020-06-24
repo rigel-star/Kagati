@@ -33,7 +33,6 @@ import javax.swing.JWindow;
 
 import org.lemon.filters.ResizeImage;
 import org.lemon.filters.transformations.PerspectivePlane;
-import org.lemon.filters.transformations.VanishingPointFilter;
 import org.lemon.utils.Utils;
 
 
@@ -41,7 +40,7 @@ public class VanishingPointFilterGUI extends JWindow {
 	private static final long serialVersionUID = 1L;
 	
 	
-	private BufferedImage mainSrc, src, copy, computedImage;
+	private BufferedImage mainSrc, src, copy;
 	private Point startP = null, endP = null;
 	private Point extraStartP = null, extraEndP = null;
 	private List<Line2D> actLns = new ArrayList<Line2D>();
@@ -60,7 +59,6 @@ public class VanishingPointFilterGUI extends JWindow {
 	
 	private Point draggedPoint;
 	
-	private BufferedImage target;
 	
 	private boolean enableEraserTool = false;
 	
@@ -73,11 +71,15 @@ public class VanishingPointFilterGUI extends JWindow {
 	private JButton cancelBtn;
 	
 	
+	public static void main(String[] args) {
+		new VanishingPointFilterGUI();
+	}
+	
+	
 	public VanishingPointFilterGUI() {
 		
 		try {
-			mainSrc = ImageIO.read(new File("C:\\Users\\Ramesh\\Desktop\\pers_homog\\boxes.jpg"));
-			target = ImageIO.read(new File("C:\\Users\\Ramesh\\Desktop\\opencv\\sponge.jpg"));
+			mainSrc = ImageIO.read(new File("C:\\Users\\Ramesh\\Desktop\\opencv\\room.jpg"));
 			
 			src = Utils.getImageCopy(mainSrc);
 			copy = Utils.getImageCopy(src);//new ResizeImage(src).getImageSizeOf(DEFAULT_RESIZED_IMAGE_SIZE.width, DEFAULT_RESIZED_IMAGE_SIZE.height);
@@ -119,7 +121,7 @@ public class VanishingPointFilterGUI extends JWindow {
 		
 		this.cancelBtn = new JButton("Cancel");
 		cancelBtn.addActionListener(action -> {
-			dispose();
+			Runtime.getRuntime().exit(0);
 		});
 		
 		btnPanel.add(saveBtn);
@@ -150,16 +152,8 @@ public class VanishingPointFilterGUI extends JWindow {
 				g2d.draw(new Line2D.Double(startP, endP));
 			
 			if(pts.size() == 4) {
-				var pp1 = pts.get(0);
-				var pp2 = pts.get(1);
-				var pp3 = pts.get(2);
-				var pp4 = pts.get(3);
 				
 				persPlanes.add(new PerspectivePlane(pts));
-				
-				computedImage = VanishingPointFilter.Pseudo3D.computeImage(target,
-						pp1, pp2, pp3, pp4);
-				//g2d.drawImage(computedImage, 0, 0, null);
 				
 				g2d.setPaint(Color.red);
 				g2d.draw(quadToRect(pts));
@@ -203,17 +197,6 @@ public class VanishingPointFilterGUI extends JWindow {
 		
 		var bound = poly.getBounds();
 		return bound;
-	}
-	
-	
-	
-	private class ImageAlignmentMouseHandler extends MouseAdapter{
-		
-		@Override
-		public void mousePressed(MouseEvent e) {
-			super.mousePressed(e);
-		}
-		
 	}
 	
 	
@@ -309,7 +292,6 @@ public class VanishingPointFilterGUI extends JWindow {
 						lloc.add(new LineLocation(pts.get(0), pts.get(3)));
 						lloc.add(new LineLocation(pts.get(2), pts.get(3)));
 						
-						//pplane.add(new PerspectivePlane(pts.get(0), pts.get(1), pts.get(2), pts.get(3)));
 					}
 					
 				}
