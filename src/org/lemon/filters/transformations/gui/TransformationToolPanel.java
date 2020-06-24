@@ -2,6 +2,7 @@ package org.lemon.filters.transformations.gui;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics2D;
@@ -12,7 +13,6 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -50,7 +50,7 @@ public class TransformationToolPanel extends JPanel {
 	/*check if image is already in perspective*/
 	private boolean alreadyInPerspective = false;
 	
-	private Graphics2D g2d;
+	Graphics2D g2d;
 	
 	
 	public TransformationToolPanel(JComponent context, Graphics2D g2d, List<PerspectivePlane> persPlanes) {
@@ -60,7 +60,7 @@ public class TransformationToolPanel extends JPanel {
 		this.persPlanes = persPlanes;
 		
 		try {
-			var img = ImageIO.read(new FileInputStream(new File("C:\\Users\\Ramesh\\Desktop\\opencv\\sponge.jpg")));
+			var img = ImageIO.read(new FileInputStream(new File("C:\\Users\\Ramesh\\Desktop\\opencv\\frame.jpeg")));
 			target = Utils.getImageCopy(img);
 			targetCopy = Utils.getImageCopy(img);
 			
@@ -102,12 +102,12 @@ public class TransformationToolPanel extends JPanel {
 			var mh = new DragMouseHandler();
 			
 			var lbl = new JLabel(new ImageIcon(img));
+			lbl.setLocation(0, 0);
 			lbl.addMouseListener(mh);
 			lbl.addMouseMotionListener(mh);
 			
 			context.add(lbl);
-			
-			context.repaint();
+			context.revalidate();
 		});
 		
 		return openFileButton;
@@ -164,8 +164,19 @@ public class TransformationToolPanel extends JPanel {
 		
 		
 		@Override
+		public void mouseMoved(MouseEvent e) {
+			super.mouseMoved(e);
+			var cursor = new Cursor(Cursor.MOVE_CURSOR);
+			e.getComponent().setCursor(cursor);
+		}
+		
+		
+		@Override
 		public void mouseDragged(MouseEvent e) {
 			super.mouseDragged(e);
+			
+			var cursor = new Cursor(Cursor.MOVE_CURSOR);
+			e.getComponent().setCursor(cursor);
 			
 			int x = e.getPoint().x - offset.x;
             int y = e.getPoint().y - offset.y;
@@ -175,6 +186,10 @@ public class TransformationToolPanel extends JPanel {
             location.y += y;
             component.setLocation(location);
             imgBounds = component.getBounds();
+            
+            var icon = ((JLabel) component).getIcon();
+            target = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+            icon.paintIcon(null, target.createGraphics(), 0, 0);
             
             if(checkOverlap(imgBounds, persPlanes)) {
             	
@@ -186,12 +201,7 @@ public class TransformationToolPanel extends JPanel {
 	            			overlappedPersPlane.p2, overlappedPersPlane.p3);
 	            	alreadyInPerspective = true;
 	            	System.out.println("Computing image");
-	            	
-//	            	try {
-//	            		ImageIO.write(computedImg, "png", new File("C:\\Users\\Ramesh\\Desktop\\lalala.png"));
-//	            	} catch (IOException ex) {
-//	            		ex.printStackTrace();
-//	            	}
+
             	}
             	
             	if(computedImg != null)
@@ -209,11 +219,11 @@ public class TransformationToolPanel extends JPanel {
 		}
 		
 		
-		/*check if imgBounds overlaps any user perspective plane*/
+		/*check if imgBounds overlaps any user defined perspective plane*/
 		private boolean checkOverlap(Rectangle r1, List<PerspectivePlane> pplanes) {
 			
 			for(PerspectivePlane pp: pplanes) {
-				if(r1.intersects(pp.getBound())) {
+				if(r1.intersects(pp.getArea())) {
 					overlappedPersPlane = pp;
 					return true;
 				}
