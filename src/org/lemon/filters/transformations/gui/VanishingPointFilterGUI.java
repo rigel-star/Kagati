@@ -33,6 +33,7 @@ import javax.swing.JWindow;
 
 import org.lemon.filters.ResizeImage;
 import org.lemon.filters.transformations.PerspectivePlane;
+import org.lemon.math.Vec2d;
 import org.lemon.utils.Utils;
 
 
@@ -43,7 +44,6 @@ public class VanishingPointFilterGUI extends JWindow {
 	private BufferedImage mainSrc, src, copy;
 	private Point startP = null, endP = null;
 	private Point extraStartP = null, extraEndP = null;
-	private List<Line2D> actLns = new ArrayList<Line2D>();
 	private List<Point> pts = new ArrayList<Point>();
 	private List<Ellipse2D> eps = new ArrayList<Ellipse2D>();
 	private List<LineLocation> lloc = new ArrayList<LineLocation>();
@@ -139,6 +139,8 @@ public class VanishingPointFilterGUI extends JWindow {
 		}
 		
 		
+		Color c = Color.blue;
+		
 		@Override
 		protected void paintComponent(Graphics g) {
 			super.paintComponent(g);
@@ -146,7 +148,7 @@ public class VanishingPointFilterGUI extends JWindow {
 			
 			g2d = (Graphics2D) g;
 			g2d.setStroke(new BasicStroke(3));
-			g2d.setPaint(Color.yellow);
+			g2d.setPaint(c);
 			
 			if(startP != null && endP != null)
 				g2d.draw(new Line2D.Double(startP, endP));
@@ -155,9 +157,9 @@ public class VanishingPointFilterGUI extends JWindow {
 				
 				persPlanes.add(new PerspectivePlane(pts));
 				
-				g2d.setPaint(Color.red);
-				g2d.draw(quadToRect(pts));
 				g2d.setPaint(Color.yellow);
+				g2d.draw(quadToRect(pts));
+				g2d.setPaint(c);
 			}
 			
 			/*when 3 points are selected*/
@@ -167,7 +169,36 @@ public class VanishingPointFilterGUI extends JWindow {
 			
 			/*lines to draw*/
 			for(LineLocation llc: lloc) {
+				
+				if(lloc.size() >= 4) {
+					
+					for(int i=0; i<4; i+=2) {
+						
+						var index = 0;
+						
+						var vc1 = new Vec2d(lloc.get(i).getP1());
+						var firstDir = Math.toDegrees(vc1.dir(new Vec2d(lloc.get(i).getP2())));
+						
+						if(i == 2)
+							index = i + 1;
+						else
+							index = i + 2;
+						
+						var vc2 = new Vec2d(lloc.get(index).getP1());
+						var scndDir = Math.toDegrees(vc2.dir(new Vec2d(lloc.get(index).getP2())));
+						
+						if((firstDir - scndDir) >= 15) {
+							c = Color.red;
+						}
+						else {
+							c = Color.blue;
+						}
+					}
+					
+				}
+				
 				g2d.draw(new Line2D.Double(llc.getP1(), llc.getP2()));
+				
 			}
 			
 			/*for every control point*/
@@ -279,17 +310,13 @@ public class VanishingPointFilterGUI extends JWindow {
 					eps.add(el);
 					
 					if(pts.size() == 2) {
-						actLns.add(new Line2D.Double(pts.get(0), pts.get(1)));
 						lloc.add(new LineLocation(pts.get(0), pts.get(1)));
 					}
 					else if(pts.size() == 3) {
-						actLns.add(new Line2D.Double(pts.get(1), pts.get(2)));
 						lloc.add(new LineLocation(pts.get(1), pts.get(2)));
 					}
 					else if(pts.size() == 4) {
-						actLns.add(new Line2D.Double(pts.get(0), pts.get(3)));
-						actLns.add(new Line2D.Double(pts.get(2), pts.get(3)));
-						lloc.add(new LineLocation(pts.get(0), pts.get(3)));
+						lloc.add(new LineLocation(pts.get(3), pts.get(0)));
 						lloc.add(new LineLocation(pts.get(2), pts.get(3)));
 						
 					}
@@ -346,7 +373,6 @@ public class VanishingPointFilterGUI extends JWindow {
 				g.setStroke(new BasicStroke(3));
 				
 				pts.clear();
-				actLns.clear();
 				eps.clear();
 				lloc.clear();
 				persPlanes.clear();
