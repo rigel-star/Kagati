@@ -11,13 +11,10 @@ import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -30,7 +27,7 @@ import org.lemon.filters.transformations.VanishingPointFilter;
 import org.lemon.gui.image.ChooseImage;
 import org.lemon.utils.Utils;
 
-public class TransformationToolPanel extends JPanel {
+public class TransformationToolPanel extends JPanel implements Runnable {
 	private static final long serialVersionUID = 1L;
 	
 	
@@ -38,6 +35,7 @@ public class TransformationToolPanel extends JPanel {
 	private JButton drawPlaneButton;
 	private JButton eraserToolButton;
 	private JButton brushToolButton;
+	
 	
 	private JComponent context = null;
 	
@@ -56,6 +54,10 @@ public class TransformationToolPanel extends JPanel {
 	
 	private Map<Integer, BufferedImage> allImgs = new HashMap<>();
 	
+	private BufferedImage computedImg = null;
+	
+	private Thread computingThread = null;
+	
 	
 	public TransformationToolPanel(JComponent context, Graphics2D g2d, List<PerspectivePlane> persPlanes) {
 		
@@ -63,23 +65,26 @@ public class TransformationToolPanel extends JPanel {
 		this.context = context;
 		this.persPlanes = persPlanes;
 		
-		try {
-			var img = ImageIO.read(new FileInputStream(new File("C:\\Users\\Ramesh\\Desktop\\opencv\\frame.jpeg")));
-			target = Utils.getImageCopy(img);
-			targetCopy = Utils.getImageCopy(img);
-			
-			var lbl = new JLabel(new ImageIcon(img));
-			
-			var dml = new DragMouseHandler();
-			lbl.addMouseListener(dml);
-			lbl.addMouseMotionListener(dml);
-			
-			context.add(lbl);
-			context.revalidate();
-			
-		} catch(Exception ex) {
-			ex.printStackTrace();
-		}
+		this.computingThread = new Thread(this);
+		computingThread.setPriority(Thread.MAX_PRIORITY);
+		
+//		try {
+//			var img = ImageIO.read(new FileInputStream(new File("C:\\Users\\Ramesh\\Desktop\\opencv\\frame.jpeg")));
+//			target = Utils.getImageCopy(img);
+//			targetCopy = Utils.getImageCopy(img);
+//			
+//			var lbl = new JLabel(new ImageIcon(img));
+//			
+//			var dml = new DragMouseHandler();
+//			lbl.addMouseListener(dml);
+//			lbl.addMouseMotionListener(dml);
+//			
+//			context.add(lbl);
+//			context.revalidate();
+//			
+//		} catch(Exception ex) {
+//			ex.printStackTrace();
+//		}
 		
 		var boxL = new FlowLayout(FlowLayout.TRAILING, 0, 10);
 		var border = BorderFactory.createLineBorder(Color.black, 1);
@@ -159,7 +164,6 @@ public class TransformationToolPanel extends JPanel {
 	private class DragMouseHandler extends MouseAdapter {
 		
 		private Point offset = null;
-		private BufferedImage computedImg = null;
 		
 		@Override
 		public void mousePressed(MouseEvent e) {
@@ -202,11 +206,17 @@ public class TransformationToolPanel extends JPanel {
             	targetCopy = Utils.getImageCopy(target);
             	
             	if(!alreadyInPerspective) {
-	            	computedImg = VanishingPointFilter.Pseudo3D.computeImage(targetCopy,
-	            			overlappedPersPlane.p0, overlappedPersPlane.p1,
-	            			overlappedPersPlane.p2, overlappedPersPlane.p3);
+            			
+        			try {
+        				computingThread.start();
+        			} catch (Exception ex) {
+        				System.out.println("Exception...");
+        				
+        				if(!Thread.currentThread().isAlive())
+        					Thread.currentThread().start();
+        			}
+            		
 	            	alreadyInPerspective = true;
-	            	System.out.println("Computing image");
 
             	}
             	
@@ -242,6 +252,16 @@ public class TransformationToolPanel extends JPanel {
 		
 	}
 	
+	
+	@Override
+	public void run() {
+		computedImg = VanishingPointFilter.Pseudo3D.computeImage(targetCopy,
+    			overlappedPersPlane.p0, overlappedPersPlane.p1,
+    			overlappedPersPlane.p2, overlappedPersPlane.p3);
+		
+		System.out.println("Computing image");
+		return;
+	}
 	
 
 }
