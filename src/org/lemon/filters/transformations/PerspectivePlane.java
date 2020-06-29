@@ -3,6 +3,8 @@ package org.lemon.filters.transformations;
 import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,8 +14,8 @@ import java.util.List;
 public class PerspectivePlane {
 	
 	
-	public Point p0, p1, p2, p3;
-	private List<Point> coords;
+	public Point2D p0, p1, p2, p3;
+	private List<Point2D> coords = new ArrayList<>();
 	
 	
 	public PerspectivePlane() {
@@ -21,7 +23,7 @@ public class PerspectivePlane {
 	}
 	
 	
-	public PerspectivePlane(final Rectangle bounds) {
+	public PerspectivePlane(Rectangle bounds) {
 		p0 = new Point(bounds.x, bounds.y);
 		p1 = new Point(bounds.x, bounds.y + bounds.height);
 		p2 = new Point(bounds.x + bounds.width, bounds.y + bounds.height);
@@ -34,7 +36,7 @@ public class PerspectivePlane {
 	}
 	
 	
-	public PerspectivePlane(final List<Point> pts){
+	public PerspectivePlane(List<Point2D> pts){
 		this.coords = pts;
 		p0 = pts.get(0);
 		p1 = pts.get(1);
@@ -43,7 +45,7 @@ public class PerspectivePlane {
 	}
 	
 	
-	public PerspectivePlane(Point p0, Point p1, Point p2, Point p3) {
+	public PerspectivePlane(Point2D p0, Point2D p1, Point2D p2, Point2D p3) {
 		this.p0 = p0;
 		this.p1 = p1;
 		this.p2 = p2;
@@ -56,21 +58,20 @@ public class PerspectivePlane {
 	}
 	
 	
-	public Rectangle getBound() {
-		Polygon poly = new Polygon();
+	public Rectangle getArea() {
+		var poly = new Polygon();
 		
-		for(Point pt: coords) {
-			poly.addPoint(pt.x, pt.y);
+		for(Point2D pt: coords) {
+			poly.addPoint((int) pt.getX(), (int) pt.getY());
 		}
-		
 		var bound = poly.getBounds();
-		bound.setLocation(p0.x, p0.y);
+		bound.setLocation((int) p0.getX(), (int) p0.getY());
 		
 		return bound;
 	}
 	
 	
-	public List<Point> getCoords(){
+	public List<Point2D> getCoords(){
 		return coords;
 	}
 	
