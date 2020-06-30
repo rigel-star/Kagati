@@ -22,6 +22,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
+import org.lemon.AppGlobalProperties;
 import org.lemon.filters.basic.GrayScale;
 import org.lemon.filters.basic.SharpImage;
 import org.lemon.filters.basic.SobelEdge;
@@ -36,13 +37,13 @@ import org.lemon.gui.image.ImageView;
 import org.lemon.gui.image.ImagePanel.PanelMode;
 import org.lemon.gui.menus.EditMenu;
 import org.lemon.gui.menus.FileMenu;
+import org.lemon.gui.menus.Menu3D;
 import org.lemon.gui.panels.ImageAnalyzePanel;
 import org.lemon.gui.panels.OpacityControlPanel;
 import org.lemon.gui.toolbars.BrushToolBar;
 import org.lemon.tools.BrushTool;
 import org.lemon.tools.LemonTool;
 import org.lemon.tools.brush.NormalBrushTool;
-import org.lemon.utils.AppGlobalProperties;
 import org.lemon.gui.panels.LemonToolPanel;
 import org.piksel.piksel.PPInternalWindow;
 
@@ -52,7 +53,7 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 	
 	
 	
-	private JMenu fileMenu, editMenu;
+	private JMenu fileMenu, editMenu, threeDMenu;
 	
 	
 	
@@ -120,6 +121,7 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 		
 		fileMenu = new FileMenu(this);
 		editMenu = new EditMenu(this);
+		threeDMenu = new Menu3D(this);
 		
 		File f = new File("C:\\Users\\Ramesh\\Documents\\3D Images\\dog2.jpg");
 		//test images: dog.jpg, flow.jpg, (color) mack.jpg
@@ -197,10 +199,10 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 		//extras option
 		extras.add(colorRange);
 		//main menu options
-		menuBar.add(this.fileMenu);
-		//menuBar.add(file);
+		menuBar.add(fileMenu);
 		menuBar.add(editMenu);
 		menuBar.add(filter);
+		menuBar.add(threeDMenu);
 		menuBar.add(extras);
 		
 		//all buttons events are intialized in this method
