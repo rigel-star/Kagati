@@ -17,6 +17,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -42,9 +43,9 @@ public class VanishingPointFilterGUI extends JWindow {
 	
 	
 	private BufferedImage mainSrc, src, copy;
-	private Point startP = null, endP = null;
-	private Point extraStartP = null, extraEndP = null;
-	private List<Point> pts = new ArrayList<Point>();
+	private Point2D startP = null, endP = null;
+	private Point2D extraStartP = null, extraEndP = null;
+	private List<Point2D> pts = new ArrayList<>();
 	private List<Ellipse2D> eps = new ArrayList<Ellipse2D>();
 	private List<LineLocation> lloc = new ArrayList<LineLocation>();
 	
@@ -57,7 +58,7 @@ public class VanishingPointFilterGUI extends JWindow {
 	
 	private final Dimension DEFAULT_RESIZED_IMAGE_SIZE = new Dimension(600, 600);
 	
-	private Point draggedPoint;
+	private Point2D draggedPoint;
 	
 	
 	private boolean enableEraserTool = false;
@@ -176,16 +177,16 @@ public class VanishingPointFilterGUI extends JWindow {
 						
 						var index = 0;
 						
-						var vc1 = new Vec2d(lloc.get(i).getP1());
-						var firstDir = Math.toDegrees(vc1.dir(new Vec2d(lloc.get(i).getP2())));
+						var vc1 = new Vec2d((Point) lloc.get(i).getP1());
+						var firstDir = Math.toDegrees(vc1.dir(new Vec2d((Point) lloc.get(i).getP2())));
 						
 						if(i == 2)
 							index = i + 1;
 						else
 							index = i + 2;
 						
-						var vc2 = new Vec2d(lloc.get(index).getP1());
-						var scndDir = Math.toDegrees(vc2.dir(new Vec2d(lloc.get(index).getP2())));
+						var vc2 = new Vec2d((Point) lloc.get(index).getP1());
+						var scndDir = Math.toDegrees(vc2.dir(new Vec2d((Point) lloc.get(index).getP2())));
 						
 						if((firstDir - scndDir) >= 15) {
 							c = Color.red;
@@ -202,8 +203,8 @@ public class VanishingPointFilterGUI extends JWindow {
 			}
 			
 			/*for every control point*/
-			for(Point p: pts) {
-				g2d.fill(new Ellipse2D.Double(p.x - 7, p.y - 7, 15, 15));
+			for(Point2D p: pts) {
+				g2d.fill(new Ellipse2D.Double((int) p.getX() - 7, (int) p.getY() - 7, 15, 15));
 			}
 		}
 		
@@ -219,11 +220,11 @@ public class VanishingPointFilterGUI extends JWindow {
 	/*
 	 * Makes rectangle out of given points.
 	 * */
-	private Rectangle quadToRect(final List<Point> pts) {
+	private Rectangle quadToRect(final List<Point2D> pts) {
 		Polygon poly = new Polygon();
 		
-		for(Point pt: pts) {
-			poly.addPoint(pt.x, pt.y);
+		for(Point2D pt: pts) {
+			poly.addPoint((int) pt.getX(), (int) pt.getY());
 		}
 		
 		var bound = poly.getBounds();
@@ -384,24 +385,24 @@ public class VanishingPointFilterGUI extends JWindow {
 	
 	class LineLocation {
 		
-		private Point p1;
-		private Point p2;
+		private Point2D p1;
+		private Point2D p2;
 		
-		public LineLocation(Point p1, Point p2) {
+		public LineLocation(Point2D p1, Point2D p2) {
 			this.p1 = p1;
 			this.p2 = p2;
 		}
 		
-		public Point getP1() {
+		public Point2D getP1() {
 			return p1;
 		}
-		public Point getP2() {
+		public Point2D getP2() {
 			return p2;
 		}
 }
 
 
-	public List<Point> getCoords(){
+	public List<Point2D> getCoords(){
 		return pts;
 	}
 	
