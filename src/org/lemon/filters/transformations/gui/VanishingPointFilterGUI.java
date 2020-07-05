@@ -34,6 +34,7 @@ import javax.swing.JWindow;
 
 import org.lemon.filters.ResizeImage;
 import org.lemon.filters.transformations.PerspectivePlane;
+import org.lemon.gui.LayerContainer;
 import org.lemon.math.Vec2d;
 import org.lemon.utils.Utils;
 
@@ -67,26 +68,29 @@ public class VanishingPointFilterGUI extends JWindow {
 	private Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 	private TransformationToolPanel toolPanel;
 	
+	
+	/*buttons*/
 	private JPanel btnPanel;
 	private JButton saveBtn;
 	private JButton cancelBtn;
 	
+	/*main application frame*/
+	private LayerContainer lycont;
+	
 	
 	public static void main(String[] args) {
-		new VanishingPointFilterGUI();
+		new VanishingPointFilterGUI(null, null);
 	}
 	
 	
-	public VanishingPointFilterGUI() {
+	public VanishingPointFilterGUI(BufferedImage userSrc, LayerContainer lycont) {
+		this.lycont = lycont;
 		
-		try {
-			mainSrc = ImageIO.read(new File("C:\\Users\\Ramesh\\Desktop\\opencv\\room.jpg"));
+		mainSrc = userSrc;
 			
-			src = Utils.getImageCopy(mainSrc);
-			copy = Utils.getImageCopy(src);//new ResizeImage(src).getImageSizeOf(DEFAULT_RESIZED_IMAGE_SIZE.width, DEFAULT_RESIZED_IMAGE_SIZE.height);
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		}
+		src = Utils.getImageCopy(mainSrc);
+		copy = Utils.getImageCopy(src);//new ResizeImage(src).getImageSizeOf(DEFAULT_RESIZED_IMAGE_SIZE.width, DEFAULT_RESIZED_IMAGE_SIZE.height);
+
 		
 		setSize(screen.width - 50, screen.height - 50);
 		setLayout(new BorderLayout());
@@ -94,7 +98,7 @@ public class VanishingPointFilterGUI extends JWindow {
 		getRootPane().setBorder(BorderFactory.createLineBorder(Color.GRAY, 4));
 		
 		var ppanel = new CanvasPanel();
-		toolPanel = new TransformationToolPanel(ppanel, g2d, persPlanes);
+		toolPanel = new TransformationToolPanel(this, this.lycont, ppanel, persPlanes);
 		
 		this.init();
 		
@@ -122,7 +126,7 @@ public class VanishingPointFilterGUI extends JWindow {
 		
 		this.cancelBtn = new JButton("Cancel");
 		cancelBtn.addActionListener(action -> {
-			Runtime.getRuntime().exit(0);
+			dispose();
 		});
 		
 		btnPanel.add(saveBtn);
@@ -383,6 +387,34 @@ public class VanishingPointFilterGUI extends JWindow {
 		}
 	
 	
+	/**
+	 * Returns the image from under the quad area which user has selected.
+	 * */
+	public BufferedImage createUntransformedImage() {
+		
+		if(persPlanes.size() == 0)
+			return null;
+		
+		var poly = new Polygon();
+		
+		for(Point2D p: pts) {
+			poly.addPoint((int) p.getX(), (int) p.getY());
+		}
+		
+		var bound = poly.getBounds();
+		poly.translate(-bound.x, -bound.y);
+		var out = new BufferedImage(bound.width, bound.height, BufferedImage.TYPE_INT_ARGB);
+		
+		Graphics2D g = out.createGraphics();
+		
+		g.setClip(poly);
+		g.drawImage(copy, -bound.x, -bound.y, null);
+		g.dispose();
+		
+		return out;
+	}
+	
+	
 	class LineLocation {
 		
 		private Point2D p1;
@@ -399,7 +431,7 @@ public class VanishingPointFilterGUI extends JWindow {
 		public Point2D getP2() {
 			return p2;
 		}
-}
+	}
 
 
 	public List<Point2D> getCoords(){
