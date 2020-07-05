@@ -34,6 +34,7 @@ import org.lemon.gui.dialogs.colrange.ColorRemoverDialog;
 import org.lemon.gui.drawing.canvas.NewDrawingPanelSetup;
 import org.lemon.gui.image.ImageInfoPanel;
 import org.lemon.gui.image.ImageView;
+import org.lemon.gui.layers.Layer;
 import org.lemon.gui.image.ImagePanel.PanelMode;
 import org.lemon.gui.menus.EditMenu;
 import org.lemon.gui.menus.FileMenu;
@@ -91,7 +92,7 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 	
 	
 	//image controllers and analyze panels
-	private OpacityControlPanel 		opacityPanel;
+	OpacityControlPanel 		opacityPanel;
 	private ImageInfoPanel 				imgInfoPanel;
 	private ImageView 					imageView;
 	
@@ -105,6 +106,12 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 	
 	
 	private AppGlobalProperties 		gProperties;
+	
+	
+	/**
+	 * Contains every layer that is created in application.
+	 * */
+	private LayerContainer layerContainer = null;
 	
 	/*
 	 * Map<ImageView, BufferedImage> selectedImgsStorage = new HashMap<>();
@@ -133,14 +140,17 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 		/*important panels in app*/
 		this.mainWorkspace = new Workspace();
 		this.mainToolPanel = new LemonToolPanel(this);
+		this.layerContainer = new LayerContainer(mainWorkspace);
 		
 		
 		this.initToolBar(currentTool);
 		
-		
 		this.imageView = new ImageView(this.choosenImage, gProperties, this.choosenImgName, true, PanelMode.canvasMode);
 		this.imgInfoPanel = new ImageInfoPanel(this.choosenImage);
 		this.opacityPanel = new OpacityControlPanel(this.choosenImage);
+		
+		//layers
+		this.layerContainer.addLayer(new Layer(imageView, imageView.getTitle()));
 		
 		//analyze panel properties
 		analyzeMenu = new ImageAnalyzePanel();
@@ -275,9 +285,10 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 		
 		/***********************************TESTING**************************************/
 		this.mainWorkspace.add(this.imageView);
+		this.mainWorkspace.add(this.layerContainer);
 		this.selectedImgsStorage.put(imageView, choosenImage);
 		this.analyzeMenu.add(this.imgInfoPanel);
-		this.analyzeMenu.add(this.opacityPanel);
+		this.analyzeMenu.add(this.layerContainer);
 		/*************************************************************************/
 		
 
@@ -336,7 +347,13 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 		
 		//vanishing point filter
 		else if(action.getSource() == this.vanishingPoint) {
-			new VanishingPointFilterGUI();
+			if(this.mainWorkspace.getSelectedFrame() instanceof ImageView) {
+				/*Gets the currently selected ImageView object from selectedImgsStorage 
+				 * and pass its corresponding selected image*/
+				new VanishingPointFilterGUI(this.selectedImgsStorage.get(this.mainWorkspace.getSelectedFrame()),
+												layerContainer);
+				return;
+			}
 		}
 		
 		//detecting edges of image
@@ -358,8 +375,6 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 				new PixelateImageDialog(this.selectedImgsStorage.get(this.mainWorkspace.getSelectedFrame()));
 				return;
 			}
-			else
-				JOptionPane.showMessageDialog(this, "Please choose image panel");
 		}
 		
 		
@@ -423,10 +438,10 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 	
 	
 	/**
-	 * Get the main scene of application. Main scene of application is handled by main frame of application.
-	 * @return mainScene {@code MainApplicationScene}
+	 * Get the main workspace of application. Main workspace is handled by the main frame of application.
+	 * @return mainScene {@code Workspace}
 	 * */
-	public Workspace getMainScene() {
+	public Workspace getMainWorkspace() {
 		return this.mainWorkspace;
 	}
 	
@@ -451,5 +466,15 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 	private void noImgSelectedDialog() {
 		JOptionPane.showMessageDialog(this, "No image selected!");
 	}
+	
+	
+	/**
+	 * Get {@code LayerContainer}.
+	 * @return {@code LayerContainer}
+	 * */
+	public LayerContainer getLayerContainer() {
+		return layerContainer;
+	}
+	
 	
 }

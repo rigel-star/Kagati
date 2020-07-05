@@ -13,6 +13,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,16 +27,20 @@ import javax.swing.JPanel;
 
 import org.lemon.filters.transformations.PerspectivePlane;
 import org.lemon.filters.transformations.VanishingPointFilter;
+import org.lemon.gui.LayerContainer;
 import org.lemon.gui.image.ChooseImage;
+import org.lemon.gui.image.ImageView;
+import org.lemon.gui.layers.Layer;
 import org.lemon.utils.Utils;
 
 public class TransformationToolPanel extends JPanel implements Runnable {
 	private static final long serialVersionUID = 1L;
 
-	private JButton openFileButton;
-	private JButton drawPlaneButton;
-	private JButton eraserToolButton;
-	private JButton brushToolButton;
+	private JButton openFileButton = null;
+	private JButton drawPlaneButton = null;
+	private JButton eraserToolButton = null;
+	private JButton brushToolButton = null;
+	private JButton exportImgAsLayerButton = null;
 
 	private JComponent context = null;
 
@@ -50,8 +55,6 @@ public class TransformationToolPanel extends JPanel implements Runnable {
 	/* check if image is already in perspective */
 	private boolean alreadyInPerspective = false;
 
-	Graphics2D g2d;
-
 	private Map<Integer, BufferedImage> allImgs = new HashMap<>();
 
 	private BufferedImage computedImg = null;
@@ -60,13 +63,20 @@ public class TransformationToolPanel extends JPanel implements Runnable {
 
 	private ResizableImagePanel resizableImgPanel = null;
 
+	private LayerContainer lycont = null;
 	
 	
-	public TransformationToolPanel(JComponent context, Graphics2D g2d, List<PerspectivePlane> persPlanes) {
+	/*parent is VanishingPointFilterGUI*/
+	private VanishingPointFilterGUI parent = null;
+	
+	
+	public TransformationToolPanel(VanishingPointFilterGUI parent, LayerContainer lycont,
+									JComponent context, List<PerspectivePlane> persPlanes) {
 
-		this.g2d = g2d;
+		this.lycont = lycont;
 		this.context = context;
 		this.persPlanes = persPlanes;
+		this.parent = parent;
 
 		this.computingThread = new Thread(this);
 		computingThread.setPriority(Thread.MAX_PRIORITY);
@@ -99,13 +109,15 @@ public class TransformationToolPanel extends JPanel implements Runnable {
 		add(createDrawPlaneButton());
 		add(createEraserToolButton());
 		add(createBrushToolButton());
+		add(createExportImgButton());
 	}
 
 	
 	
 	private JButton createOpenFileButton() {
-		this.openFileButton = new JButton("Open...");
-
+		this.openFileButton = new JButton();
+		openFileButton.setIcon(new ImageIcon("icons/insert_img.png"));
+		openFileButton.setToolTipText("Open Image");
 		openFileButton.addActionListener(action -> {
 
 			var chooser = new ChooseImage();
@@ -138,7 +150,7 @@ public class TransformationToolPanel extends JPanel implements Runnable {
 	private JButton createDrawPlaneButton() {
 		this.drawPlaneButton = new JButton();
 		drawPlaneButton.setIcon(new ImageIcon("icons/tools/transformation/perspective.png"));
-
+		drawPlaneButton.setToolTipText("Create Perspective Tool");
 		drawPlaneButton.addActionListener(action -> {
 
 		});
@@ -150,6 +162,7 @@ public class TransformationToolPanel extends JPanel implements Runnable {
 	
 	private JButton createEraserToolButton() {
 		this.eraserToolButton = new JButton();
+		eraserToolButton.setToolTipText("Eraser Tool");
 		eraserToolButton.setIcon(new ImageIcon("icons/tools/eraser.png"));
 		return eraserToolButton;
 	}
@@ -158,10 +171,36 @@ public class TransformationToolPanel extends JPanel implements Runnable {
 	
 	private JButton createBrushToolButton() {
 		this.brushToolButton = new JButton();
+		brushToolButton.setToolTipText("Brush Tool");
 		brushToolButton.setIcon(new ImageIcon("icons/tools/brush.png"));
 		return brushToolButton;
 	}
 
+	
+	/**
+	 * To export the sub image that user has selected
+	 * */
+	private JButton createExportImgButton() {
+		this.exportImgAsLayerButton = new JButton();
+		exportImgAsLayerButton.setToolTipText("Export Selected Area");
+		exportImgAsLayerButton.setIcon(new ImageIcon("icons/tools/transfer.png"));
+		
+		exportImgAsLayerButton.addActionListener(action -> {
+			ImageView view = null;
+			try {
+				if(parent != null) {
+					view = new ImageView(((VanishingPointFilterGUI) parent).createUntransformedImage(), "VP un-transformed");
+					lycont.addLayer(new Layer(view));
+				}
+				else
+					System.out.println("Null Parent");
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		});
+		
+		return exportImgAsLayerButton;
+	}
 	
 	
 	@Override
@@ -182,12 +221,14 @@ public class TransformationToolPanel extends JPanel implements Runnable {
 			offset = e.getPoint();
 		}
 
+		
 		@Override
 		public void mouseMoved(MouseEvent e) {
 			super.mouseMoved(e);
 			var cursor = new Cursor(Cursor.MOVE_CURSOR);
 			e.getComponent().setCursor(cursor);
 		}
+		
 
 		@Override
 		public void mouseDragged(MouseEvent e) {
