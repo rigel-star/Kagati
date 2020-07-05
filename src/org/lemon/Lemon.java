@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 
 import org.lemon.gui.ApplicationFrame;
 
@@ -25,16 +24,25 @@ public class Lemon {
 				
 				try {
 					UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-					new ApplicationFrame();
+				
 				} catch (Exception ex3) {
 					ex3.printStackTrace();
+					
 					try {
+						/*if nimbus is not supported*/
 						UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+						
 					} catch (Exception ex) {
 						ex.printStackTrace();
 					}
 					
-				}	
+				}
+				
+				try {
+					new ApplicationFrame();
+				} catch(IOException ex) {
+					ex.printStackTrace();
+				}
 			}
 		});
 	}
