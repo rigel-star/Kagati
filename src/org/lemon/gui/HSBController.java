@@ -3,8 +3,6 @@ package org.lemon.gui;
 import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JButton;
@@ -22,7 +20,6 @@ import org.lemon.utils.Utils;
 import org.rampcv.filters.Brightness;
 
 public class HSBController extends JInternalFrame implements 
-																ActionListener,
 																ChangeListener,
 																Runnable {
 
@@ -45,8 +42,6 @@ public class HSBController extends JInternalFrame implements
 	
 	private final static int HUE = 1, BRGT = 2, SATR = 3;
 	private int operation = 0;
-	
-	private JButton okBttn;
 	
 	
 	public HSBController() {
@@ -112,9 +107,6 @@ public class HSBController extends JInternalFrame implements
 		this.addSliderFeature(this.brgtjs);
 		brgtjs.addChangeListener(this);
 		
-		this.okBttn = new JButton("OK");//new ImageIcon("icons/tick.png"));
-		okBttn.addActionListener(this);
-		
 		this.editPanel = new JPanel(new GridLayout(3, 3));
 		
 	}
@@ -163,22 +155,6 @@ public class HSBController extends JInternalFrame implements
 			var v = (ImageView) comp;
 			v.getImagePanel().setImage(copy);
 			v.getImagePanel().revalidate();
-		}
-	}
-
-	
-	
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		
-		if(e.getSource() == okBttn) {
-			
-			if(comp instanceof ImageView) {
-				var view = (ImageView) comp;
-				view.getImagePanel().setImage(src);
-				view.getImagePanel().revalidate();
-			}
-			
 		}
 	}
 	
