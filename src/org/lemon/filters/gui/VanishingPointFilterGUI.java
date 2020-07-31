@@ -6,7 +6,6 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -19,12 +18,9 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -74,13 +70,8 @@ public class VanishingPointFilterGUI extends JWindow {
 	private JButton saveBtn;
 	private JButton cancelBtn;
 	
-	/*main application frame*/
+	/*application main LayerContainer*/
 	private LayerContainer lycont;
-	
-	
-	public static void main(String[] args) {
-		new VanishingPointFilterGUI(null, null);
-	}
 	
 	
 	public VanishingPointFilterGUI(BufferedImage userSrc, LayerContainer lycont) {
@@ -90,9 +81,9 @@ public class VanishingPointFilterGUI extends JWindow {
 			
 		src = Utils.getImageCopy(mainSrc);
 		copy = Utils.getImageCopy(src);//new ResizeImage(src).getImageSizeOf(DEFAULT_RESIZED_IMAGE_SIZE.width, DEFAULT_RESIZED_IMAGE_SIZE.height);
-
+		copy = new ResizeImage(copy).getImageSizeOf(600, 600);
 		
-		setSize(screen.width - 50, screen.height - 50);
+		setSize(screen.width - 50, 650);
 		setLayout(new BorderLayout());
 		setLocationRelativeTo(null);
 		getRootPane().setBorder(BorderFactory.createLineBorder(Color.GRAY, 4));
@@ -103,11 +94,11 @@ public class VanishingPointFilterGUI extends JWindow {
 		this.init();
 		
 		Container c = getContentPane();
-		c.setLayout(new FlowLayout(FlowLayout.LEFT, 100, 5));
+		c.setLayout(new BorderLayout());
 		
-		c.add(toolPanel);
-		c.add(ppanel);
-		c.add(btnPanel);
+		c.add(toolPanel, BorderLayout.WEST);
+		c.add(ppanel, BorderLayout.CENTER);
+		c.add(btnPanel, BorderLayout.EAST);
 		
 		var mh = new MouseHandler(ppanel, copy.createGraphics());
 		
@@ -141,19 +132,27 @@ public class VanishingPointFilterGUI extends JWindow {
 		
 		public CanvasPanel() {
 			setLocationRelativeTo(null);
+			setBorder(BorderFactory.createLineBorder(Color.darkGray, 2));
 		}
 		
 		
 		Color c = Color.blue;
+		int imgWidth = copy.getWidth();
+		int imgHeight = copy.getHeight();
+		
 		
 		@Override
 		protected void paintComponent(Graphics g) {
 			super.paintComponent(g);
-			g.drawImage(copy, 0, 0, null);
+			
+			var dim = getPreferredSize();
 			
 			g2d = (Graphics2D) g;
 			g2d.setStroke(new BasicStroke(3));
 			g2d.setPaint(c);
+			g2d.translate((dim.width / 2) - (imgWidth / 2), (dim.height / 2) - (imgHeight / 2));
+			g2d.drawImage(copy, 0, 0, null);
+			g2d.translate(0, 0);
 			
 			if(startP != null && endP != null)
 				g2d.draw(new Line2D.Double(startP, endP));
@@ -190,7 +189,7 @@ public class VanishingPointFilterGUI extends JWindow {
 							index = i + 2;
 						
 						var vc2 = new Vec2d((Point) lloc.get(index).getP1());
-						var scndDir = Math.toDegrees(vc2.dir(new Vec2d((Point) lloc.get(index).getP2())));
+						var scndDir = Math.toRadians(vc2.dir(new Vec2d((Point) lloc.get(index).getP2())));
 						
 						if((firstDir - scndDir) >= 15) {
 							c = Color.red;
@@ -215,7 +214,7 @@ public class VanishingPointFilterGUI extends JWindow {
 		
 		@Override
 		public Dimension getPreferredSize() {
-			return new Dimension(DEFAULT_RESIZED_IMAGE_SIZE.width, DEFAULT_RESIZED_IMAGE_SIZE.height);
+			return new Dimension(imgWidth, imgHeight);
 		};
 		
 	}
