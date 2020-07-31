@@ -1,11 +1,10 @@
 package org.lemon.gui.image;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -14,13 +13,15 @@ import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 
+import org.lemon.AppGlobalProperties;
 import org.lemon.gui.drawing.image.DrawingCanvasOnImage;
 import org.lemon.tools.select.LassoSelectionTool;
 import org.lemon.tools.select.PolygonalSelectTool;
-import org.lemon.utils.AppGlobalProperties;
 
 /**
  * Class description: This class extends JLabel and takes image as param and apply it as its icon.
@@ -34,14 +35,13 @@ public class ImagePanel extends JPanel {
 	private int panelMode;
 	
 	private ImagePanel self;
+	private JLabel imgContainer;
 	
 	/*Different types of mouseListeners for different tools*/
 	private DrawingCanvasOnImage brushToolListener;
 	private PolygonalSelectTool polySelectionToolListener;
 	private LassoSelectionTool lassoSelectionToolListener;
 	private ImageZoomAndPanListener zoomAndPanListener;
-	
-	private ImageKeyEventListener keyEvents;
 	
 	
 	private boolean init = true;
@@ -86,10 +86,14 @@ public class ImagePanel extends JPanel {
 		//for drawing shapes in image
 		public static final int 	SHAPES_MODE = 3;
 		
+		//for zooming and panning the image
+		public static final int ZOOM_AND_PAN_MODE = 4;
+		
 		public static final int 	defaultMode = DEFAULT_MODE;
 		public static final int 	canvasMode = CANVAS_MODE;
 		public static final int 	snapMode = SNAP_MODE;
 		public static final int 	shapesMode = SHAPES_MODE;
+		public static final int		zoomAndPanMode = ZOOM_AND_PAN_MODE;
 	}
 	
 	
@@ -109,49 +113,49 @@ public class ImagePanel extends JPanel {
 		//BoxLayout layout = new BoxLayout(getContentPane(), BoxLayout.Y_AXIS);
 				
 		Border border = BorderFactory.createLineBorder(Color.GRAY, 1);
-		setBorder(border);
-		setSize(img.getWidth(), img.getHeight());
+		setBorder(border);	
+		
+		this.imgContainer = new JLabel(new ImageIcon(img));
+		
+		add(imgContainer);
 		
 		setBackground(Color.WHITE);
-		setFocusable(true);
 		
+		this.panelMode = PanelMode.ZOOM_AND_PAN_MODE;
 		initCurrentTool(this.panelMode);
 		
 		self = this;
-		keyEvents = new ImageKeyEventListener();
-		addKeyListener(keyEvents);
 		
 	}
 	
 	
 	
-	@Override
-	protected void paintComponent(Graphics g) {
-		super.paintComponent(g);
-		
-        Graphics2D g2 = (Graphics2D) g;
-        int x = (int) (this.getWidth() - (img.getWidth() * .2)) / 2;
-        int y = (int) (this.getHeight() - (img.getHeight() * .2)) / 2;
-        
-        x = 0;
-        y = 0;
-
-        AffineTransform at = new AffineTransform();
-        at.translate(x, y);
-        at.scale(1, 1);
-        
-        if (init) {
-            g2.setTransform(at);
-            init = false;
-            coordTransform = g2.getTransform();
-        } else {
-            g2.setTransform(coordTransform);
-        }
-
-        g2.drawImage(img, 0, 0, this);
-
-        g2.dispose();
-	}
+//	@Override
+//	protected void paintComponent(Graphics g) {
+//		super.paintComponent(g);
+//		
+//        Graphics2D g2 = (Graphics2D) g;
+//        int x = (int) (this.getWidth() - (img.getWidth() * .2)) / 2;
+//        int y = (int) (this.getHeight() - (img.getHeight() * .2)) / 2;
+//        x = 0;
+//        y = 0;
+//
+//        AffineTransform at = new AffineTransform();
+//        at.translate(x, y);
+//        at.scale(1, 1);
+//        
+//        if (init) {
+//            g2.setTransform(at);
+//            init = false;
+//            coordTransform = g2.getTransform();
+//        } else {
+//            g2.setTransform(coordTransform);
+//        }
+//
+//        g2.drawImage(img, 0, 0, this);
+//        
+//        g2.dispose();
+//	}
 	
 	
 	
@@ -179,11 +183,60 @@ public class ImagePanel extends JPanel {
 		}
 		break;
 		
+		case PanelMode.ZOOM_AND_PAN_MODE: {
+			imgContainer.addMouseListener(zoomAndPanListener);
+			imgContainer.addMouseMotionListener(zoomAndPanListener);
+			imgContainer.addMouseWheelListener(zoomAndPanListener);
+			currentMouseListsner = zoomAndPanListener;
+		}
+		break;
 		
 		
 		}
 	}
 	
+	
+	private Point2D.Float transformPoint(Point p1) throws NoninvertibleTransformException {
+        AffineTransform inverse = coordTransform.createInverse();
+        Point2D.Float p2 = new Point2D.Float();
+        inverse.transform(p1, p2);
+        return p2;
+    }
+	
+	
+	
+	/*
+	 * Class which exetnds Abstract class MouseAdapter and overrides some functions.
+	 * This class is used for zooming and panning the image on the screen.
+	 * */
+	private class ImageZoomAndPanListener extends MouseAdapter {
+		
+		
+		/*init starrting and ending point of affine transformation*/
+		@Override
+		public void mousePressed(MouseEvent e) {
+			super.mousePressed(e);
+			dragStartScreen = e.getPoint();
+            dragEndScreen = null;
+		}
+		
+		
+		/*pan the image*/
+		@Override
+		public void mouseDragged(MouseEvent e) {
+			super.mouseDragged(e);
+			pan(e);
+		}
+		
+		
+		/*zoom the image*/
+		@Override
+        public void mouseWheelMoved(MouseWheelEvent e) {
+            if (e.isControlDown()) {
+                zoom(e);
+            }
+        }
+	}
 	
 	
 	/*pan image on mouse drag*/
@@ -236,85 +289,6 @@ public class ImagePanel extends JPanel {
 	}
 	
 	
-	private Point2D.Float transformPoint(Point p1) throws NoninvertibleTransformException {
-        AffineTransform inverse = coordTransform.createInverse();
-        Point2D.Float p2 = new Point2D.Float();
-        inverse.transform(p1, p2);
-        return p2;
-    }
-	
-	
-	
-	
-	
-	private class ImageKeyEventListener extends KeyAdapter {
-		
-		MouseAdapter current = getCurrentMouseListener();
-		
-		@Override
-		public void keyPressed(KeyEvent e) {
-			super.keyPressed(e);
-			self.removeMouseListener(current);
-			self.removeMouseMotionListener(current);
-			self.removeMouseWheelListener(current);
-			self.addMouseListener(zoomAndPanListener);
-			self.addMouseMotionListener(zoomAndPanListener);
-			self.addMouseWheelListener(zoomAndPanListener);
-			self.revalidate();
-		}
-		
-		
-		@Override
-		public void keyReleased(KeyEvent e) {
-			super.keyReleased(e);
-			self.removeMouseListener(zoomAndPanListener);
-			self.removeMouseMotionListener(zoomAndPanListener);
-			self.removeMouseWheelListener(zoomAndPanListener);
-			self.addMouseListener(current);
-			self.addMouseMotionListener(current);
-			self.addMouseWheelListener(current);
-			self.revalidate();
-		}
-	}
-	
-	
-	
-	/*
-	 * Class which exetnds Abstract class MouseAdapter and overrides some functions.
-	 * This class is used for zooming and panning the image on the screen.
-	 * */
-	private class ImageZoomAndPanListener extends MouseAdapter {
-		
-		
-		/*init starrting and ending point of affine transformation*/
-		@Override
-		public void mousePressed(MouseEvent e) {
-			super.mousePressed(e);
-			dragStartScreen = e.getPoint();
-            dragEndScreen = null;
-		}
-		
-		
-		/*pan the image*/
-		@Override
-		public void mouseDragged(MouseEvent e) {
-			super.mouseDragged(e);
-			pan(e);
-		}
-		
-		
-		/*zoom the image*/
-		@Override
-        public void mouseWheelMoved(MouseWheelEvent e) {
-            if (e.isControlDown()) {
-                zoom(e);
-            }
-        }
-	}
-	
-	
-	
-	
 	/**
 	 * Returns currently applied canvas mouse listener if applied else returns {@code null}.
 	 * @return {@code DrawingCanvasOnImage} current canvas mouse listener.
@@ -361,13 +335,19 @@ public class ImagePanel extends JPanel {
 	}
 	
 	
+	@Override
+	public Dimension getPreferredSize() {
+		return new Dimension(img.getWidth(), img.getHeight());
+	}
+	
 	
 	/**
 	 * Sets the new image to {@code this ImagePanel}.
 	 * @param img	{@code BufferedImage} object.
 	 * */
-	public void setImage(BufferedImage img) {
-		this.img = img;
+	public void setImage(BufferedImage imgg) {
+		this.img = imgg;
+		this.imgContainer.setIcon(new ImageIcon(imgg));
 	}
 	
 	
