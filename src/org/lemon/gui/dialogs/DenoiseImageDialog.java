@@ -7,7 +7,6 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 
 import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -16,16 +15,15 @@ import javax.swing.JWindow;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.lemon.gui.image.ImagePanel;
-import org.lemon.gui.image.ImagePanel.PanelMode;
+import org.lemon.gui.ImageView;
+import org.lemon.gui.image.ImagePreviewPanel;
 import org.rampcv.rampcv.RampCV;
-import org.rampcv.utils.Tools;
 
 public class DenoiseImageDialog extends JWindow implements ChangeListener, ActionListener {
 
 	private static final long serialVersionUID = 1L;
 
-	private ImagePanel 			impanel;
+	private ImagePreviewPanel 	previewPanel;
 	
 	private JPanel 				editPanel, imgPanel, bttnPanel;
 	
@@ -45,12 +43,12 @@ public class DenoiseImageDialog extends JWindow implements ChangeListener, Actio
 	 * @param image which going to be denoised
 	 * */
 	public DenoiseImageDialog(JComponent container, BufferedImage img) {
-		this.init(img);
 		this.img = img;
+		this.init(this.img);
 		this.container = container;
 		
 		//frame properties
-		setSize(img.getWidth() + 100, img.getHeight() + 50);
+		setSize(400, 400);
 		setVisible(true);
 		setLocation(200, 100);
 				
@@ -62,7 +60,7 @@ public class DenoiseImageDialog extends JWindow implements ChangeListener, Actio
 	
 	private void init(BufferedImage img) {
 		
-		this.impanel = new ImagePanel(img, null, PanelMode.defaultMode);
+		this.previewPanel = new ImagePreviewPanel(img);
 		this.editPanel = new JPanel();
 		this.imgPanel = new JPanel();
 		this.bttnPanel = new JPanel();
@@ -84,7 +82,7 @@ public class DenoiseImageDialog extends JWindow implements ChangeListener, Actio
 		this.slider.setPaintLabels(true);
 		this.slider.addChangeListener(this);
 		
-		imgPanel.add(impanel);
+		imgPanel.add(previewPanel);
 		imgPanel.add(bttnPanel);
 		editPanel.add(slider);
 		bttnPanel.add(okBttn);
@@ -96,7 +94,7 @@ public class DenoiseImageDialog extends JWindow implements ChangeListener, Actio
 		if(e.getSource() == this.slider) {
 			
 			int curr = this.slider.getValue();
-			copy = Tools.copyImage(this.img);
+			copy = previewPanel.getCopyImage();
 			
 			//starting another thread
 			//to denoise the image
@@ -108,8 +106,8 @@ public class DenoiseImageDialog extends JWindow implements ChangeListener, Actio
 					RampCV.denoise(copy, curr);
 					
 					//set new image and revalidate
-					impanel.setIcon(new ImageIcon(copy));
-					imgPanel.revalidate();
+					//impanel.setIcon(new ImageIcon(copy));
+					previewPanel.update(copy);
 				}
 			}).start();
 			
@@ -121,7 +119,8 @@ public class DenoiseImageDialog extends JWindow implements ChangeListener, Actio
 		
 		if(e.getSource() == this.okBttn) {
 			if(this.copy != null) {
-				this.img = copy;
+				this.img = this.previewPanel.getFinalImage();
+				((ImageView) this.container).getImagePanel().repaint();
 				this.container.revalidate();
 				this.dispose();
 			}

@@ -14,7 +14,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import org.lemon.gui.image.ImageView;
+import org.lemon.gui.ImageView;
 import org.lemon.utils.AccessoriesRemover;
 import org.rampcv.rampcv.RampCV;
 

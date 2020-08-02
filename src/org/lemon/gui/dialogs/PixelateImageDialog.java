@@ -12,7 +12,7 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.lemon.gui.image.ImageView;
+import org.lemon.gui.ImageView;
 import org.rampcv.rampcv.RampCV;
 import org.rampcv.utils.Tools;
 

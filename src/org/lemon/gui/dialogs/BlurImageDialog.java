@@ -12,7 +12,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.lemon.filters.basic.BlurImage;
-import org.lemon.gui.image.ImageView;
+import org.lemon.gui.ImageView;
 import org.rampcv.utils.Tools;
 
 public class BlurImageDialog extends JFrame implements ChangeListener {
