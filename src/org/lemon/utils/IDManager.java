@@ -38,8 +38,7 @@ public class IDManager<E> {
 	 * */
 	public int next() {
 		NavigableSet<Integer> keys = this.idStorage.descendingKeySet();		//e.g. 5 4 3 2 1
-		int id = 1;
-		
+		int id = 0;
 		if(!keys.isEmpty()) {
 			id = keys.first() + 1;		//e.g. first(5) + 1 = 6
 		}

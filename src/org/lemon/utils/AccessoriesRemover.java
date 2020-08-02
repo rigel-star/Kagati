@@ -4,7 +4,7 @@ import java.awt.Component;
 
 import javax.swing.JPanel;
 
-import org.lemon.gui.image.ImageView;
+import org.lemon.gui.ImageView;
 
 public class AccessoriesRemover {
 
