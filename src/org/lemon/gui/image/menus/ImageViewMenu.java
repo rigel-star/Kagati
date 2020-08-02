@@ -9,10 +9,10 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
+import org.lemon.gui.ImageView;
 import org.lemon.gui.dialogs.SharePixelsDialog;
 import org.lemon.gui.image.ImagePanel.PanelMode;
 import org.lemon.tools.brush.gui.BrushGUI;
-import org.lemon.gui.image.ImageView;
 
 
 
@@ -28,35 +28,68 @@ public class ImageViewMenu extends JPopupMenu {
 	private ImageView context;
 	
 	
-	private JMenu connect, options;
+	private JMenu connect, options, useAsBackground;
 	private JMenuItem brushes, duplicate, delete;
+	private JMenu sendTo;
 	
 	
 	public ImageViewMenu(ImageView context) {
 		
 		this.context = context;
 		
+		useAsBackground = createUseAsBgMenu();
+		sendTo = createSendToMenu();
 		connect = createConnectionMenu();
 		options = createOptionsMenu();
 		brushes = createBrushMenu();
 		duplicate = createDuplicateMenu();
 		delete = createDeleteMenu();
 		
+		
 		add(connect);
+		add(useAsBackground);
+		add(sendTo);
 		add(options);
 		add(brushes);
 		add(duplicate);
 		add(delete);
 	}
 	
+	
+	
+	private JMenu createSendToMenu() {
+		var send = new JMenu("Send to...");
+		
+		var newFrame = new JMenuItem("new frame");
+		var con = new JMenuItem("Connection");
+		
+		send.add(newFrame);
+		send.add(con);
+		
+		return send;
+	}
+	
+	
+	
+	/**
+	 * Creates the use as background menu.
+	 * This option makes selected {@code ImageView} or {@code DrawingPanel} main background layer.
+	 * */
+	private JMenu createUseAsBgMenu() {
+		var uabg = new JMenu("Use as background...");
+		return uabg;
+	}
 
 	
+	/**
+	 * Creates the option menu for this current ImageView (eg. Blend option, share pixels option etc)
+	 * */
 	private JMenu createOptionsMenu() {
 		var options = new JMenu("Options...");
 		
 		var sharePixel = new JMenuItem("Share pixels");
 		sharePixel.addActionListener(action -> {
-			new SharePixelsDialog(this.context.getImage(), this.context.getConnection().getImage());
+			new SharePixelsDialog(this.context.getActualImage(), this.context.getConnection().getActualImage());
 		});
 		
 		var blend = new JMenuItem("Blend");
@@ -81,6 +114,10 @@ public class ImageViewMenu extends JPopupMenu {
 	}
 	
 	
+	
+	/**
+	 * Creates connection menu i.e lists all the available ImageView and DrawingCanvas for this current ImageView.
+	 * */
 	private JMenu createConnectionMenu() {
 		var connect = new JMenu("Connect...");
 		
@@ -119,6 +156,9 @@ public class ImageViewMenu extends JPopupMenu {
 	}
 	
 	
+	/**
+	 * Option to delete this ImageView
+	 * */
 	private JMenuItem createDeleteMenu() {
 		var delete = new JMenuItem("Delete...");
 		
@@ -129,6 +169,10 @@ public class ImageViewMenu extends JPopupMenu {
 	}
 	
 	
+	
+	/**
+	 * BrushMenu 
+	 * */
 	private JMenuItem createBrushMenu() {
 		var brush = new JMenuItem("Brushes...");
 		
@@ -144,6 +188,10 @@ public class ImageViewMenu extends JPopupMenu {
 	}
 	
 	
+	
+	/**
+	 * Duplication option for this ImageView
+	 * */
 	private JMenuItem createDuplicateMenu() {
 		var duplicate = new JMenuItem("Duplicate...");
 		

@@ -20,6 +20,7 @@ import javax.swing.border.Border;
 
 import org.lemon.AppGlobalProperties;
 import org.lemon.gui.drawing.image.DrawingCanvasOnImage;
+import org.lemon.tools.SelectionTool;
 import org.lemon.tools.select.LassoSelectionTool;
 import org.lemon.tools.select.PolygonalSelectTool;
 
@@ -37,12 +38,13 @@ public class ImagePanel extends JPanel {
 	private ImagePanel self;
 	private JLabel imgContainer;
 	
-	/*Different types of mouseListeners for different tools*/
+	/*different types of mouseListeners for different tools*/
 	private DrawingCanvasOnImage brushToolListener;
 	private PolygonalSelectTool polySelectionToolListener;
 	private LassoSelectionTool lassoSelectionToolListener;
 	private ImageZoomAndPanListener zoomAndPanListener;
 	
+	private SelectionTool.SelectedArea selectedArea = null;
 	
 	private boolean init = true;
     private int zoomLevel = 0;

@@ -74,7 +74,7 @@ public class ImagePreviewPanel extends JPanel {
 	/*
 	 * Resize image to required size.
 	 * */
-	public BufferedImage resize(BufferedImage img, int w, int h) {
+	private BufferedImage resize(BufferedImage img, int w, int h) {
 		
 		if(img.getHeight() == h && img.getWidth() == w) {
 			return img;
