@@ -10,7 +10,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 import org.lemon.filters.ResizeImage;
-import org.lemon.gui.image.ImageView;
+import org.lemon.gui.ImageView;
 
 public class LayerPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -42,7 +42,7 @@ public class LayerPanel extends JPanel {
 		else if(layer.getLayerComponent() instanceof ImageView) {
 			var view = ((ImageView) layer.getLayerComponent());//.getImage();
 			title = layer.getTitle();
-			indiImg = view.getImage();
+			indiImg = view.getActualImage();
 		}
 		
 		if(indiImg != null)
