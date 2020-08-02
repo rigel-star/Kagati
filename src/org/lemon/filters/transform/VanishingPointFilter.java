@@ -74,7 +74,7 @@ public class VanishingPointFilter {
 	        m.m12 *= p3.z;
 	        m.m20 *= p3.x;
 	        m.m21 *= p3.y;
-	        m.m22 *= p3.z;
+	        m.m22 *= 1;//p3.z;
 	        return m;
 	    }
 

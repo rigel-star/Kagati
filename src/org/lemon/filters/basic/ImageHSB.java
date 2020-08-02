@@ -18,12 +18,16 @@ public class ImageHSB {
 	}
 	
 	
-	public static void incSaturation(BufferedImage src, int x, int y, float intensity) {
+	/**
+	 * @param pixel specific pixel value
+	 * @param intensity how much to increase or decrease saturation
+	 * */
+	public static int incSaturation(int pixel, float intensity) {
 		
 		if(intensity <= 0 || intensity > 1.0)
 			throw new IllegalArgumentException("Intensity must be between 0.0 to 1.0");
 		
-		color = new Color(src.getRGB(x, y));
+		color = new Color(pixel);
 		int r = color.getRed();
 		int g = color.getGreen();
 		int b = color.getBlue();
@@ -33,9 +37,8 @@ public class ImageHSB {
 		hsb[1] = Range.constrain(hsb[1] * intensity, 0.0f, 1.0f);
 
 		Color res = new Color(hsb[0], hsb[1], hsb[2]);
-		src.setRGB(x, y, res.getRGB());
+		return res.getRGB();
 	}
-	
 	
 	
 	public static void incBrightness(BufferedImage src, int x, int y, float intensity) {
