@@ -2,17 +2,6 @@ package org.lemon.math;
 
 
 public class Matrix3 {
-	
-	
-	public static void main(String[] args) {
-		var mat = new Matrix3(2, 0, 0, 0, 2, 0, 0, 0, 2);
-		var pt = new Point3(-1, 2, 3);
-		
-		mat.transform(pt);
-		
-		System.out.println(pt.x + " " + pt.y + " " + pt.z);
-	}
-	
 
 	double a11;
 	double a12;
