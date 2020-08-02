@@ -12,8 +12,8 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JWindow;
 
+import org.lemon.gui.ImageView;
 import org.lemon.gui.image.ImagePanel;
-import org.lemon.gui.image.ImageView;
 
 public class BrushToolOptions extends JWindow {
 	private static final long serialVersionUID = 1L;
