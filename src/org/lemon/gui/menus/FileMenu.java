@@ -7,14 +7,14 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
 import org.lemon.gui.ApplicationFrame;
+import org.lemon.gui.ImageView;
 import org.lemon.gui.image.ChooseImage;
 import org.lemon.gui.image.ImagePanel.PanelMode;
-import org.lemon.gui.image.ImageView;
 import org.lemon.gui.layers.Layer;
 
 /**
- * FileMenu is for opening, saving etc files in application, saving files etc.
- * FileMenu's container is MainApplicationFrame.
+ * FileMenu is for opening, saving files in application.
+ * FileMenu's container is MainApplicationFrame.JMenuBar.
  * */
 public class FileMenu extends JMenu implements ActionListener {
 	private static final long serialVersionUID = 1L;
@@ -69,6 +69,7 @@ public class FileMenu extends JMenu implements ActionListener {
 		var imgChoose = new ChooseImage();
 
 		var img = imgChoose.getChoosenImage();
+		
 		var title = imgChoose.getChoosenFile().getName();
 		
 		var imgView = new ImageView(img, null, title, true, PanelMode.snapMode);
