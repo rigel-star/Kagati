@@ -142,7 +142,7 @@ public class ImageView extends JInternalFrame implements Cloneable {
 		setTitle(this.title);
 		setClosable(closeable);
 		setVisible(true);
-		setSize(new Dimension(img.getWidth(), img.getHeight()));
+		setSize(new Dimension(srcCopy.getWidth(), srcCopy.getHeight()));
 		setLayout(new BorderLayout());
 		setMaximizable(true);
 		setIconifiable(true);

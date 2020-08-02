@@ -5,7 +5,6 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.image.BufferedImage;
 
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
@@ -16,8 +15,10 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
+import org.lemon.filters.basic.ImageHSB;
 import org.lemon.utils.Utils;
 import org.rampcv.filters.Brightness;
+import org.rampcv.filters.Saturation;
 
 public class HSBController extends JInternalFrame implements 
 																ChangeListener,
@@ -66,7 +67,7 @@ public class HSBController extends JInternalFrame implements
 			view.getImagePanel().revalidate();
 		}
 		
-		setSize(225, 280);
+		setSize(225, 220);
 		setResizable(false);
 		setTitle("HSB Controller");
 		setVisible(true);
@@ -94,15 +95,16 @@ public class HSBController extends JInternalFrame implements
 	
 	//initializing components
 	private void init() {
-		this.huejs = new JSlider(JSlider.HORIZONTAL, 0, 10, 0);
+		this.huejs = new JSlider(JSlider.HORIZONTAL, 0, 25, 0);
 		this.huetf = new JLabel("Hue");
 		this.addSliderFeature(this.huejs);
 		
-		this.satrjs = new JSlider(JSlider.HORIZONTAL, 0, 10, 0);
+		this.satrjs = new JSlider(JSlider.HORIZONTAL, 0, 25, 0);
 		this.satrtf = new JLabel("Saturation");
 		this.addSliderFeature(this.satrjs);
+		satrjs.addChangeListener(this);
 		
-		this.brgtjs = new JSlider(JSlider.HORIZONTAL, 0, 10, 0);
+		this.brgtjs = new JSlider(JSlider.HORIZONTAL, 0, 25, 0);
 		this.brgttf = new JLabel("Brightness");
 		this.addSliderFeature(this.brgtjs);
 		brgtjs.addChangeListener(this);
@@ -119,7 +121,6 @@ public class HSBController extends JInternalFrame implements
 		//js properties
 		js.setPaintTicks(true);
 		js.setMajorTickSpacing(1);
-		js.setPaintLabels(true);
 		js.setSize(110, 45);
 	}
 
@@ -129,8 +130,12 @@ public class HSBController extends JInternalFrame implements
 		
 		if(e.getSource() == brgtjs) {
 			operation = HSBController.BRGT;
-			new Thread(this).start();
 		}
+		else if(e.getSource() == satrjs) {
+			operation = HSBController.SATR;
+		}
+		
+		new Thread(this).start();
 	}
 
 
@@ -141,8 +146,25 @@ public class HSBController extends JInternalFrame implements
 		
 		switch(operation) {
 		
+		case HSBController.HUE: {
+			break;
+		}
+		
+		case HSBController.SATR: {
+			
+			if(satrjs.getValue() == 0)
+				return;
+			
+			new Saturation(copy, satrjs.getValue() / 10);
+			break;
+		}
+		
 		case HSBController.BRGT: {
-			new Brightness(copy, brgtjs.getValue() * 5);
+			
+			if(brgtjs.getValue() == 0)
+				return;
+			
+			new Brightness(copy, brgtjs.getValue() * 10);
 			break;
 		}
 		
@@ -158,6 +180,20 @@ public class HSBController extends JInternalFrame implements
 		}
 	}
 	
+	
+	
+	/**
+	 * increase the saturation of image
+	 * */
+	public void increaseSatr(BufferedImage src, float intensity) {
+		
+		for(int x=0; x<src.getHeight(); x++) {
+			for(int y=0; y<src.getWidth(); y++) {
+				var pix = ImageHSB.incSaturation(src.getRGB(x, y), intensity);
+				src.setRGB(x, y, pix);
+			}
+		}
+	}
 	
 	
 	/*Window operation handler like, window closing, opening etc...*/

@@ -12,11 +12,8 @@ import java.awt.geom.QuadCurve2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 
-import org.lemon.gui.image.ImageView;
-import org.lemon.math.Vec2d;
 import org.lemon.utils.Pair;
 
 /**
@@ -85,18 +82,20 @@ public class Workspace extends JDesktopPane implements ComponentListener {
 		g2d.setPaint(Color.white);
 		g2d.setStroke(new BasicStroke(3));
 		
-		Vec2d v1 = p.getFirstPoint();
-		Vec2d v2 = p.getSecondPoint();
-		JComponent start = p.getFirstComponent(), end = p.getSecondComponent();
+		var v1 = p.getFirstPoint();
+		var v2 = p.getSecondPoint();
+		var start = p.getFirstComponent();
+		var end = p.getSecondComponent();
 		
-		Point begin = new Point(v1.x + start.getWidth(),
-				v1.y + (start.getHeight() / 2));
-		Point stop = new Point(v2.x,
-				v2.y + (end.getHeight() / 2));
+		var begin = new Point((int) v1.x + start.getWidth(),
+				(int) v1.y + (start.getHeight() / 2));
 		
-		Vec2d ctrlPoint = v1.midpoint(v2);
+		var stop = new Point((int) v2.x,
+				(int) v2.y + (end.getHeight() / 2));
 		
-		QuadCurve2D.Double curve = new QuadCurve2D.Double(begin.x, begin.y,
+		var ctrlPoint = v1.midpoint(v2);
+		
+		var curve = new QuadCurve2D.Double(begin.x, begin.y,
 															ctrlPoint.x, ctrlPoint.y,
 																stop.x, stop.y);
 		g2d.fillOval(begin.x - 5, begin.y, 10, 10);

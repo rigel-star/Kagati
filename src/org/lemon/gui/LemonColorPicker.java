@@ -38,14 +38,16 @@ public class LemonColorPicker extends JFrame {
 	private BufferedImage colWheelImage;
 	
 	/*tf = text filed*/
-	private JLabel rlbl, glbl, blbl;
+	JLabel rlbl, glbl, blbl;
 	private JTextField rtf, gtf, btf;
 	
-	private GridBagConstraints gbc = new GridBagConstraints();
+	GridBagConstraints gbc = new GridBagConstraints();
+	
 	
 	public static void main(String[] args) {
 		new LemonColorPicker();
 	}
+	
 	
 	public LemonColorPicker() {
 		

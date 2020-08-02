@@ -26,14 +26,13 @@ import org.lemon.AppGlobalProperties;
 import org.lemon.filters.basic.GrayScale;
 import org.lemon.filters.basic.SharpImage;
 import org.lemon.filters.basic.SobelEdge;
-import org.lemon.filters.transformations.gui.VanishingPointFilterGUI;
+import org.lemon.filters.gui.VanishingPointFilterGUI;
+import org.lemon.gui.dialogs.ColorReplaceDialog;
 import org.lemon.gui.dialogs.DenoiseImageDialog;
 import org.lemon.gui.dialogs.NegativeImageDialog;
 import org.lemon.gui.dialogs.PixelateImageDialog;
-import org.lemon.gui.dialogs.colrange.ColorRemoverDialog;
 import org.lemon.gui.drawing.canvas.NewDrawingPanelSetup;
 import org.lemon.gui.image.ImageInfoPanel;
-import org.lemon.gui.image.ImageView;
 import org.lemon.gui.layers.Layer;
 import org.lemon.gui.image.ImagePanel.PanelMode;
 import org.lemon.gui.menus.EditMenu;
@@ -126,8 +125,13 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 		
 		gProperties = new AppGlobalProperties(this);;
 		
+		/*important panels in app*/
+		this.mainWorkspace = new Workspace();
+		this.mainToolPanel = new LemonToolPanel(this);
+		this.layerContainer = new LayerContainer(mainWorkspace);
+		
 		fileMenu = new FileMenu(this);
-		editMenu = new EditMenu(this);
+		editMenu = new EditMenu(mainWorkspace);
 		threeDMenu = new Menu3D(this);
 		
 		File f = new File("C:\\Users\\Ramesh\\Documents\\3D Images\\dog2.jpg");
@@ -136,11 +140,6 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 		this.choosenImgName = f.getName();
 		
 		currentTool = new NormalBrushTool(choosenImage.createGraphics(), gProperties.getGLobalColor());
-		
-		/*important panels in app*/
-		this.mainWorkspace = new Workspace();
-		this.mainToolPanel = new LemonToolPanel(this);
-		this.layerContainer = new LayerContainer(mainWorkspace);
 		
 		
 		this.initToolBar(currentTool);
@@ -165,7 +164,7 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 		
 		//main menu items
 		filter = new JMenu("Filter");
-		extras = new JMenu("Extras");
+		extras = new JMenu("Utils");
 		
 		//file properties
 		plainDrawingPage = new JMenuItem("New Page");
@@ -296,6 +295,7 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 		c.add(this.mainWorkspace, BorderLayout.CENTER);
 		c.add(this.analyzeMenu, BorderLayout.EAST);
 		c.add(this.mainToolPanel, BorderLayout.WEST);
+		c.add(new ToolInfoPanel("Drag on image to draw something."), BorderLayout.SOUTH);
 		
 	}
 
@@ -393,7 +393,7 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 		else if(action.getSource() == this.colorRange) {
 			
 			if(this.mainWorkspace.getSelectedFrame() instanceof ImageView) {
-				new ColorRemoverDialog(this.selectedImgsStorage.get(this.mainWorkspace.getSelectedFrame()));
+				new ColorReplaceDialog(this.selectedImgsStorage.get(this.mainWorkspace.getSelectedFrame()));
 			}
 		}
 		
