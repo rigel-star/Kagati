@@ -8,8 +8,8 @@ import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JToolBar;
 
+import org.lemon.AppGlobalProperties;
 import org.lemon.tools.BrushTool;
-import org.lemon.utils.AppGlobalProperties;
 
 
 /**

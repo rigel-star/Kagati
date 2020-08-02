@@ -8,7 +8,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 
-import application.ApplicationFrame;
+import org.lemon.gui.ApplicationFrame;
 
 
 public class LemonToolPanel extends JPanel {

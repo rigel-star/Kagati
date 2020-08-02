@@ -7,15 +7,17 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 
-public class OpacityControlPanel extends JPanel implements ChangeListener {
+public class OpacityControlPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	
 	private JTextField opacity;
+	private JSlider opSlider;
 	
 	private BufferedImage img;
 	
@@ -23,12 +25,13 @@ public class OpacityControlPanel extends JPanel implements ChangeListener {
 		this.img = img;
 		
 		this.opacity = new JTextField("100%");
+		this.opSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 100);
 		
 		setBackground(Color.white);
 		
 		Box box = new Box(BoxLayout.X_AXIS);
 		box.add(new JLabel("Opacity"));
-		box.add(this.opacity);
+		box.add(this.opSlider);
 		
 		add(box);
 		
@@ -51,9 +54,5 @@ public class OpacityControlPanel extends JPanel implements ChangeListener {
 		return this.img;
 	}
 
-	@Override
-	public void stateChanged(ChangeEvent e) {
-		
-	}
 	
 }

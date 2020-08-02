@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,13 +18,12 @@ import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
+import org.lemon.gui.ApplicationFrame;
+import org.lemon.gui.ImageView;
+import org.lemon.gui.Workspace;
 import org.lemon.gui.drawing.image.DrawingCanvasOnImage;
-import org.lemon.gui.image.ImageView;
 import org.lemon.gui.toolbars.BrushToolBar;
 import org.lemon.tools.select.PolygonalSelectTool;
-
-import application.ApplicationFrame;
-import application.Workspace;
 
 
 public class LemonToolsMenu extends JInternalFrame implements ActionListener{
@@ -35,7 +36,7 @@ public class LemonToolsMenu extends JInternalFrame implements ActionListener{
 	private JButton 					polySnappingTool;
 	private JButton						cropTool;
 	private JButton						colPickerTool;
-	private JButton						moveTool;
+	private JButton						handTool;
 	
 	
 	
@@ -109,9 +110,9 @@ public class LemonToolsMenu extends JInternalFrame implements ActionListener{
 	
 	/*create move tool*/
 	private JButton createMoveTool() {
-		this.moveTool = new JButton();
-		moveTool.setIcon(new ImageIcon("icons/tools/move.png"));
-		return moveTool;
+		this.handTool = new JButton();
+		handTool.setIcon(new ImageIcon("icons/tools/move.png"));
+		return handTool;
 	}
 	
 	
@@ -163,7 +164,7 @@ public class LemonToolsMenu extends JInternalFrame implements ActionListener{
 	
 	/*init all components listeners*/
 	private void initListeners() {
-		this.moveTool.addActionListener(this);
+		this.handTool.addActionListener(this);
 		this.brushTool.addActionListener(this);
 		this.polySnappingTool.addActionListener(this);
 		this.colPickerTool.addActionListener(this);
@@ -174,11 +175,11 @@ public class LemonToolsMenu extends JInternalFrame implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		
 		ImageView view = null;
-		Workspace workspace = parent.getMainScene();
+		Workspace workspace = parent.getMainWorkspace();
 		this.contexts = workspace.getAllFrames();
 		
 		
-		if(e.getSource() == this.moveTool) {
+		if(e.getSource() == this.handTool) {
 			
 			for(JInternalFrame c: contexts) {
 				
@@ -254,6 +255,7 @@ public class LemonToolsMenu extends JInternalFrame implements ActionListener{
 	/*apply brush tool to the specific container*/
 	private void applyBrushTool(JComponent context, DrawingCanvasOnImage tool) {
 		context.addMouseMotionListener(tool);
+		context.addMouseListener(tool);
 	}
 	
 	
@@ -269,11 +271,11 @@ public class LemonToolsMenu extends JInternalFrame implements ActionListener{
 		var l1 = container.getMouseListeners();
 		var l2 = container.getMouseMotionListeners();
 		
-		for(int i=0; i<l1.length; i++) {
-			container.removeMouseListener(l1[i]);
+		for(MouseListener md: l1) {
+			container.removeMouseListener(md);
 		}
-		for(int i=0; i<l2.length; i++) {
-			container.removeMouseMotionListener(l2[i]);
+		for(MouseMotionListener md: l2) {
+			container.removeMouseMotionListener(md);
 		}
 	}
 
