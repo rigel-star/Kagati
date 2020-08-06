@@ -12,6 +12,11 @@ import org.lemon.tools.LemonTool;
  * Object is defined in {@code ApplicationFrame} class and from there, it will be circulated to
  * all over the application. All the UI components of application will take it as a first parameter.
  * */
+
+@LemonObject(type = LemonObject.HELPER_CLASS)
+@Info(author = "Ramesh Poudel",
+		date = 2020,
+		version = 1)
 public class AppGlobalProperties {
 
 	
