@@ -24,13 +24,17 @@ import org.lemon.gui.image.menus.ImageViewMenu;
 import org.lemon.utils.Utils;
 import org.rampcv.utils.Tools;
 
+
 /**
  * Parent of ImageView is always MainBackgroundPane class. 
  * ImageView is for holding image opened by user in application. 
  * ImageView has one main feature, connection. Connection is basically for connecting 
  * two ImageViews. If two views connected, they can be blended, edited, etc. together.
  * */
-
+@LemonObject(type = LemonObject.GUI_CLASS)
+@Info(author = "Ramesh Poudel",
+		date = 2020,
+		version = 2)
 public class ImageView extends JInternalFrame implements Cloneable {
 	private static final long serialVersionUID = 1L;
 	
