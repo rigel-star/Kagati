@@ -3,7 +3,9 @@ package org.lemon.gui;
 import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.lang.System.Logger;
 
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
@@ -15,16 +17,25 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
+import org.lemon.LemonObject;
 import org.lemon.filters.basic.ImageHSB;
+import org.lemon.math.Vec2d;
 import org.lemon.utils.Utils;
 import org.rampcv.filters.Brightness;
 import org.rampcv.filters.Saturation;
 
+
+@LemonObject(type = LemonObject.GUI_CLASS)
 public class HSBController extends JInternalFrame implements 
 																ChangeListener,
-																Runnable {
+																Runnable,
+																FilterController {
 
 	private static final long serialVersionUID = 1L;
+	
+	/*node control points*/
+	private final int nodeCount = 1;
+	private Node[] nodes = new Node[nodeCount];
 	
 	//global vars
 	//jslider: hue, saturation and brightness slider
@@ -59,6 +70,8 @@ public class HSBController extends JInternalFrame implements
 		this.comp = comp;
 		this.src = src;
 		this.copy = Utils.getImageCopy(src);
+		
+		createNode(comp);
 		
 		/*setting image copy on ImageView before modifying*/
 		if(comp instanceof ImageView) {
@@ -113,6 +126,18 @@ public class HSBController extends JInternalFrame implements
 		
 	}
 	
+	
+	/*
+	 * Creating the nodes for this component
+	 * */
+	private void createNode(JComponent con) {
+		var thisLoc = getLocation();
+		var conLoc = con.getLocation();
+		var start = new Point(thisLoc.x + this.getWidth(), thisLoc.y + 50);
+		var end = new Point(conLoc.x, conLoc.y + 50);
+		var node = new Node(new Vec2d(start), new Vec2d(end), comp);
+		addNode(node, 0);
+	}
 	
 	
 	//all three sliders will have same functions so one method is
@@ -193,6 +218,24 @@ public class HSBController extends JInternalFrame implements
 				src.setRGB(x, y, pix);
 			}
 		}
+	}
+	
+	
+	
+	@Override
+	public void addNode(Node node, int index) {
+		if(index > nodes.length) {
+			Logger logger = System.getLogger(Logger.class.getName());
+			logger.log(Logger.Level.ERROR, "Length of nodes array: " + nodes.length + "\nInput index: " + index);
+			return;
+		}
+		nodes[index] = node;
+	}
+	
+	
+	@Override
+	public Node[] getNodes() {
+		return nodes;
 	}
 	
 	
