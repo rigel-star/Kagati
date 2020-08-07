@@ -23,6 +23,9 @@ public class Workspace extends JDesktopPane implements ComponentListener {
 	private static final long serialVersionUID = 1L;
 	
 	
+	private List<Node> nodes = new ArrayList<Node>();
+	
+	
 	public Workspace() {
 		
 		setSize(5000, 5000);
@@ -61,23 +64,51 @@ public class Workspace extends JDesktopPane implements ComponentListener {
 	
 	
 	@Override
-	public void paint(Graphics g) {
-		super.paint(g);
+	public void paintComponent(Graphics g) {
+		super.paintComponent(g);
 		
 		for(Component c: getComponents()) {
 			if(c instanceof ImageView) {
-				ImageView view = (ImageView) c;
+				var view = (ImageView) c;
 				if(view.getConnection() != null) {
 					draw(g, new Pair(view, view.getConnection()));
 				}
 			}
+			if(c instanceof FilterController) {
+				var con = (FilterController) c;
+				for(Node node: con.getNodes()) {
+					if(!nodes.contains(node))
+						nodes.add(node);
+				}
+			}
 		}
 		
+		drawNodes(g);
 	}
 	
 	
+	
+	private void drawNodes(Graphics g) {
+		Graphics2D g2d = (Graphics2D) g;
+		g2d.setPaint(Color.white);
+		g2d.setStroke(new BasicStroke(3));
+		
+		for(Node node: nodes) {
+			g2d.fillOval((int) node.start.x, (int) node.start.y, 10, 10);
+			//g2d.fillOval((int) node.end.x, (int) node.end.y, 10, 10);
+			
+			//var curve = new QuadCurve2D.Double((int) node.start.x, (int) node.start.y,
+			//									(int) node.mid.x, (int) node.mid.y,
+			//									(int) node.end.x, (int) node.end.y);
+			
+			//g2d.draw(curve);
+		}
+	}
+	
+	
+	
 	/*drawing curve between two connections*/
-	private void draw(Graphics g, org.lemon.utils.Pair p) {
+	private void draw(Graphics g, Pair p) {
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setPaint(Color.white);
 		g2d.setStroke(new BasicStroke(3));
@@ -108,7 +139,7 @@ public class Workspace extends JDesktopPane implements ComponentListener {
 
 	@Override
 	public void componentResized(ComponentEvent e) {
-		
+		repaint();
 	}
 
 	@Override
@@ -118,12 +149,12 @@ public class Workspace extends JDesktopPane implements ComponentListener {
 
 	@Override
 	public void componentShown(ComponentEvent e) {
-		
+		repaint();
 	}
 
 	@Override
 	public void componentHidden(ComponentEvent e) {
-		
+		repaint();
 	}
 	
 
