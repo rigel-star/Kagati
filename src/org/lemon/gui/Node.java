@@ -1,31 +1,59 @@
 package org.lemon.gui;
 
+import java.util.Stack;
+
 import javax.swing.JComponent;
 
 import org.lemon.LemonObject;
 import org.lemon.math.Vec2d;
 
-@LemonObject(type = LemonObject.GUI_CLASS)
+@LemonObject(type = LemonObject.HELPER_CLASS)
 public class Node {
 	
 	public Vec2d start = null, end = null, mid = null;
-	private JComponent con;
+	private JComponent  parent;
 	
+	private Stack<FilterControllable> cons = new Stack<>();
 	
 	public Node(Vec2d start, Vec2d end) {
 		this(start, end, null);
 	}
 	
 	
-	public Node(Vec2d start, Vec2d end, JComponent con) {
+	public Node(Vec2d start, Vec2d end, JComponent parent) {
+		this.parent = parent;
 		this.start = start;
 		this.end = end;
-		this.mid = start.midpoint(end);
+		
+		if(this.end != null)
+			this.mid = start.midpoint(end);
 	}
 	
 	
-	public JComponent getComponent() {
-		return con;
+	public void setStart(Vec2d start) {
+		this.start = start;
+	}
+	
+	
+	public void setEnd(Vec2d end) {
+		this.end = end;
+		if(this.end != null)
+			this.mid = start.midpoint(end);
+	}
+	
+	
+	public void addConnection(FilterControllable controllable) {
+		cons.push(controllable);
+	}
+	
+	
+	public JComponent getParent() {
+		return parent;
+	}
+	
+	
+	public Stack<FilterControllable> getConnections() {
+		return cons;
 	}
 	
 }
