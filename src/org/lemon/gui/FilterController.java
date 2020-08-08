@@ -10,7 +10,7 @@ import org.lemon.LemonObject;
 @LemonObject(type = LemonObject.HELPER_CLASS)
 public interface FilterController {
 	
-	public void addNode(Node node, int index);
 	public Node[] getNodes();
+	public void updateNodes();
 	
 }
