@@ -66,10 +66,13 @@ public class EditMenu extends JMenu implements ActionListener {
 			
 			if(workspace.getSelectedFrame() instanceof ImageView) {
 				var v = (ImageView) workspace.getSelectedFrame();
-				hsb = new HSBController(workspace.getSelectedFrame(), v.getImagePanel().getImage());
+				hsb = new HSBController(v, v.getImagePanel().getImage());
 			}
 			
 			workspace.add(hsb);
+			workspace.fetchNodes();
+			workspace.refresh();
+			workspace.revalidate();
 		}
 	}
 	

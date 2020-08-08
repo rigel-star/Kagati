@@ -21,11 +21,11 @@ public class FileMenu extends JMenu implements ActionListener {
 	
 	
 	private JMenuItem openFile, saveFile;
-	private Object container;
+	private ApplicationFrame frame;
 	
-	public FileMenu(Object container) {
+	public FileMenu(ApplicationFrame frame) {
 		
-		this.container = container;
+		this.frame = frame;
 		
 		setText("File");
 		this.init();
@@ -74,9 +74,10 @@ public class FileMenu extends JMenu implements ActionListener {
 		
 		var imgView = new ImageView(img, null, title, true, PanelMode.snapMode);
 
-		var frame = (ApplicationFrame) this.container;
-		frame.getMainWorkspace().add(imgView);
-		frame.getMainWorkspace().refresh();
+		frame.getWorkspace().add(imgView);
+		frame.getWorkspace().fetchNodes();
+		frame.getWorkspace().refresh();
+		frame.getWorkspace().revalidate();
 		frame.getImageStorage().put(imgView, img);
 		frame.getLayerContainer().addLayer(new Layer(imgView, imgView.getTitle(), Layer.NORMAL_LAYER));
 	}
