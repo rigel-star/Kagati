@@ -5,7 +5,6 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
-import java.lang.System.Logger;
 
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
@@ -35,7 +34,11 @@ public class HSBController extends JInternalFrame implements
 	
 	/*node control points*/
 	private final int nodeCount = 1;
+	private Node imgNode = null;
 	private Node[] nodes = new Node[nodeCount];
+	
+	//image node port text
+	private JLabel imgNodeTxt = new JLabel("Image");
 	
 	//global vars
 	//jslider: hue, saturation and brightness slider
@@ -71,7 +74,12 @@ public class HSBController extends JInternalFrame implements
 		this.src = src;
 		this.copy = Utils.getImageCopy(src);
 		
-		createNode(comp);
+		
+		/*the node which connects this HSB control panel to image panels*/
+		var start = new Point(getLocation().x + this.getWidth(), getLocation().y + (this.getHeight() - 30));
+		imgNode = new Node(new Vec2d(start), null, this);
+		nodes[0] = imgNode;
+		
 		
 		/*setting image copy on ImageView before modifying*/
 		if(comp instanceof ImageView) {
@@ -80,12 +88,14 @@ public class HSBController extends JInternalFrame implements
 			view.getImagePanel().revalidate();
 		}
 		
+		
 		setSize(225, 220);
 		setResizable(false);
 		setTitle("HSB Controller");
 		setVisible(true);
 		setClosable(true);
 		setLocation(300, 50);
+		
 		
 		editPanel.setLayout(new FlowLayout(FlowLayout.TRAILING));
 		editPanel.add(huetf);
@@ -97,7 +107,7 @@ public class HSBController extends JInternalFrame implements
 		editPanel.add(brgttf);
 		editPanel.add(brgtjs);
 		
-		//editPanel.add(okBttn);
+		editPanel.add(imgNodeTxt);
 		
 		Container c = getContentPane();
 		c.add(this.editPanel);
@@ -124,19 +134,6 @@ public class HSBController extends JInternalFrame implements
 		
 		this.editPanel = new JPanel(new GridLayout(3, 3));
 		
-	}
-	
-	
-	/*
-	 * Creating the nodes for this component
-	 * */
-	private void createNode(JComponent con) {
-		var thisLoc = getLocation();
-		var conLoc = con.getLocation();
-		var start = new Point(thisLoc.x + this.getWidth(), thisLoc.y + 50);
-		var end = new Point(conLoc.x, conLoc.y + 50);
-		var node = new Node(new Vec2d(start), new Vec2d(end), comp);
-		addNode(node, 0);
 	}
 	
 	
@@ -221,15 +218,10 @@ public class HSBController extends JInternalFrame implements
 	}
 	
 	
-	
 	@Override
-	public void addNode(Node node, int index) {
-		if(index > nodes.length) {
-			Logger logger = System.getLogger(Logger.class.getName());
-			logger.log(Logger.Level.ERROR, "Length of nodes array: " + nodes.length + "\nInput index: " + index);
-			return;
-		}
-		nodes[index] = node;
+	public void updateNodes() {
+		imgNode.start.x = this.getLocation().x + this.getWidth();
+		imgNode.start.y = this.getLocation().y + this.getHeight() - 30;
 	}
 	
 	
