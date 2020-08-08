@@ -3,6 +3,7 @@ package org.lemon.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -21,9 +22,9 @@ import org.lemon.filters.ResizeImage;
 import org.lemon.gui.image.ImagePanel;
 import org.lemon.gui.image.ImagePanel.PanelMode;
 import org.lemon.gui.image.menus.ImageViewMenu;
+import org.lemon.math.Vec2d;
 import org.lemon.utils.Utils;
 import org.rampcv.utils.Tools;
-
 
 /**
  * Parent of ImageView is always MainBackgroundPane class. 
@@ -31,11 +32,8 @@ import org.rampcv.utils.Tools;
  * ImageView has one main feature, connection. Connection is basically for connecting 
  * two ImageViews. If two views connected, they can be blended, edited, etc. together.
  * */
-@LemonObject(type = LemonObject.GUI_CLASS)
-@Info(author = "Ramesh Poudel",
-		date = 2020,
-		version = 2)
-public class ImageView extends JInternalFrame implements Cloneable {
+
+public class ImageView extends JInternalFrame implements Cloneable, FilterControllable {
 	private static final long serialVersionUID = 1L;
 	
 	private ImageView 				connection;
@@ -51,6 +49,10 @@ public class ImageView extends JInternalFrame implements Cloneable {
 	private boolean 				close;
 	
 	private ImageViewMenu			menu;
+	
+	/*filterly controllable node*/
+	private Node controllableNode = null;
+	private List<FilterController> controllers = new ArrayList<>();
 	
 	/*Connections for this imageview*/
 	private Map<String, ImageView> 	connections = new HashMap<String, ImageView>();
@@ -166,6 +168,8 @@ public class ImageView extends JInternalFrame implements Cloneable {
 		 * */
 		revalidateListeners();
 		
+		var pt = new Point(this.getLocation().x, this.getLocation().y + 30);
+		controllableNode = new Node(new Vec2d(pt), null, this);
 	}
 	
 	
@@ -313,7 +317,31 @@ public class ImageView extends JInternalFrame implements Cloneable {
 		}
 		
 	}
+
+
+	@Override
+	public void addController(FilterController controller) {
+		controllers.add(controller);
+	}
+
+
+	@Override
+	public List<FilterController> getControllers() {
+		return controllers;
+	}
 	
+	
+	@Override
+	public void updateNode() {
+		controllableNode.start.x = this.getLocation().x;
+		controllableNode.start.y = this.getLocation().y + 30;
+	}
+	
+	
+	@Override
+	public Node getNode() {
+		return controllableNode;
+	}
 	
 }
 
