@@ -41,8 +41,8 @@ public class Workspace extends JDesktopPane implements ComponentListener {
 	 * While connecting the nodes, the workspace have to be repainted everytime to show the connecting line in real time.
 	 * But while repainting the workspace, every node will be rechecked and repainted on every repaint() method call and
 	 * it is long process. So, to avoid the node reinitializing process, I will check if the nodes are getting connected.
-	 *  If the nodes are getting connected I will avoid node reinitialization.
-	 *  See {@code paintComponent} method to understand what i'm talking about.
+	 * If the nodes are getting connected I will avoid node reinitialization.
+	 * NOTE: Not implemented currently
 	 * */
 	private boolean connectingLine = false;
 	
@@ -145,9 +145,6 @@ public class Workspace extends JDesktopPane implements ComponentListener {
 			g2d.setPaint(Color.red);
 			g2d.drawOval((int) node.start.x - 7, (int) node.start.y - 7, 15, 15);
 			
-			if(connectingLine)
-				return;
-			
 			if(node.getParent() instanceof FilterControllable) {
 				
 			}
@@ -169,8 +166,6 @@ public class Workspace extends JDesktopPane implements ComponentListener {
 					}
 				});
 			}
-			
-			return;
 		}
 		
 	}
