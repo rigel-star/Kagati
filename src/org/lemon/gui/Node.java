@@ -1,5 +1,7 @@
 package org.lemon.gui;
 
+import java.awt.Shape;
+import java.awt.geom.Ellipse2D;
 import java.util.Stack;
 
 import javax.swing.JComponent;
@@ -55,5 +57,11 @@ public class Node {
 	public Stack<FilterControllable> getConnections() {
 		return cons;
 	}
+	
+	
+	public Shape getDrawable() {
+		return new Ellipse2D.Double(start.x - 7, start.y - 7, 15, 15);
+	}
+	
 	
 }
