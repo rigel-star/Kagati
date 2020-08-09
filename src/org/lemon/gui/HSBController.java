@@ -3,6 +3,7 @@ package org.lemon.gui;
 import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JComponent;
@@ -15,16 +16,29 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
+import org.lemon.LemonObject;
 import org.lemon.filters.basic.ImageHSB;
+import org.lemon.math.Vec2d;
 import org.lemon.utils.Utils;
 import org.rampcv.filters.Brightness;
 import org.rampcv.filters.Saturation;
 
+
+@LemonObject(type = LemonObject.GUI_CLASS)
 public class HSBController extends JInternalFrame implements 
 																ChangeListener,
-																Runnable {
+																Runnable,
+																FilterController {
 
 	private static final long serialVersionUID = 1L;
+	
+	/*node control points*/
+	private final int nodeCount = 1;
+	private Node imgNode = null;
+	private Node[] nodes = new Node[nodeCount];
+	
+	//image node port text
+	private JLabel imgNodeTxt = new JLabel("Image");
 	
 	//global vars
 	//jslider: hue, saturation and brightness slider
@@ -60,6 +74,13 @@ public class HSBController extends JInternalFrame implements
 		this.src = src;
 		this.copy = Utils.getImageCopy(src);
 		
+		
+		/*the node which connects this HSB control panel to image panels*/
+		var start = new Point(getLocation().x + this.getWidth(), getLocation().y + (this.getHeight() - 30));
+		imgNode = new Node(new Vec2d(start), null, this);
+		nodes[0] = imgNode;
+		
+		
 		/*setting image copy on ImageView before modifying*/
 		if(comp instanceof ImageView) {
 			var view = (ImageView) comp;
@@ -67,12 +88,14 @@ public class HSBController extends JInternalFrame implements
 			view.getImagePanel().revalidate();
 		}
 		
+		
 		setSize(225, 220);
 		setResizable(false);
 		setTitle("HSB Controller");
 		setVisible(true);
 		setClosable(true);
 		setLocation(300, 50);
+		
 		
 		editPanel.setLayout(new FlowLayout(FlowLayout.TRAILING));
 		editPanel.add(huetf);
@@ -84,7 +107,7 @@ public class HSBController extends JInternalFrame implements
 		editPanel.add(brgttf);
 		editPanel.add(brgtjs);
 		
-		//editPanel.add(okBttn);
+		editPanel.add(imgNodeTxt);
 		
 		Container c = getContentPane();
 		c.add(this.editPanel);
@@ -112,7 +135,6 @@ public class HSBController extends JInternalFrame implements
 		this.editPanel = new JPanel(new GridLayout(3, 3));
 		
 	}
-	
 	
 	
 	//all three sliders will have same functions so one method is
@@ -193,6 +215,19 @@ public class HSBController extends JInternalFrame implements
 				src.setRGB(x, y, pix);
 			}
 		}
+	}
+	
+	
+	@Override
+	public void updateNodes() {
+		imgNode.start.x = this.getLocation().x + this.getWidth();
+		imgNode.start.y = this.getLocation().y + this.getHeight() - 30;
+	}
+	
+	
+	@Override
+	public Node[] getNodes() {
+		return nodes;
 	}
 	
 	

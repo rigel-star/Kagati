@@ -145,6 +145,7 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 		this.initToolBar(currentTool);
 		
 		this.imageView = new ImageView(this.choosenImage, gProperties, this.choosenImgName, true, PanelMode.canvasMode);
+		
 		this.imgInfoPanel = new ImageInfoPanel(this.choosenImage);
 		this.opacityPanel = new OpacityControlPanel(this.choosenImage);
 		
@@ -285,7 +286,7 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 		/***********************************TESTING**************************************/
 		this.mainWorkspace.add(this.imageView);
 		this.mainWorkspace.add(this.layerContainer);
-		this.selectedImgsStorage.put(imageView, choosenImage);
+		this.selectedImgsStorage.put(this.imageView, this.choosenImage);
 		this.analyzeMenu.add(this.imgInfoPanel);
 		this.analyzeMenu.add(this.layerContainer);
 		/*************************************************************************/
@@ -441,7 +442,7 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 	 * Get the main workspace of application. Main workspace is handled by the main frame of application.
 	 * @return mainScene {@code Workspace}
 	 * */
-	public Workspace getMainWorkspace() {
+	public Workspace getWorkspace() {
 		return this.mainWorkspace;
 	}
 	

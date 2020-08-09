@@ -125,9 +125,22 @@ public class LayerContainer extends JInternalFrame {
 				case 0:{
 					Layer lay = layerList.getSelectedValue();
 					
-					if(lay.getLayerComponent() instanceof ImageView)
-						workspace.remove(lay.getLayerComponent());
+					if(lay.getLayerComponent() instanceof FilterControllable) {
+						var fcon = (FilterControllable) lay.getLayerComponent();
+						//setting node position null cause workspace will paint node even if the component is 
+						//deleted cause node is still in node list.
+						//so if we set node to null then workspace wont get any position to paint node.
+						fcon.getNode().start = null;
+					}
+					else if(lay.getLayerComponent() instanceof FilterController) {
+						var fcon = (FilterController) lay.getLayerComponent();
+						//read upper comment to understand why im setting node positions null
+						for(Node node: fcon.getNodes()) {
+							node.start = null;
+						}
+					}
 					
+					workspace.remove(lay.getLayerComponent());
 					layerList.remove(lay);
 					workspace.revalidate();
 				}
