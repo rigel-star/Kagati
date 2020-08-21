@@ -19,6 +19,7 @@ import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 
 import org.lemon.LemonObject;
+import org.lemon.gui.filter.BlurFilterController;
 import org.lemon.utils.Pair;
 
 /**
@@ -35,14 +36,15 @@ public class Workspace extends JDesktopPane implements ComponentListener {
 	
 	private Graphics2D wpGraphics = null;
 	private Line2D.Double connect = null;
+	private Color nodeColor = new Color(55, 164, 237);
 	
 	/**
 	 * This boolean value will be checked when connecting the nodes.
 	 * While connecting the nodes, the workspace have to be repainted everytime to show the connecting line in real time.
 	 * But while repainting the workspace, every node will be rechecked and repainted on every repaint() method call and
 	 * it is long process. So, to avoid the node reinitializing process, I will check if the nodes are getting connected.
-	 * If the nodes are getting connected I will avoid node reinitialization.
-	 * NOTE: Not implemented currently
+	 *  If the nodes are getting connected I will avoid node reinitialization.
+	 *  See {@code paintComponent} method to understand what i'm talking about.
 	 * */
 	private boolean connectingLine = false;
 	
@@ -61,6 +63,8 @@ public class Workspace extends JDesktopPane implements ComponentListener {
 		var mh = new MouseHandler();
 		addMouseListener(mh);
 		addMouseMotionListener(mh);
+		
+		add(new BlurFilterController());
 	}
 	
 	
@@ -83,7 +87,7 @@ public class Workspace extends JDesktopPane implements ComponentListener {
 		
 		if(connect != null) {
 			wpGraphics.setPaint(Color.white);
-			wpGraphics.setStroke(new BasicStroke(2));
+			wpGraphics.setStroke(new BasicStroke(1));
 			wpGraphics.draw(connect);
 		}
 	}
@@ -130,20 +134,20 @@ public class Workspace extends JDesktopPane implements ComponentListener {
 				}
 			}
 		}
-		System.out.println("Nodes: " + nodes.size());
-		System.out.println("Filter controllables: " + fcontrollables.size());
-		System.out.println("Filter controllers: " + fcontrollers.size());
 	}
 
 	
 	
 	private void drawNode(Graphics2D g2d, Node node) {
-		g2d.setPaint(Color.yellow);
+		g2d.setPaint(nodeColor);
 		
 		if(node != null && node.start != null) {
-			g2d.fillOval((int) node.start.x - 7, (int) node.start.y - 7, 15, 15);
-			g2d.setPaint(Color.red);
-			g2d.drawOval((int) node.start.x - 7, (int) node.start.y - 7, 15, 15);
+			g2d.fillOval((int) node.start.x - 5, (int) node.start.y - 5, 10, 10);
+			g2d.setPaint(Color.white);
+			g2d.drawOval((int) node.start.x - 5, (int) node.start.y - 5, 10, 10);
+			
+			if(connectingLine)
+				return;
 			
 			if(node.getParent() instanceof FilterControllable) {
 				
@@ -153,7 +157,7 @@ public class Workspace extends JDesktopPane implements ComponentListener {
 				node.getConnections().forEach(c -> {
 						
 					g2d.setPaint(Color.white);
-					g2d.setStroke(new BasicStroke(2));
+					g2d.setStroke(new BasicStroke(1));
 					
 					/*
 					var curve = new QuadCurve2D.Double((int) node.start.x, (int) node.start.y,
@@ -166,6 +170,8 @@ public class Workspace extends JDesktopPane implements ComponentListener {
 					}
 				});
 			}
+			
+			return;
 		}
 		
 	}
@@ -288,10 +294,11 @@ public class Workspace extends JDesktopPane implements ComponentListener {
 				}
 			}
 			
-			if(endNode != null) {
+			if(startNode != null && endNode != null) {
 				connectNodes(startNode, endNode);
 			}
 			
+			start = null;
 			connectingLine = false;
 			connect = null;
 			repaint();
