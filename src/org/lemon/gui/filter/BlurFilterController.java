@@ -1,11 +1,13 @@
 package org.lemon.gui.filter;
 
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 
 import javax.swing.JComboBox;
 import javax.swing.JInternalFrame;
@@ -13,10 +15,17 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 
+import org.lemon.LemonObject;
+import org.lemon.gui.FilterControllable;
 import org.lemon.gui.FilterController;
+import org.lemon.gui.ImageView;
 import org.lemon.gui.Node;
 import org.lemon.math.Vec2d;
 
+import org.rampcv.filters.blur.BoxBlur;
+
+
+@LemonObject(type = LemonObject.GUI_CLASS)
 public class BlurFilterController extends JInternalFrame implements FilterController, ActionListener {
 	private static final long serialVersionUID = 1L;
 	
@@ -44,11 +53,10 @@ public class BlurFilterController extends JInternalFrame implements FilterContro
 	
 	private String choosenBlur = GAUSS;
 	
-	private boolean showDegreeSlider = false;
-	
 	public BlurFilterController() {
 		
 		init();
+		//initBlur();
 		
 		setSize(200, 140);
 		setTitle("Blur Controller");
@@ -57,20 +65,15 @@ public class BlurFilterController extends JInternalFrame implements FilterContro
 		setClosable(true);
 		setLocation(20, 50);
 		
-		var size = getSize();
-		var loc = getLocation();
-		var pt = new Point(loc.x + (size.width / 2), loc.y + (size.height / 2));
-		imgNode = new Node(new Vec2d(pt), null, this);
-		
+		var start = new Point(getLocation().x + this.getWidth(), getLocation().y + (this.getHeight() / 2));
+		imgNode = new Node(new Vec2d(start), null, this);
 		nodes[0] = imgNode;
 		
 		blurChooserPanel.add(blurChooserTxt);
 		blurChooserPanel.add(blurChooser);
 		
-		if(showDegreeSlider) {
-			spinBlurPanel.add(degreeSliderTxt);
-			spinBlurPanel.add(degreeSlider);
-		}
+		spinBlurPanel.add(degreeSliderTxt);
+		spinBlurPanel.add(degreeSlider);
 		
 		controlPanel.add(blurChooserPanel);
 		controlPanel.add(spinBlurPanel);
@@ -88,9 +91,10 @@ public class BlurFilterController extends JInternalFrame implements FilterContro
 		degreeSlider.setPreferredSize(new Dimension(130, 36));
 		
 		String[] blurs = {
+				"Select",
 				GAUSS,
-				MOTION,
 				BOX,
+				MOTION,
 				SPIN
 		};
 		
@@ -109,30 +113,75 @@ public class BlurFilterController extends JInternalFrame implements FilterContro
 	}
 	
 	
-	private void initBlur(String bl) {
-		
-		if(bl.equals("Spin Blur"))
-			choosenBlur = SPIN;
-		else if(bl.equals("Gaussian Blur"))
-			choosenBlur = GAUSS;
-		else if(bl.equals("Box Blur"))
-			choosenBlur = BOX;
-		else if(bl.equals("Motion Blur"))
-			choosenBlur = MOTION;
+	/*init the currently selected blur method*/
+	private void initBlur() {
 		
 		switch (choosenBlur) {
 		
 		case SPIN: {
-			showDegreeSlider = true;
-			spinBlurPanel.revalidate();
+			/*adding extra options for spin blur*/
+			degreeSlider.setEnabled(true);
+			applyBlur(choosenBlur);
 			break;
 		}
-
+		
+		case MOTION:
+		case BOX:
+		case GAUSS: {
+			degreeSlider.setEnabled(false);
+			applyBlur(choosenBlur);
+			break;
+		}
+		
 		default: {
+			degreeSlider.setEnabled(false);
 			break;
 		}
 		
 		}
+		
+		controlPanel.revalidate();
+		revalidate();
+	}
+	
+	
+	private BufferedImage src = null;
+	private Component view;
+	private void applyBlur(String blur) {
+		
+		if(imgNode.getConnections().size() == 0) {
+			System.out.println("No connections!");
+			return;
+		}
+		
+		for(FilterControllable fc: imgNode.getConnections()) {	
+			
+			if(fc instanceof ImageView) {
+				view = (ImageView) fc;
+				src = ((ImageView) view).getImagePanel().getImage();
+			}
+			
+			new Thread(new Runnable() {
+				
+				@Override
+				public void run() {
+					
+					switch(blur) {
+					
+					case BOX: {	
+						var blur = new BoxBlur();
+						blur.setRadius(5);
+						src = blur.filter(src, null);
+						((ImageView) view).getImagePanel().setImage(src);
+					}
+					
+					}
+				}
+				
+			}).start();
+		}
+		
+		view.revalidate();
 	}
 	
 	
@@ -150,11 +199,8 @@ public class BlurFilterController extends JInternalFrame implements FilterContro
 	
 	@Override
 	public void updateNodes() {
-		var size = getSize();
-		var loc = getLocation();
-		var pt = new Point(loc.x + size.width, loc.y + (size.height / 2));
-		imgNode.start.x = pt.x;
-		imgNode.start.y = pt.y;
+		imgNode.start.x = this.getLocation().x + this.getWidth();
+		imgNode.start.y = this.getLocation().y + (this.getHeight() / 2);
 	}
 
 
@@ -162,9 +208,8 @@ public class BlurFilterController extends JInternalFrame implements FilterContro
 	public void actionPerformed(ActionEvent e) {
 		
 		if(e.getSource() == blurChooser) {
-			String bl = (String) blurChooser.getSelectedItem();
-			initBlur(bl);
-			System.out.println(choosenBlur);
+			choosenBlur = (String) blurChooser.getSelectedItem();
+			initBlur();
 		}
 		
 		spinBlurPanel.repaint();
