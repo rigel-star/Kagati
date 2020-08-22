@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -40,11 +41,10 @@ import org.lemon.gui.menus.FileMenu;
 import org.lemon.gui.menus.Menu3D;
 import org.lemon.gui.panels.ImageAnalyzePanel;
 import org.lemon.gui.panels.OpacityControlPanel;
-import org.lemon.gui.toolbars.BrushToolBar;
-import org.lemon.tools.BrushTool;
+import org.lemon.gui.toolbars.SaveChangesToolBar;
 import org.lemon.tools.LemonTool;
-import org.lemon.tools.brush.NormalBrushTool;
 import org.lemon.gui.panels.LemonToolPanel;
+
 import org.piksel.piksel.PPInternalWindow;
 
 
@@ -52,9 +52,7 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	
 	
-	
 	private JMenu fileMenu, editMenu, threeDMenu;
-	
 	
 	
 	//menus and submenus
@@ -100,8 +98,8 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 	
 	
 	/*current tool*/
-	private JToolBar					toolBar;
-	private LemonTool		 			currentTool;
+	private JPanel toolBarsContainer = new JPanel();
+	private SaveChangesToolBar saveChngsToolBar = new SaveChangesToolBar();
 	
 	
 	private AppGlobalProperties 		gProperties;
@@ -139,10 +137,8 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 		this.choosenImage = ImageIO.read(f);
 		this.choosenImgName = f.getName();
 		
-		currentTool = new NormalBrushTool(choosenImage.createGraphics(), gProperties.getGLobalColor());
-		
-		
-		this.initToolBar(currentTool);
+		toolBarsContainer.setLayout(new FlowLayout(FlowLayout.TRAILING));
+		toolBarsContainer.add(saveChngsToolBar);
 		
 		this.imageView = new ImageView(this.choosenImage, gProperties, this.choosenImgName, true, PanelMode.canvasMode);
 		
@@ -247,21 +243,6 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 	}
 	
 	
-	
-	/**
-	 * init the tool bar according to selected tool
-	 * */
-	private void initToolBar(LemonTool tool) {
-		
-		if(tool instanceof BrushTool) {
-			gProperties.setGlobalTool(tool);
-			this.toolBar = new BrushToolBar(this.gProperties, (BrushTool) tool);
-		}
-		
-	}
-	
-	
-	
 	//applying click event to every JMenuItem
 	private void events(){
 		plainDrawingPage.addActionListener(this);
@@ -292,7 +273,7 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 		/*************************************************************************/
 		
 
-		c.add(this.toolBar, BorderLayout.NORTH);
+		c.add(this.toolBarsContainer, BorderLayout.NORTH);
 		c.add(this.mainWorkspace, BorderLayout.CENTER);
 		c.add(this.analyzeMenu, BorderLayout.EAST);
 		c.add(this.mainToolPanel, BorderLayout.WEST);
@@ -453,7 +434,7 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 	 * @return mainToolBar {@code MainToolBar}
 	 * */
 	public JToolBar getCurrentToolBar() {
-		return this.toolBar;
+		return this.saveChngsToolBar;
 	}
 	
 	

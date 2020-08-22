@@ -46,6 +46,8 @@ public class Node {
 	
 	public void addConnection(FilterControllable controllable) {
 		cons.push(controllable);
+		System.out.println("Added!");
+		System.out.println("Count: " + cons.size());
 	}
 	
 	
@@ -60,7 +62,7 @@ public class Node {
 	
 	
 	public Shape getDrawable() {
-		return new Ellipse2D.Double(start.x - 7, start.y - 7, 15, 15);
+		return new Ellipse2D.Double(start.x - 5, start.y - 5, 10, 10);
 	}
 	
 	

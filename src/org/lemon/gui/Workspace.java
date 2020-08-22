@@ -19,7 +19,6 @@ import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 
 import org.lemon.LemonObject;
-import org.lemon.gui.filter.BlurFilterController;
 import org.lemon.utils.Pair;
 
 /**
@@ -63,10 +62,7 @@ public class Workspace extends JDesktopPane implements ComponentListener {
 		var mh = new MouseHandler();
 		addMouseListener(mh);
 		addMouseMotionListener(mh);
-		
-		add(new BlurFilterController());
 	}
-	
 	
 	
 	@Override
@@ -93,9 +89,8 @@ public class Workspace extends JDesktopPane implements ComponentListener {
 	}
 	
 	
-	
 	/**
-	 * Refresh's all the available ImageViews.
+	 * Refresh's all the listeners.
 	 * */
 	public void refresh() {
 		
@@ -136,7 +131,6 @@ public class Workspace extends JDesktopPane implements ComponentListener {
 		}
 	}
 
-	
 	
 	private void drawNode(Graphics2D g2d, Node node) {
 		g2d.setPaint(nodeColor);
