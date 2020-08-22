@@ -17,12 +17,12 @@ import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
 import org.lemon.LemonObject;
-import org.lemon.filters.basic.ImageHSB;
 import org.lemon.gui.FilterController;
 import org.lemon.gui.ImageView;
 import org.lemon.gui.Node;
 import org.lemon.math.Vec2d;
 import org.lemon.utils.Utils;
+
 import org.rampcv.filters.Brightness;
 import org.rampcv.filters.Saturation;
 
@@ -202,21 +202,6 @@ public class HSBController extends JInternalFrame implements
 			var v = (ImageView) comp;
 			v.getImagePanel().setImage(copy);
 			v.getImagePanel().revalidate();
-		}
-	}
-	
-	
-	
-	/**
-	 * increase the saturation of image
-	 * */
-	public void increaseSatr(BufferedImage src, float intensity) {
-		
-		for(int x=0; x<src.getHeight(); x++) {
-			for(int y=0; y<src.getWidth(); y++) {
-				var pix = ImageHSB.incSaturation(src.getRGB(x, y), intensity);
-				src.setRGB(x, y, pix);
-			}
 		}
 	}
 	
