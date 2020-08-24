@@ -23,7 +23,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.lemon.gui.ImageView;
-import org.lemon.gui.drawing.canvas.DrawingPanel;
+import org.lemon.gui.canvas.DrawingPanel;
 import org.lemon.tools.BrushTool;
 import org.lemon.tools.brush.utils.Brushes;
 
