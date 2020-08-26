@@ -3,8 +3,10 @@ package org.lemon.tools.select;
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Cursor;
+import java.awt.Component;
 import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Polygon;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.event.MouseAdapter;
@@ -15,24 +17,44 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.JLabel;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.lemon.tools.SelectionTool;
 
-//Basic image snapping tool
+
 public class PolygonalSelectTool extends MouseAdapter implements SelectionTool {
 	
-	private JLabel context;
+	private static final Logger LOGGER = Logger.getLogger( PolygonalSelectTool.class.getName() );
 	
-	List<Shape> shapes = new ArrayList<Shape>();
+	private Component context;
 	
-	Graphics2D g2d;
+	private List<Shape> shapes = new ArrayList<Shape>();
+	private List<Point> pts = new ArrayList<Point>();
 	
-	public PolygonalSelectTool(BufferedImage img, Object container) {
-		this.context = (JLabel) container;
+	private Graphics2D g2d;
+	private BufferedImage src;
+	
+	private boolean areaSelectionDone = false;
+	private SelectedArea selectedArea;
+	private Polygon selectionShape;
+	
+	/**
+	 * 
+	 * {@code PolygonalSelectTool} is a selection tool made to select the part from an image. The image container
+	 * passed in parameter works as a painting background where the selected region will be highlighted. This class 
+	 * implements the {@code interface} SelectionTool.
+	 * 
+	 * @param img Image to select from
+	 * @param imgContainer The component which contains the image
+	 * 
+	 * */
+	
+	public PolygonalSelectTool( BufferedImage img, Component imgContainer ) {
+		context = imgContainer;
+		src = img;
 		
-		g2d = (Graphics2D) img.getGraphics();
+		g2d = (Graphics2D) src.getGraphics();
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2d.setStroke(new BasicStroke(2));
 		g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));	//transparency
@@ -40,14 +62,22 @@ public class PolygonalSelectTool extends MouseAdapter implements SelectionTool {
 	}
 	
 	
-	public void paintImage() {
-		for(int i=0; i<shapes.size(); i++) {
-			g2d.fill(shapes.get(i));
+	private void paintImage() {
+		
+		if(areaSelectionDone) {
+			g2d.setStroke(new BasicStroke(1, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_BEVEL, 5f, new float[] {5, 5},  2));
+			this.g2d.setPaint( Color.gray );
+			clearSelection();
+			return;
+		}
+		
+		for( int i=0; i<shapes.size(); i++ ) {
+			g2d.fill( shapes.get(i) );
 			
-			if(i != shapes.size() - 1) {
+			if( i != shapes.size() - 1 ) {
 				Point2D p1 = shapes.get(i).getBounds().getLocation();
-				Point2D p2 = shapes.get(i+1).getBounds().getLocation();
-				g2d.draw(new Line2D.Double(p1.getX(), p1.getY(), p2.getX(), p2.getY()));
+				Point2D p2 = shapes.get(i + 1).getBounds().getLocation();
+				g2d.draw( new Line2D.Double( p1.getX(), p1.getY(), p2.getX(), p2.getY() ) );
 			}	
 		}
 		context.repaint();
@@ -56,32 +86,80 @@ public class PolygonalSelectTool extends MouseAdapter implements SelectionTool {
 	
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		super.mouseClicked(e);
+		super.mouseClicked( e );
 		
-		if(e.getButton() == MouseEvent.BUTTON1) {
-			int x = e.getX();
-			int y = e.getY();
-			Rectangle2D r = new Rectangle2D.Double(x, y+15, 5, 5);
+		if( e.getButton() == MouseEvent.BUTTON1 ) {
 			
-			for(Shape s: shapes) {
-				if(s instanceof Rectangle2D) 
-					if(r.intersects((Rectangle2D) s))
-						this.g2d.setPaint(Color.white);
+			if( areaSelectionDone ) {
+				clearSelection();
 			}
 			
-			this.shapes.add(r);
+			int x = e.getX();
+			int y = e.getY();
+			Rectangle2D r = new Rectangle2D.Double( x, y, 5, 5 );
+			
+			for( Shape s: shapes ) {
+				if( s instanceof Rectangle2D ) 
+					if( r.intersects((Rectangle2D) s) ) {
+						
+						selectionShape = new Polygon();
+						for( Point pt: pts )
+							selectionShape.addPoint( pt.x, pt.y );
+						
+						//selectedArea = new SelectedArea((Area) selectionShape);
+						areaSelectionDone = true;
+					}
+			}
+			
+			this.shapes.add( r );
+			this.pts.add( new Point( x, y ) );
 			this.paintImage();
 		}
 	}
 	
+	
 	@Override
-	public void mouseMoved(MouseEvent e) {
-		super.mouseMoved(e);
+	public void clearSelection() {
+		shapes = new ArrayList<>();
+		pts = new ArrayList<>();
+		areaSelectionDone = false;
 		
-		var cursor = new Cursor(Cursor.DEFAULT_CURSOR);
-		context.setCursor(cursor);
+		g2d.setStroke( new BasicStroke(2) );
+		g2d.setPaint( Color.blue );
+		
+		LOGGER.log(Level.INFO, "Selection cleared from: " + this.getClass().getName());
+		
 	}
 	
 	
+	@Override
+	public BufferedImage getSelectedAreaImage() {
+		/*result image*/
+		BufferedImage res = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_ARGB);
+		
+		Graphics2D g = res.createGraphics();
+		g.setClip(selectionShape);
+		g.drawImage(src, 0, 0, null);
+		g.dispose();
+		
+		LOGGER.log(Level.INFO, "Getting selected area image.");
+		
+		return res;
+	}
+	
+	
+	@Override
+	public SelectedArea getSelectedArea() {
+		return selectedArea;
+	}
+	
+	
+	/**
+	 * @return {@code true} if area is selected, otherwise {@code false}.
+	 * */
+	@Override
+	public boolean isAreaSelected() {
+		return areaSelectionDone;
+	}
 	
 }
