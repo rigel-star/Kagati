@@ -1,14 +1,17 @@
 package org.lemon.tools;
 
-import java.awt.Polygon;
+import java.awt.image.BufferedImage;
+
+import org.lemon.tools.select.SelectedArea;
 
 public interface SelectionTool extends LemonTool {
 
-	class SelectedArea {
-		
-		public SelectedArea(Polygon area) {
-			
-		}
-		
-	}
+	public SelectedArea getSelectedArea();
+	
+	public void clearSelection();
+	
+	public BufferedImage getSelectedAreaImage();
+	
+	public boolean isAreaSelected();
+	
 }
