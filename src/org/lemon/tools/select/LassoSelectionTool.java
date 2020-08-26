@@ -50,7 +50,6 @@ public class LassoSelectionTool extends MouseAdapter implements SelectionTool{
 	}
 	
 	
-	
 	/**
 	 * Init the drawing context of this lasso tool with custom strokes, transparency, custom cursor etc..
 	 * */
@@ -64,9 +63,7 @@ public class LassoSelectionTool extends MouseAdapter implements SelectionTool{
 		context.setPaint(new Color(128, 128, 128, 128));
 		context.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));	//transparency
 		//context.setPaint(Color.black);
-	}
-	
-	
+	}	
 	
 	
 	@Override
@@ -78,8 +75,6 @@ public class LassoSelectionTool extends MouseAdapter implements SelectionTool{
 		oldX = newX;
 		oldY = newY;
 	}
-	
-	
 	
 	
 	@Override
@@ -95,8 +90,7 @@ public class LassoSelectionTool extends MouseAdapter implements SelectionTool{
 		oldX = newX;
 		oldY = newY;
 	}
-	
-	
+		
 	
 	@Override
 	public void mouseMoved(MouseEvent e) {
@@ -110,6 +104,29 @@ public class LassoSelectionTool extends MouseAdapter implements SelectionTool{
 
 		
 		container.setCursor(cursor);
+	}
+	
+	
+	@Override
+	public SelectedArea getSelectedArea() {
+		return null;
+	}
+
+
+	@Override
+	public void clearSelection() {
+	}
+
+
+	@Override
+	public BufferedImage getSelectedAreaImage() {
+		return null;
+	}
+
+
+	@Override
+	public boolean isAreaSelected() {
+		return false;
 	}
 	
 }
