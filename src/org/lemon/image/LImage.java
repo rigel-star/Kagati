@@ -10,10 +10,10 @@ import org.lemon.filters.GrayImageFilter;
 
 public class LImage extends ImageGraphics {
 
+	private BufferedImage asBufferedImg = null;
 	private Raster raster = null;
 	private DataBuffer data = null;
 	private byte[] actData;
-	private boolean hasAlpha = false;
 	
 	private boolean disposed = false;
 	
@@ -25,26 +25,37 @@ public class LImage extends ImageGraphics {
 	public final static int DEFAULT = 11;
 	
 	
-	public LImage(int w, int h, int type) {
-		this(null, w, h, false, type);
+	public LImage( int w, int h, int type ) {
+		this( null, w, h, type );
 	}
 	
 	
-	public LImage(int w, int h, boolean alpha, int type) {
-		this(null, w, h, alpha, type);
+	public LImage( int w, int h, boolean alpha, int type ) {
+		this( null, w, h, type );
 	}
 	
 	
-	public LImage(Raster raster, int w, int h, boolean alpha, int type) {
+	public LImage( BufferedImage img ) {
+		asBufferedImg = img;
+		width = img.getWidth();
+		height = img.getHeight();
+		type = DEFAULT;
+		raster = img.getData();
+		initImageType( type );
+	}
+	
+	
+	public LImage(Raster raster, int w, int h, int type) {
 		
 		width = w;
 		height = h;
 		this.type = type;
+		
+		asBufferedImg = new BufferedImage( w, h, BufferedImage.TYPE_INT_ARGB );
+		asBufferedImg.setData( raster );
 		actData = new byte[w * h];
 		this.raster = raster;
 		data = raster.getDataBuffer();
-		
-		hasAlpha = alpha;
 		
 		if( data instanceof DataBufferByte ) {
 			actData = (( DataBufferByte ) data ).getData();
@@ -107,15 +118,8 @@ public class LImage extends ImageGraphics {
 	}
 	
 	
-	public boolean hasAlphaChannel() {
-		return hasAlpha;
-	}
-	
-	
 	public BufferedImage getAsBufferedImage() {
-		BufferedImage im = new BufferedImage( width, height, BufferedImage.TYPE_3BYTE_BGR );
-		im.setData( raster );
-		return im;
+		return asBufferedImg;
 	}
 
 }
