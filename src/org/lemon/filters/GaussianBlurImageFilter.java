@@ -8,10 +8,8 @@ import org.lemon.image.Pixel;
 
 public class GaussianBlurImageFilter extends AbstractImageFilter {
 
-	
 	/* max iteration */
 	private int iter = 0;
-	
 	
 	/**
 	 * 
