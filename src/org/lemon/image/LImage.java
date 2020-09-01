@@ -3,7 +3,6 @@ package org.lemon.image;
 import java.awt.Shape;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
-import java.awt.image.DataBufferByte;
 import java.awt.image.Raster;
 
 import org.lemon.filters.GrayImageFilter;
@@ -13,7 +12,6 @@ public class LImage extends ImageGraphics {
 	private BufferedImage asBufferedImg = null;
 	private Raster raster = null;
 	private DataBuffer data = null;
-	private byte[] actData;
 	
 	private boolean disposed = false;
 	
@@ -53,13 +51,8 @@ public class LImage extends ImageGraphics {
 		
 		asBufferedImg = new BufferedImage( w, h, BufferedImage.TYPE_INT_ARGB );
 		asBufferedImg.setData( raster );
-		actData = new byte[w * h];
 		this.raster = raster;
 		data = raster.getDataBuffer();
-		
-		if( data instanceof DataBufferByte ) {
-			actData = (( DataBufferByte ) data ).getData();
-		}
 		
 		initImageType( type );
 	}
@@ -86,9 +79,10 @@ public class LImage extends ImageGraphics {
 	@Override
 	public void draw(Shape shape) {
 		
-		if(!disposed) {
-			
-		}
+		if(disposed) 
+			return;
+		
+		
 	}
 	
 	
@@ -98,26 +92,77 @@ public class LImage extends ImageGraphics {
 	}
 	
 	
-	public void setPixels( byte[] pixels ) {
-		this.actData = pixels;
+	/**
+	* 
+	* Set the pixels to this image.
+	* @param x       the left edge of the pixel block
+    * @param y       the right edge of the pixel block
+    * @param width   the width of the pixel arry
+    * @param height  the height of the pixel arry
+    * @param pixels  the array of pixels to set
+	*
+	*/
+	public void setPixels( int x, int y, int width, int height, int[] pixels ) {
+		BufferedImage image = getAsBufferedImage();
+		int type = image.getType();
+		
+		if ( type == BufferedImage.TYPE_INT_ARGB || type == BufferedImage.TYPE_INT_RGB )
+			image.getRaster().setDataElements( x, y, width, height, pixels );
+		else
+			image.setRGB( x, y, width, height, pixels, 0, width );	
 	}
 	
 	
-	public byte[] getPixels() {
-		return actData;
-	}
+	/**
+	 * 
+	 * Get the all pixels of this image.
+     * @param x       the left edge of the pixel block
+     * @param y       the right edge of the pixel block
+     * @param width   the width of the pixel arry
+     * @param height  the height of the pixel arry
+     * @param pixels  the array to hold the returned pixels. May be null.
+     * @return the pixels
+     * @see #setRGB
+     * 
+     */
+	public int[] getPixels( int x, int y, int width, int height, int[] pixels ) {
+		BufferedImage image = getAsBufferedImage();
+		int type = image.getType();
+		
+		if ( type == BufferedImage.TYPE_INT_ARGB || type == BufferedImage.TYPE_INT_RGB )
+			return (int [])image.getRaster().getDataElements( x, y, width, height, pixels );
+		return image.getRGB( x, y, width, height, pixels, 0, width );
+    }
 	
 	
+	/**
+	 * 
+	 * Get {@code DataBuffer} attached with this image.
+	 * @return data the {@code DataBuffer}
+	 * 
+	 * */
 	public DataBuffer getDataBuffer() {
 		return data;
 	}
 	
 	
+	/**
+	 * 
+	 * Get {@code Raster} attached with this image.
+	 * @return data the {@code Raster}
+	 * 
+	 * */
 	public Raster getRaster() {
 		return raster;
 	}
 	
 	
+	/**
+	 * 
+	 * Get {@code this LImage} as {@code BufferedImage}.
+	 * @return img the {@code BufferedImage} version of this {@code LImage}
+	 * 
+	 * */
 	public BufferedImage getAsBufferedImage() {
 		return asBufferedImg;
 	}
