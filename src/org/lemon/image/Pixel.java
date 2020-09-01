@@ -4,13 +4,50 @@ import java.awt.image.Raster;
 
 public class Pixel {
 	
+	private int value = 0;
+	
+	public Pixel() {
+		
+	}
+	
+	
+	public Pixel( int argb ) {
+		value = argb;
+	}
+	
+	
+	public int getRGB() {
+		return value;
+	}
+	
+	
+	public int getAlpha() {
+		return ( value >> 24 ) & 0xFF;
+	}
+	
+	
+	public int getRed() {
+		return extractRGB( value )[0];
+	}
+	
+	
+	public int getGreen() {
+		return extractRGB( value )[1];
+	}
+	
+	
+	public int getBlue() {
+		return extractRGB( value )[2];
+	}
+	
 	
 	/**
 	 * 
-	 * Get the neighbors of the image of particularly specified pixel coordinate.
+	 * Get the 8 neighbor pixels of the particularly specified pixel coordinate.
 	 * @param img the source image.
 	 * @param x x-coordinate
 	 * @param y y-coordinate
+	 * @return neighbors the neighbor pixels. The length of the array will be 9 including the source pixel itself.
 	 * 
 	 * */
 	public static int[] getNeighbors( Raster data, int x, int y, boolean hasAlpha ) {
@@ -48,8 +85,8 @@ public class Pixel {
 	
 	/**
 	 * 
-	 * Average the pixels.
-	 * @param pixels the array of pixels to average.
+	 * Average the block of pixels.
+	 * @param pixels the block of pixels to average.
 	 * */
 	public static int average( int[] pixels ) {
 		
@@ -62,7 +99,7 @@ public class Pixel {
 		for( int argb: pixels ) {
 			a += ( argb >> 24 ) & 0xFF;
 			
-			int[] rgb = getRGB( argb );
+			int[] rgb = extractRGB( argb );
 			
 			r += rgb[0];
 			g += rgb[1];
@@ -82,14 +119,15 @@ public class Pixel {
 	
 	/**
 	 * 
-	 * Get RGB values extracted from single rgb integer.
+	 * Get RGB values extracted seperately.
 	 * @param rgb the rgb value to extract.
+	 * @return rgb the array of seperated RGB values
 	 * */
-	public static int[] getRGB( int rgb ) {
+	public static int[] extractRGB( int rgb ) {
 		return new int[] {
-				( (rgb >> 16) & 0xFF ),
-				( (rgb >> 8) & 0xFF ),
-				( (rgb >> 0) & 0xFF ),
+				( (rgb >> 16) & 0xFF ), //red
+				( (rgb >> 8) & 0xFF ),  //green
+				( (rgb >> 0) & 0xFF ),  //blue
 		};
 	}
 	
