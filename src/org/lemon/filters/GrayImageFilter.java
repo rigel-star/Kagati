@@ -1,15 +1,15 @@
 package org.lemon.filters;
 
-public class GrayImageFilter extends AbstractImageFilter {
+public class GrayImageFilter extends SingleRGBFilter {
 	
 	
 	@Override
-	public int process( int rgb ) {
+	public int processRGB( int rgb ) {
         
-		int a = (int) ( ( rgb >> 24 ) & 0xff);
-        int b = (int) ( rgb & 0xff);
-        int g = (int) ( ( rgb >> 8 ) & 0xff);
-        int r = (int) ( ( rgb >> 16 ) & 0xff);
+		int a = (int) ( rgb & 0xFF000000);
+        int b = (int) ( rgb & 0xFF);
+        int g = (int) ( ( rgb >> 8 ) & 0xFF);
+        int r = (int) ( ( rgb >> 16 ) & 0xFF);
         
         final int lum = (int) ( b * 0.0722 + g * 0.2126 + r * 0.2126 );
 		
