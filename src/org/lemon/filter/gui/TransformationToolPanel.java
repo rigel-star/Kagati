@@ -25,8 +25,8 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.lemon.filters.transform.PerspectivePlane;
-import org.lemon.filters.transform.VanishingPointFilter;
+import org.lemon.filter.transform.PerspectivePlane;
+import org.lemon.filter.transform.VanishingPointFilter;
 import org.lemon.gui.ImageView;
 import org.lemon.gui.LayerContainer;
 import org.lemon.gui.image.ChooseImage;
