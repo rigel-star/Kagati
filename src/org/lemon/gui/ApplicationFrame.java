@@ -23,7 +23,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
-import org.lemon.AppGlobalProperties;
 import org.lemon.filters.basic.GrayScale;
 import org.lemon.filters.basic.SharpImage;
 import org.lemon.filters.basic.SobelEdge;
@@ -32,7 +31,6 @@ import org.lemon.gui.dialogs.ColorReplaceDialog;
 import org.lemon.gui.dialogs.DenoiseImageDialog;
 import org.lemon.gui.dialogs.NegativeImageDialog;
 import org.lemon.gui.dialogs.PixelateImageDialog;
-import org.lemon.gui.drawing.canvas.NewDrawingPanelSetup;
 import org.lemon.gui.image.ImageInfoPanel;
 import org.lemon.gui.layers.Layer;
 import org.lemon.gui.image.ImagePanel.PanelMode;
@@ -41,6 +39,7 @@ import org.lemon.gui.menus.FileMenu;
 import org.lemon.gui.menus.Menu3D;
 import org.lemon.gui.panels.ImageAnalyzePanel;
 import org.lemon.gui.panels.OpacityControlPanel;
+import org.lemon.gui.panels.ToolInfoPanel;
 import org.lemon.gui.toolbars.SaveChangesToolBar;
 import org.lemon.tools.LemonTool;
 import org.lemon.gui.panels.LemonToolPanel;
@@ -102,9 +101,6 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 	private SaveChangesToolBar saveChngsToolBar = new SaveChangesToolBar();
 	
 	
-	private AppGlobalProperties 		gProperties;
-	
-	
 	/**
 	 * Contains every layer that is created in application.
 	 * */
@@ -120,8 +116,6 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 	
 	
 	public ApplicationFrame() throws IOException {
-		
-		gProperties = new AppGlobalProperties(this);;
 		
 		/*important panels in app*/
 		this.mainWorkspace = new Workspace();
@@ -140,7 +134,7 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 		toolBarsContainer.setLayout(new FlowLayout(FlowLayout.TRAILING));
 		toolBarsContainer.add(saveChngsToolBar);
 		
-		this.imageView = new ImageView(this.choosenImage, gProperties, this.choosenImgName, true, PanelMode.canvasMode);
+		this.imageView = new ImageView(this.choosenImage, this.choosenImgName, true, PanelMode.canvasMode);
 		
 		this.imgInfoPanel = new ImageInfoPanel(this.choosenImage);
 		this.opacityPanel = new OpacityControlPanel(this.choosenImage);
@@ -178,11 +172,11 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 		//edit properties
 		cropImg = new JMenuItem("Crop");
 		denoiseImg = new JMenuItem("Denoise");
-		colorRange = new JMenuItem("Color Range");
+		colorRange = new JMenuItem("Selective Color");
 		
 		//main menu bar
 		menuBar = new JMenuBar();
-	
+		
 		//file sub menu
 		fileSubMenu.add(plainDrawingPage);
 		fileSubMenu.add(pixelDrawingPage);
@@ -227,10 +221,7 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 		addPanelsToFrame();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
-		
-
 	}
-	
 	
 	
 	private void initBlendModes() {
@@ -292,16 +283,9 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 			return;
 		}
 		
-		//new page in the editingPanel
-		if(action.getSource() == plainDrawingPage) {
-			//panel where user can draw
-			new NewDrawingPanelSetup(this.mainWorkspace);
-			this.revalidate();
-		}
-		
 		
 		//sharping the image
-		else if(action.getSource() == this.sharpImg) {
+		if(action.getSource() == this.sharpImg) {
 			try {
 				SharpImage simg = new SharpImage(this.choosenImage);
 				this.editingPanel.add(new ImageView(simg.getSharpedImg(), this.choosenImgName));
@@ -317,14 +301,9 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 		
 		//gray scaling the image
 		else if(action.getSource() == this.grayScale) {
-			try {
-				this.editingPanel.add(new ImageView(new GrayScale(this.choosenImage).getGrayScaledImg(), this.choosenImgName));
-				this.add(editingPanel, BorderLayout.CENTER);
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			} finally {
-				this.revalidate();
-			}
+			this.editingPanel.add(new ImageView(new GrayScale(this.choosenImage).getGrayScaledImg(), this.choosenImgName));
+			this.add(editingPanel, BorderLayout.CENTER);
+			this.revalidate();
 		}
 		
 		//vanishing point filter
@@ -373,9 +352,15 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 		
 		//removing color of image using simple AI
 		else if(action.getSource() == this.colorRange) {
+			BufferedImage ii = null;
 			
+			try {
+				ii = ImageIO.read(new File("C:\\Users\\Ramesh\\Documents\\3D Images\\pink.png"));
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
 			if(this.mainWorkspace.getSelectedFrame() instanceof ImageView) {
-				new ColorReplaceDialog(this.selectedImgsStorage.get(this.mainWorkspace.getSelectedFrame()));
+				new ColorReplaceDialog(this.selectedImgsStorage.get(this.mainWorkspace.getSelectedFrame()), ii);
 			}
 		}
 		
@@ -395,7 +380,7 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 	 * @return {@code String} current tool
 	 * */
 	public LemonTool getTool() {
-		return this.gProperties.getGlobalTool();
+		return null;
 	}
 	
 	
@@ -405,18 +390,8 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 	 * @param newTool new tool
 	 * */
 	public void setTool(LemonTool newTool) {
-		this.gProperties.setGlobalTool(newTool);
+		
 	}
-	
-	
-	/**
-	 * Get global properties of application.
-	 * @return properties
-	 * */
-	public AppGlobalProperties getGlobalProperties() {
-		return this.gProperties;
-	}
-	
 	
 	
 	/**

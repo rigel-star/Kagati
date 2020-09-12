@@ -7,7 +7,6 @@ import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,23 +16,22 @@ import javax.swing.BorderFactory;
 import javax.swing.JInternalFrame;
 import javax.swing.border.Border;
 
-import org.lemon.AppGlobalProperties;
-import org.lemon.filters.ResizeImage;
+import org.lemon.filters.basic.ResizeImage;
 import org.lemon.gui.image.ImagePanel;
 import org.lemon.gui.image.ImagePanel.PanelMode;
 import org.lemon.gui.image.menus.ImageViewMenu;
+import org.lemon.image.LImage;
 import org.lemon.math.Vec2d;
 import org.lemon.utils.Utils;
 import org.rampcv.utils.Tools;
 
 /**
- * Parent of ImageView is always MainBackgroundPane class. 
- * ImageView is for holding image opened by user in application. 
- * ImageView has one main feature, connection. Connection is basically for connecting 
- * two ImageViews. If two views connected, they can be blended, edited, etc. together.
+ * 
+ * ImageView is for holding image opened by user in application.
+ * Parent of {@code ImageView} is {@code Workspace}.
+ * 
  * */
-
-public class ImageView extends JInternalFrame implements Cloneable, FilterControllable {
+public class ImageView extends JInternalFrame implements Cloneable, FilterControllable, View {
 	private static final long serialVersionUID = 1L;
 	
 	private ImageView 				connection;
@@ -62,8 +60,6 @@ public class ImageView extends JInternalFrame implements Cloneable, FilterContro
 	
 	private MouseEventsHandler 		meh;
 	
-	private AppGlobalProperties		agp;
-	
 	private final Dimension MAX_IMG_SIZE = new Dimension(500, 500); 
 	
 	/**
@@ -74,43 +70,48 @@ public class ImageView extends JInternalFrame implements Cloneable, FilterContro
 	public boolean imageIsActual = true;
 	
 	
+	public ImageView() {
+		this( LImage.createImage( 100, 100, BufferedImage.TYPE_INT_ARGB ).getAsBufferedImage() );
+	}
+	
+	
 	/*Note image can't be null*/
-	public ImageView(BufferedImage img) throws IOException {
-		this(img, null, null, false, PanelMode.DEFAULT_MODE);
+	public ImageView(BufferedImage img) {
+		this(img, null, false, PanelMode.DEFAULT_MODE);
 	}
 	
 	
-	public ImageView(BufferedImage img, String title) throws IOException {
-		this(img, null, title, false, PanelMode.DEFAULT_MODE);
+	public ImageView(BufferedImage img, String title) {
+		this(img, title, false, PanelMode.DEFAULT_MODE);
 	}
 	
 	
-	public ImageView(BufferedImage img, boolean closeable) throws IOException {
-		this(img, null, null, closeable, PanelMode.DEFAULT_MODE);
+	public ImageView(BufferedImage img, boolean closeable) {
+		this(img, null, closeable, PanelMode.DEFAULT_MODE);
 	}
 	
 	
-	public ImageView(BufferedImage img, int panelMode) throws IOException {
-		this(img, null, null, false, panelMode);
+	public ImageView(BufferedImage img, int panelMode) {
+		this(img, null, false, panelMode);
 	}
 	
 	
-	public ImageView(BufferedImage img, String title, int panelMode) throws IOException {
-		this(img, null, title, false, panelMode);
+	public ImageView(BufferedImage img, String title, int panelMode) {
+		this(img, title, false, panelMode);
 	}
 	
 	
-	public ImageView(BufferedImage img, boolean closeable, int panelMode) throws IOException {
-		this(img, null, null, closeable, panelMode);
+	public ImageView(BufferedImage img, boolean closeable, int panelMode) {
+		this(img, null, closeable, panelMode);
 	}
 	
 	
-	public ImageView(BufferedImage img, String title, boolean closeable) throws IOException {
-		this(img, null, title, closeable, PanelMode.DEFAULT_MODE);
+	public ImageView(BufferedImage img, String title, boolean closeable) {
+		this(img, title, closeable, PanelMode.DEFAULT_MODE);
 	}
 	
 	
-	public ImageView(BufferedImage img, AppGlobalProperties agp, String title, boolean closeable, int panelMode)  {
+	public ImageView(BufferedImage img, String title, boolean closeable, int panelMode)  {
         
 		if(img == null)
 			throw new NullPointerException("Image can't be null.");
@@ -135,8 +136,7 @@ public class ImageView extends JInternalFrame implements Cloneable, FilterContro
 			}
 		}
 		
-		this.agp = agp;
-		this.imgPan = new ImagePanel(srcCopy, agp, panelMode);
+		this.imgPan = new ImagePanel(srcCopy, panelMode);
 		this.title = title;
 		this.close = closeable;
 		
@@ -168,7 +168,7 @@ public class ImageView extends JInternalFrame implements Cloneable, FilterContro
 		 * */
 		revalidateListeners();
 		
-		var pt = new Point(this.getLocation().x, this.getLocation().y + 30);
+		var pt = new Point(this.getLocation().x, this.getLocation().y + 40);
 		controllableNode = new Node(new Vec2d(pt), null, this);
 	}
 	
@@ -181,10 +181,9 @@ public class ImageView extends JInternalFrame implements Cloneable, FilterContro
 	@Override
 	public Object clone() throws CloneNotSupportedException {
 		var newImg = Tools.copyImage(getActualImage());
-		ImageView duplicate = new ImageView(newImg, this.agp, getTitle(), getCloseableState(), getImagePanel().getPanelMode());
+		ImageView duplicate = new ImageView(newImg, getTitle(), getCloseableState(), getImagePanel().getPanelMode());
 		return duplicate;
 	}
-	
 	
 	
 	/**
@@ -195,7 +194,6 @@ public class ImageView extends JInternalFrame implements Cloneable, FilterContro
 		getImagePanel().addMouseListener(meh);
 		getImagePanel().addMouseMotionListener(meh);
 	}
-	
 	
 	
 	/**
@@ -273,7 +271,7 @@ public class ImageView extends JInternalFrame implements Cloneable, FilterContro
 	
 	/**
 	 * Get non-edited or non-transformed original image.
-	 * @return {@code BufferedImage}
+	 * @return img original image
 	 * */
 	public BufferedImage getActualImage() {
 		return src;
@@ -282,7 +280,7 @@ public class ImageView extends JInternalFrame implements Cloneable, FilterContro
 	
 	/**
 	 * Get edited or transformed image.
-	 * @return {@code BufferedImage}
+	 * @return img copied image from original
 	 * */
 	public BufferedImage getCurrentImage() {
 		return srcCopy;
