@@ -9,7 +9,8 @@ import javax.swing.JMenuItem;
 
 import org.lemon.gui.ImageView;
 import org.lemon.gui.Workspace;
-import org.lemon.gui.filter.HSBController;
+import org.lemon.gui.filter.BlurFilterController;
+import org.lemon.gui.filter.HSBAdjustController;
 import org.lemon.gui.filter.TextureController;
 
 public class EditMenu extends JMenu implements ActionListener {
@@ -53,13 +54,13 @@ public class EditMenu extends JMenu implements ActionListener {
 		
 		add(crop);
 		
-		add(hsbControl);
 		hsbControl.addActionListener(this);
+		add(hsbControl);
 		
+		blur.addActionListener(this);
 		add(blur);
 		
 		add(texture);
-		texture.addActionListener(this);
 		
 	}
 
@@ -73,8 +74,12 @@ public class EditMenu extends JMenu implements ActionListener {
 			
 			if(workspace.getSelectedFrame() instanceof ImageView) {
 				var v = (ImageView) workspace.getSelectedFrame();
-				comp = new HSBController(v, v.getImagePanel().getImage());
+				comp = new HSBAdjustController(v, v.getImagePanel().getImage());
 			}
+		}
+		
+		else if(e.getSource() == blur) {
+			comp = new BlurFilterController();
 		}
 		
 		else if(e.getSource() == texture) {
