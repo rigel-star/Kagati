@@ -5,7 +5,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.awt.image.Raster;
 
-import org.lemon.filters.GrayImageFilter;
+import org.lemon.filter.GrayImageFilter;
 
 public class LImage extends ImageGraphics {
 
