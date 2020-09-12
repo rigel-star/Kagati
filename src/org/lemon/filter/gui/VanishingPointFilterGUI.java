@@ -28,8 +28,8 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JWindow;
 
-import org.lemon.filters.ResizeImage;
-import org.lemon.filters.transform.PerspectivePlane;
+import org.lemon.filter.ResizeImage;
+import org.lemon.filter.transform.PerspectivePlane;
 import org.lemon.gui.LayerContainer;
 import org.lemon.math.Vec2d;
 import org.lemon.utils.Utils;
