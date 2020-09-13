@@ -1,4 +1,4 @@
-package org.lemon.filters;
+package org.lemon.filter;
 
 import org.lemon.image.LImage;
 
@@ -11,7 +11,7 @@ public abstract class AbstractImageFilter {
 	 * @param limage the image to filter.
 	 * 
 	 * */
-	public abstract void filter( LImage limage );
+	public abstract LImage filter( LImage limage );
 	
 	
 	/**
@@ -22,7 +22,7 @@ public abstract class AbstractImageFilter {
 	 * @param max maximum constrain.
 	 * 
 	 * */
-	public int constrain( int pix, int min, int max ) {
+	public static int constrain( int pix, int min, int max ) {
 		return (pix < min) ? min : (pix > max) ? max : pix;
 	}
 }

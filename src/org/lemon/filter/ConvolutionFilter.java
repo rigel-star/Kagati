@@ -1,11 +1,11 @@
-package org.lemon.filters;
+package org.lemon.filter;
 
 import java.awt.image.Kernel;
 
 import org.lemon.image.ImageMath;
 import org.lemon.image.LImage;
 
-public class ConvolutionFilter extends AbstractImageFilter {
+public abstract class ConvolutionFilter extends AbstractImageFilter {
 
 	/**
      * Treat pixels off the edge as zero.
@@ -61,7 +61,7 @@ public class ConvolutionFilter extends AbstractImageFilter {
 	
 	
 	@Override
-	public void filter( LImage limage ) {
+	public LImage filter( LImage limage ) {
 		
 		int width = limage.width;
 		int height = limage.height;
@@ -80,15 +80,17 @@ public class ConvolutionFilter extends AbstractImageFilter {
 			ImageMath.unpremultiplyAlpha( data );
 		
 		limage.setPixels( 0, 0, width, height, out );
+		
+		return limage;
 	}
 	
 	
-	public void convolve( Kernel kernel, int[] data, int[] out, int width, int height, int edgeAction ) {
+	public static void convolve( Kernel kernel, int[] data, int[] out, int width, int height, int edgeAction ) {
 		convolve(kernel, data, out, width, height, true, edgeAction);
 	}
 	
 	
-	public void convolve( Kernel kernel, int[] data, int[] out, int width, int height, boolean alpha, int edgeAction ) {
+	public static void convolve( Kernel kernel, int[] data, int[] out, int width, int height, boolean alpha, int edgeAction ) {
 		if (kernel.getHeight() == 1)
 			convolveH(kernel, data, out, width, height, alpha, edgeAction);
 		else if (kernel.getWidth() == 1)

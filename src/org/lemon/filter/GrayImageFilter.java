@@ -1,6 +1,6 @@
-package org.lemon.filters;
+package org.lemon.filter;
 
-public class GrayImageFilter extends SingleRGBFilter {
+public class GrayImageFilter extends SinglePixelFilter {
 	
 	
 	@Override

@@ -1,12 +1,12 @@
-package org.lemon.filters;
+package org.lemon.filter;
 
 import org.lemon.image.LImage;
 
-public abstract class SingleRGBFilter extends AbstractImageFilter {
+public abstract class SinglePixelFilter extends AbstractImageFilter {
 
 	
 	@Override
-	public void filter( LImage limage ) {
+	public LImage filter( LImage limage ) {
 		
 		final int width = limage.width;
         final int height = limage.height;
@@ -21,6 +21,7 @@ public abstract class SingleRGBFilter extends AbstractImageFilter {
 		
 		limage.setPixels( 0, 0, width, height, out );
 		
+		return limage;
 	}
 	
 	
