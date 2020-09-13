@@ -50,9 +50,12 @@ public class LImage extends ImageGraphics {
 		this.type = type;
 		
 		asBufferedImg = new BufferedImage( w, h, BufferedImage.TYPE_INT_ARGB );
-		asBufferedImg.setData( raster );
-		this.raster = raster;
-		data = raster.getDataBuffer();
+		
+		if( raster != null ) {
+			asBufferedImg.setData( raster );
+			this.raster = raster;
+			data = raster.getDataBuffer();
+		}
 		
 		initImageType( type );
 	}
@@ -82,7 +85,6 @@ public class LImage extends ImageGraphics {
 		if(disposed) 
 			return;
 		
-		
 	}
 	
 	
@@ -95,6 +97,7 @@ public class LImage extends ImageGraphics {
 	/**
 	* 
 	* Set the pixels to this image.
+	* 
 	* @param x       the left edge of the pixel block
     * @param y       the right edge of the pixel block
     * @param width   the width of the pixel arry
@@ -116,13 +119,13 @@ public class LImage extends ImageGraphics {
 	/**
 	 * 
 	 * Get the all pixels of this image.
+	 * 
      * @param x       the left edge of the pixel block
      * @param y       the right edge of the pixel block
      * @param width   the width of the pixel arry
      * @param height  the height of the pixel arry
      * @param pixels  the array to hold the returned pixels. May be null.
      * @return the pixels
-     * @see #setRGB
      * 
      */
 	public int[] getPixels( int x, int y, int width, int height, int[] pixels ) {
@@ -138,7 +141,8 @@ public class LImage extends ImageGraphics {
 	/**
 	 * 
 	 * Get {@code DataBuffer} attached with this image.
-	 * @return data the {@code DataBuffer}
+	 * 
+	 * @return {@code DataBuffer}
 	 * 
 	 * */
 	public DataBuffer getDataBuffer() {
@@ -149,7 +153,8 @@ public class LImage extends ImageGraphics {
 	/**
 	 * 
 	 * Get {@code Raster} attached with this image.
-	 * @return data the {@code Raster}
+	 * 
+	 * @return {@code Raster} data
 	 * 
 	 * */
 	public Raster getRaster() {
@@ -160,7 +165,8 @@ public class LImage extends ImageGraphics {
 	/**
 	 * 
 	 * Get {@code this LImage} as {@code BufferedImage}.
-	 * @return img the {@code BufferedImage} version of this {@code LImage}
+	 * 
+	 * @return {@code BufferedImage} version of this {@code LImage}
 	 * 
 	 * */
 	public BufferedImage getAsBufferedImage() {

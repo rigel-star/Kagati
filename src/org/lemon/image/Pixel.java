@@ -6,9 +6,7 @@ public class Pixel {
 	
 	private int value = 0;
 	
-	public Pixel() {
-		
-	}
+	public Pixel() {}
 	
 	
 	public Pixel( int argb ) {
@@ -122,6 +120,7 @@ public class Pixel {
 	 * Get RGB values extracted seperately.
 	 * @param rgb the rgb value to extract.
 	 * @return rgb the array of seperated RGB values
+	 * 
 	 * */
 	public static int[] extractRGB( int rgb ) {
 		return new int[] {
