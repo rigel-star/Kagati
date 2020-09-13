@@ -4,10 +4,13 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JComboBox;
 import javax.swing.JInternalFrame;
@@ -16,11 +19,16 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 
 import org.lemon.LemonObject;
+import org.lemon.filter.BlurFilter;
+import org.lemon.filter.GaussianBlurImageFilter;
 import org.lemon.gui.FilterControllable;
 import org.lemon.gui.FilterController;
 import org.lemon.gui.ImageView;
 import org.lemon.gui.Node;
+import org.lemon.gui.image.ImagePanel;
+import org.lemon.image.LImage;
 import org.lemon.math.Vec2d;
+import org.lemon.tools.select.PolygonalSelectTool;
 
 import org.rampcv.filters.blur.BoxBlur;
 
@@ -29,6 +37,7 @@ import org.rampcv.filters.blur.BoxBlur;
 public class BlurFilterController extends JInternalFrame implements FilterController, ActionListener {
 	private static final long serialVersionUID = 1L;
 	
+	private static final Logger LOGGER = Logger.getLogger( BlurFilterController.class.getName() );
 	
 	private Node[] nodes = new Node[1];
 	private Node imgNode = null;
@@ -45,7 +54,6 @@ public class BlurFilterController extends JInternalFrame implements FilterContro
 	private JPanel spinBlurPanel = new JPanel();
 	private JPanel blurChooserPanel = new JPanel();
 	
-	
 	private final String GAUSS = "Gaussian Blur";
 	private final String MOTION = "Motion Blur";
 	private final String SPIN = "Spin Blur";
@@ -56,24 +64,23 @@ public class BlurFilterController extends JInternalFrame implements FilterContro
 	public BlurFilterController() {
 		
 		init();
-		//initBlur();
 		
-		setSize(200, 140);
-		setTitle("Blur Controller");
-		setResizable(false);
-		setVisible(true);
-		setClosable(true);
-		setLocation(20, 50);
+		setSize( 200, 140 );
+		setTitle( "Blur Controller" );
+		setResizable( false );
+		setVisible( true );
+		setClosable( true );
+		setLocation( 20, 50 );
 		
-		var start = new Point(getLocation().x + this.getWidth(), getLocation().y + (this.getHeight() / 2));
-		imgNode = new Node(new Vec2d(start), null, this);
+		var start = new Point( getLocation().x + this.getWidth(), getLocation().y + (this.getHeight() / 2) );
+		imgNode = new Node( new Vec2d(start), null, this );
 		nodes[0] = imgNode;
 		
-		blurChooserPanel.add(blurChooserTxt);
-		blurChooserPanel.add(blurChooser);
+		blurChooserPanel.add( blurChooserTxt );
+		blurChooserPanel.add( blurChooser );
 		
-		spinBlurPanel.add(degreeSliderTxt);
-		spinBlurPanel.add(degreeSlider);
+		spinBlurPanel.add( degreeSliderTxt );
+		spinBlurPanel.add( degreeSlider );
 		
 		controlPanel.add(blurChooserPanel);
 		controlPanel.add(spinBlurPanel);
@@ -114,9 +121,9 @@ public class BlurFilterController extends JInternalFrame implements FilterContro
 	
 	
 	/*init the currently selected blur method*/
-	private void initBlur() {
+	private void startBlur() {
 		
-		switch (choosenBlur) {
+		switch ( choosenBlur ) {
 		
 		case SPIN: {
 			/*adding extra options for spin blur*/
@@ -145,34 +152,53 @@ public class BlurFilterController extends JInternalFrame implements FilterContro
 	}
 	
 	
-	private BufferedImage src = null;
-	private Component view;
-	private void applyBlur(String blur) {
+	private BufferedImage img = null;
+	private LImage limg = null;
+	private Component view = null;
+	
+	/**
+	 * 
+	 * Apply blur to an image.
+	 * @param blur 		specified blur
+	 * 
+	 * */
+	private void applyBlur( String blur ) {
 		
-		if(imgNode.getConnections().size() == 0) {
+		if( imgNode.getConnections().size() == 0 ) {
 			System.out.println("No connections!");
 			return;
 		}
 		
-		for(FilterControllable fc: imgNode.getConnections()) {	
+		for( FilterControllable fc: imgNode.getConnections() ) {	
 			
-			if(fc instanceof ImageView) {
-				view = (ImageView) fc;
-				src = ((ImageView) view).getImagePanel().getImage();
+			if( fc instanceof ImageView ) {
+				view = ( (ImageView) fc ).getImagePanel();
+				img = ( (ImageView) fc ).getImagePanel().getImage();
+				limg = new LImage( img );
 			}
 			
-			new Thread(new Runnable() {
+			new Thread( new Runnable() {
 				
 				@Override
 				public void run() {
 					
-					switch(blur) {
+					BlurFilter blurFilter = null;
+					
+					switch( blur ) {
 					
 					case BOX: {	
-						var blur = new BoxBlur();
-						blur.setRadius(5);
-						src = blur.filter(src, null);
-						((ImageView) view).getImagePanel().setImage(src);
+						doBoxBlur();
+						break;
+					}
+					
+					case GAUSS: {
+						blurFilter = new GaussianBlurImageFilter();
+						blurFilter.blur( limg );
+						break;
+					}
+					
+					case SPIN: {
+						break;
 					}
 					
 					}
@@ -182,6 +208,34 @@ public class BlurFilterController extends JInternalFrame implements FilterContro
 		}
 		
 		view.revalidate();
+	}
+	
+	
+	private void doBoxBlur() {
+		var blur = new BoxBlur();
+		blur.setRadius( 5 );
+		
+		ImagePanel panel = (ImagePanel) view;
+		
+		if( panel.hasAreaSelected() ) {		
+			
+			if( panel.getCurrentMouseListener() instanceof PolygonalSelectTool ) {
+				img = ((PolygonalSelectTool) panel.getCurrentMouseListener()).getSelectedAreaImage();
+				img = blur.filter( img, null );
+				Graphics2D g = panel.getImage().createGraphics();
+				g.drawImage( img, 0, 0, null );
+				g.dispose();
+				panel.repaint();
+				return;
+			}
+		}
+		else {
+			LOGGER.log( Level.INFO, "ImagePanel doesn't have area selected." );
+			img = panel.getImage();
+		}
+		
+		img = blur.filter(img, null);
+		panel.repaint();
 	}
 	
 	
@@ -209,7 +263,7 @@ public class BlurFilterController extends JInternalFrame implements FilterContro
 		
 		if(e.getSource() == blurChooser) {
 			choosenBlur = (String) blurChooser.getSelectedItem();
-			initBlur();
+			startBlur();
 		}
 		
 		spinBlurPanel.repaint();
