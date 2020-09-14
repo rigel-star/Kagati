@@ -3,11 +3,12 @@ package org.lemon.gui;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 
+import org.lemon.gui.image.PanelMode;
 import org.lemon.image.LImage;
 
 /**
  * 
- * Sub class of {@code ImageView} which contains blank image for painting.
+ * Sub class of {@code ImageView} which holds blank image for painting.
  * 
  * */
 public class CanvasView extends ImageView {
@@ -30,7 +31,7 @@ public class CanvasView extends ImageView {
 	 * @param panelMode	panel mode for canvas
 	 * 
 	 * */
-	public CanvasView( int width, int height, Color bg, String title, boolean closeable, int panelMode ) {
+	public CanvasView( int width, int height, Color bg, String title, boolean closeable, PanelMode panelMode ) {
 		super( LImage.createImage( width, height, bg, BufferedImage.TYPE_INT_ARGB ).getAsBufferedImage(), 
 				title, closeable, panelMode);
 	}

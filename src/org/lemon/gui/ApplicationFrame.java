@@ -23,17 +23,17 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
-import org.lemon.filters.basic.GrayScale;
-import org.lemon.filters.basic.SharpImage;
-import org.lemon.filters.basic.SobelEdge;
-import org.lemon.filters.gui.VanishingPointFilterGUI;
+import org.lemon.filter.basic.GrayScale;
+import org.lemon.filter.basic.SharpImage;
+import org.lemon.filter.basic.SobelEdge;
+import org.lemon.filter.gui.VanishingPointFilterGUI;
 import org.lemon.gui.dialogs.ColorReplaceDialog;
 import org.lemon.gui.dialogs.DenoiseImageDialog;
 import org.lemon.gui.dialogs.NegativeImageDialog;
 import org.lemon.gui.dialogs.PixelateImageDialog;
 import org.lemon.gui.image.ImageInfoPanel;
 import org.lemon.gui.layers.Layer;
-import org.lemon.gui.image.ImagePanel.PanelMode;
+import org.lemon.gui.image.PanelMode;
 import org.lemon.gui.menus.EditMenu;
 import org.lemon.gui.menus.FileMenu;
 import org.lemon.gui.menus.Menu3D;
@@ -134,7 +134,7 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 		toolBarsContainer.setLayout(new FlowLayout(FlowLayout.TRAILING));
 		toolBarsContainer.add(saveChngsToolBar);
 		
-		this.imageView = new ImageView(this.choosenImage, this.choosenImgName, true, PanelMode.canvasMode);
+		this.imageView = new ImageView(this.choosenImage, this.choosenImgName, true, PanelMode.CANVAS_MODE);
 		
 		this.imgInfoPanel = new ImageInfoPanel(this.choosenImage);
 		this.opacityPanel = new OpacityControlPanel(this.choosenImage);

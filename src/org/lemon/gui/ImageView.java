@@ -16,13 +16,14 @@ import javax.swing.BorderFactory;
 import javax.swing.JInternalFrame;
 import javax.swing.border.Border;
 
-import org.lemon.filters.basic.ResizeImage;
+import org.lemon.filter.ResizeImageFilter;
 import org.lemon.gui.image.ImagePanel;
-import org.lemon.gui.image.ImagePanel.PanelMode;
-import org.lemon.gui.image.menus.ImageViewMenu;
+import org.lemon.gui.image.ImageViewMenu;
+import org.lemon.gui.image.PanelMode;
 import org.lemon.image.LImage;
 import org.lemon.math.Vec2d;
 import org.lemon.utils.Utils;
+
 import org.rampcv.utils.Tools;
 
 /**
@@ -31,7 +32,7 @@ import org.rampcv.utils.Tools;
  * Parent of {@code ImageView} is {@code Workspace}.
  * 
  * */
-public class ImageView extends JInternalFrame implements Cloneable, FilterControllable, View {
+public class ImageView extends JInternalFrame implements Cloneable, FilterControllable, ViewHolder {
 	private static final long serialVersionUID = 1L;
 	
 	private ImageView 				connection;
@@ -63,9 +64,11 @@ public class ImageView extends JInternalFrame implements Cloneable, FilterContro
 	private final Dimension MAX_IMG_SIZE = new Dimension(500, 500); 
 	
 	/**
+	 * 
 	 * To check if the {@code ImageView} is showing original image or
-	 *  image is resized or changed. If the image size is over than 500X500 then the image
-	 *  will be resized to 500X500 otherwise {@code ImageView} will show actual image.
+	 * image is resized or changed. If the image size is over than 500X500 then the image
+	 * will be resized to 500X500 otherwise {@code ImageView} will show actual image.
+	 * 
 	 * */
 	public boolean imageIsActual = true;
 	
@@ -76,132 +79,132 @@ public class ImageView extends JInternalFrame implements Cloneable, FilterContro
 	
 	
 	/*Note image can't be null*/
-	public ImageView(BufferedImage img) {
-		this(img, null, false, PanelMode.DEFAULT_MODE);
+	public ImageView( BufferedImage img ) {
+		this( img, null, false, PanelMode.DEFAULT_MODE );
 	}
 	
 	
-	public ImageView(BufferedImage img, String title) {
-		this(img, title, false, PanelMode.DEFAULT_MODE);
+	public ImageView( BufferedImage img, String title ) {
+		this( img, title, false, PanelMode.DEFAULT_MODE );
 	}
 	
 	
-	public ImageView(BufferedImage img, boolean closeable) {
-		this(img, null, closeable, PanelMode.DEFAULT_MODE);
+	public ImageView( BufferedImage img, boolean closeable ) {
+		this( img, null, closeable, PanelMode.DEFAULT_MODE );
 	}
 	
 	
-	public ImageView(BufferedImage img, int panelMode) {
-		this(img, null, false, panelMode);
+	public ImageView( BufferedImage img, PanelMode panelMode ) {
+		this( img, null, false, panelMode );
 	}
 	
 	
-	public ImageView(BufferedImage img, String title, int panelMode) {
-		this(img, title, false, panelMode);
+	public ImageView( BufferedImage img, String title, PanelMode panelMode ) {
+		this( img, title, false, panelMode );
 	}
 	
 	
-	public ImageView(BufferedImage img, boolean closeable, int panelMode) {
-		this(img, null, closeable, panelMode);
+	public ImageView( BufferedImage img, boolean closeable, PanelMode panelMode ) {
+		this( img, null, closeable, panelMode);
 	}
 	
 	
-	public ImageView(BufferedImage img, String title, boolean closeable) {
-		this(img, title, closeable, PanelMode.DEFAULT_MODE);
+	public ImageView( BufferedImage img, String title, boolean closeable ) {
+		this(img, title, closeable, PanelMode.DEFAULT_MODE );
 	}
 	
 	
-	public ImageView(BufferedImage img, String title, boolean closeable, int panelMode)  {
+	public ImageView( BufferedImage img, String title, boolean closeable, PanelMode panelMode )  {
         
-		if(img == null)
-			throw new NullPointerException("Image can't be null.");
+		if( img == null )
+			throw new NullPointerException( "Image can't be null." );
 		else {
 			this.src = img;
-			this.srcCopy = Utils.getImageCopy(src);
+			this.srcCopy = Utils.getImageCopy( src );
 			
-			var resize = new ResizeImage(srcCopy); 
+			if( src.getHeight() > MAX_IMG_SIZE.height && src.getWidth() > MAX_IMG_SIZE.width ) {
+				srcCopy = new ResizeImageFilter( MAX_IMG_SIZE.width, MAX_IMG_SIZE.height )
+												.filter( new LImage( srcCopy ))
+												.getAsBufferedImage();
+			}
+			else if( src.getHeight() > MAX_IMG_SIZE.height ) {
+				srcCopy = new ResizeImageFilter( src.getWidth(), MAX_IMG_SIZE.height )
+												.filter( new LImage( srcCopy ))
+												.getAsBufferedImage();
+			}
+			else if( src.getWidth() > MAX_IMG_SIZE.width ) {
+				srcCopy = new ResizeImageFilter( MAX_IMG_SIZE.width, src.getHeight() )
+												.filter( new LImage( srcCopy ))
+												.getAsBufferedImage();
+			}
 			
-			if(src.getHeight() > MAX_IMG_SIZE.height && src.getWidth() > MAX_IMG_SIZE.width) {
-				srcCopy = resize.getImageSizeOf(MAX_IMG_SIZE.width, MAX_IMG_SIZE.height);
-			}
-			else if(src.getHeight() > MAX_IMG_SIZE.height) {
-				srcCopy = resize.getImageSizeOf(src.getWidth(), MAX_IMG_SIZE.height);
-			}
-			else if(src.getWidth() > MAX_IMG_SIZE.width) {
-				srcCopy = resize.getImageSizeOf(MAX_IMG_SIZE.width, src.getHeight());
-			}
-			
-			if(resize.isDone()) {
-				srcCopy.getGraphics().dispose();
-			}
+			srcCopy.getGraphics().dispose();
 		}
 		
-		this.imgPan = new ImagePanel(srcCopy, panelMode);
+		this.imgPan = new ImagePanel( srcCopy, panelMode );
 		this.title = title;
 		this.close = closeable;
 		
-		//border for panel
-		final Border layoutBorder = BorderFactory.createLineBorder(Color.BLACK, 2);
+		final Border layoutBorder = BorderFactory.createLineBorder( Color.BLACK, 2 );
 		
-		setLayout(new BorderLayout());
-		setBorder(layoutBorder);
-		setTitle(this.title);
-		setClosable(closeable);
-		setVisible(true);
-		setSize(new Dimension(srcCopy.getWidth(), srcCopy.getHeight()));
-		setLayout(new BorderLayout());
-		setMaximizable(true);
-		setIconifiable(true);
+		setLayout( new BorderLayout() );
+		setBorder( layoutBorder );
+		setTitle( this.title );
+		setClosable( closeable );
+		setVisible( true );
+		setSize( new Dimension(srcCopy.getWidth(), srcCopy.getHeight()) );
+		setLayout( new BorderLayout() );
+		setMaximizable( true );
+		setIconifiable( true );
 		
-		//var scroll = new JScrollPane(imgPan);
+		add( imgPan, BorderLayout.CENTER );
 		
-		add(imgPan, BorderLayout.CENTER);
-		
-		//add(new ImageZoomAndPan(img), BorderLayout.CENTER);
-		
-		/* Revalidatng simply re-adds the listeners to this ImageView.
+		/* 
+		 * Revalidatng simply re-adds the listeners to this ImageView.
 		 * I'm calling revalidate here even im not revalidating is cause 
 		 * even for the first time i have to first of all add listener
 		 * and if all of the listeners removed from this ImageView, on
 		 * calling this method, again default mouse listeners will be applied.
 		 * BADDDDDDDDD ENGLISSSSSSSSSSHHHHHHHHHH
+		 * 
 		 * */
 		revalidateListeners();
 		
-		var pt = new Point(this.getLocation().x, this.getLocation().y + 40);
-		controllableNode = new Node(new Vec2d(pt), null, this);
+		var pt = new Point( this.getLocation().x, this.getLocation().y + 40 );
+		controllableNode = new Node( new Vec2d(pt), null, this );
 	}
 	
 	
-	/*
-	 * Duplicates itself :D
-	 * Simply returning super.clone() was causing duplicate not to move from one place to another.
-	 * So, have to take this approach of making new ImageView object.
-	 * */
 	@Override
 	public Object clone() throws CloneNotSupportedException {
-		var newImg = Tools.copyImage(getActualImage());
-		ImageView duplicate = new ImageView(newImg, getTitle(), getCloseableState(), getImagePanel().getPanelMode());
+		var newImg = Tools.copyImage( getActualImage() );
+		ImageView duplicate = new ImageView( newImg, getTitle(), getCloseableState(), 
+												getImagePanel().getPanelMode() );
 		return duplicate;
 	}
 	
 	
 	/**
+	 * 
 	 * Revalidate every listener applied to this ImageView
+	 * 
 	 * */
 	public void revalidateListeners() {
 		meh = new MouseEventsHandler();
-		getImagePanel().addMouseListener(meh);
-		getImagePanel().addMouseMotionListener(meh);
+		getImagePanel().addMouseListener( meh );
+		getImagePanel().addMouseMotionListener( meh );
 	}
 	
 	
 	/**
-	 * Connect two ImageView.<p>
+	 * 
+	 * Connect two ImageViews.
+	 * 
 	 * @param {@code ImageView} to connect with
 	 * @return {@code false} if connectTo is null else {@code true}.
+	 * 
 	 * */
-	public boolean setConnection(ImageView connectTo) {
+	public boolean setConnection( ImageView connectTo ) {
 		/*set this imageviews connection*/
 		this.connection = connectTo;
 		return true;
@@ -209,8 +212,11 @@ public class ImageView extends JInternalFrame implements Cloneable, FilterContro
 	
 	
 	/**
+	 * 
 	 * Get connected ImageView object.
+	 * 
 	 * @return connection
+	 * 
 	 * */
 	public ImageView getConnection() {
 		return this.connection;
@@ -218,23 +224,29 @@ public class ImageView extends JInternalFrame implements Cloneable, FilterContro
 	
 	
 	/**
+	 * 
 	 * Set connection options for this ImageView.
+	 * 
 	 * @param {{@code List<String>}  of options
+	 * 
 	 * */
-	public void setConOptions(List<String> optionsTitle, List<ImageView> views) {
+	public void setConOptions( List<String> optionsTitle, List<ImageView> views ) {
 		connections.clear();
 		this.conOptionsTitles = optionsTitle;
 		this.conOptionsViews = views;
 		
-		for(int i=0; i<views.size(); i++) {
-			connections.put(optionsTitle.get(i), views.get(i));
+		for( int i=0; i<views.size(); i++ ) {
+			connections.put( optionsTitle.get(i), views.get(i) );
 		}
 	}
 	
 	
 	/**
+	 * 
 	 * Get all the available connections titles for this ImageView.
+	 * 
 	 * @return list of connections titles
+	 * 
 	 * */
 	public List<String> getConOptionsTitles() {
 		return this.conOptionsTitles;
@@ -242,8 +254,11 @@ public class ImageView extends JInternalFrame implements Cloneable, FilterContro
 	
 	
 	/**
+	 * 
 	 * Get all the available connections of this {@code ImageView}.
+	 * 
 	 * @return list of available ImageViews to connect with.
+	 * 
 	 * */
 	public List<ImageView> getConOptionsViews(){
 		return this.conOptionsViews;
@@ -251,27 +266,39 @@ public class ImageView extends JInternalFrame implements Cloneable, FilterContro
 	
 	
 	/**
+	 * 
 	 * Sets the custom {@code ImagePanel} object for {@code this} {@code ImageView}.<p>
+	 * 
 	 * @param imgPan 	{@code ImagePanel} object.
+	 * 
 	 * */
-	public void setImagePanel(ImagePanel imgPan) {
-		this.imgPan.setImage(imgPan.getImage());
-		this.imgPan.setPanelMode(imgPan.getPanelMode());
+	public void setImagePanel( ImagePanel imgPan ) {
+		this.imgPan.setImage( imgPan.getImage() );
+		this.imgPan.setPanelMode( imgPan.getPanelMode() );
 		revalidate();
 	}
 	
 	
 	/**
-	 * @return 			{@code ImagePanel}
+	 * 
+	 * Get {@code ImagePanel} attached with this {@code ImageView} in a 
+	 * manner that the modification of the {@code LImage} attached with
+	 * {@code ImagePanel} brings changes in {@code this ImageView}.
+	 * 
+	 * @return 			{@code ImagePanel} attached with this {@code ImageView}
+	 * 
 	 * */
 	public ImagePanel getImagePanel() {
-		return this.imgPan;
+		return imgPan;
 	}
 	
 	
 	/**
+	 * 
 	 * Get non-edited or non-transformed original image.
+	 * 
 	 * @return img original image
+	 * 
 	 * */
 	public BufferedImage getActualImage() {
 		return src;
@@ -279,8 +306,11 @@ public class ImageView extends JInternalFrame implements Cloneable, FilterContro
 	
 	
 	/**
+	 * 
 	 * Get edited or transformed image.
+	 * 
 	 * @return img copied image from original
+	 * 
 	 * */
 	public BufferedImage getCurrentImage() {
 		return srcCopy;
@@ -288,28 +318,54 @@ public class ImageView extends JInternalFrame implements Cloneable, FilterContro
 	
 	
 	/**
-	 * @return		{@code true} if {@code this ImageView} is closeable <p> else returns {@code false}
+	 * 
+	 * @return		{@code true} if {@code this ImageView} is closeable else returns {@code false}
+	 * 
 	 * */
 	public boolean getCloseableState() {
 		return this.close;
 	}
 	
 	
+	@Override
+	public String getTitle() {
+		return this.title;
+	}
+	
+	
+	@Override
+	public void setTitle( String title ) {
+		this.title = title;
+	}
+	
+	
 	/**
+	 * 
+	 * @return Properties of this {@code ImageView}.
+	 * 
+	 * */
+	public ImageViewProperties getProperties() {
+		return new ImageViewProperties( this );
+	}
+	
+	
+	/**
+	 * 
 	 * Mouse events handler for ImageView.
+	 * 
 	 * */
 	private class MouseEventsHandler extends MouseAdapter {
 		
 		@Override
-		public void mouseClicked(MouseEvent e) {
-			super.mouseClicked(e);
+		public void mouseClicked( MouseEvent e ) {
+			super.mouseClicked( e );
 			
 			/*BUTTON3 = Right Mouse Button*/
-			if(e.getButton() == MouseEvent.BUTTON3) {
+			if( e.getButton() == MouseEvent.BUTTON3 ) {
 				
 				//show available options
-				menu = new ImageViewMenu(self);
-				menu.show(self, e.getX(), e.getY());
+				menu = new ImageViewMenu( self );
+				menu.show( self, e.getX(), e.getY() );
 				
 			}
 		}
@@ -318,8 +374,8 @@ public class ImageView extends JInternalFrame implements Cloneable, FilterContro
 
 
 	@Override
-	public void addController(FilterController controller) {
-		controllers.add(controller);
+	public void addController( FilterController controller ) {
+		controllers.add( controller );
 	}
 
 
@@ -342,5 +398,3 @@ public class ImageView extends JInternalFrame implements Cloneable, FilterContro
 	}
 	
 }
-
-
