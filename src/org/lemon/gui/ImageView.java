@@ -199,7 +199,6 @@ public class ImageView extends JInternalFrame implements Cloneable, FilterContro
 	/**
 	 * 
 	 * Connect two ImageViews.
-	 * 
 	 * @param {@code ImageView} to connect with
 	 * @return {@code false} if connectTo is null else {@code true}.
 	 * 
@@ -214,7 +213,6 @@ public class ImageView extends JInternalFrame implements Cloneable, FilterContro
 	/**
 	 * 
 	 * Get connected ImageView object.
-	 * 
 	 * @return connection
 	 * 
 	 * */
@@ -226,7 +224,6 @@ public class ImageView extends JInternalFrame implements Cloneable, FilterContro
 	/**
 	 * 
 	 * Set connection options for this ImageView.
-	 * 
 	 * @param {{@code List<String>}  of options
 	 * 
 	 * */
@@ -244,7 +241,6 @@ public class ImageView extends JInternalFrame implements Cloneable, FilterContro
 	/**
 	 * 
 	 * Get all the available connections titles for this ImageView.
-	 * 
 	 * @return list of connections titles
 	 * 
 	 * */
@@ -256,7 +252,6 @@ public class ImageView extends JInternalFrame implements Cloneable, FilterContro
 	/**
 	 * 
 	 * Get all the available connections of this {@code ImageView}.
-	 * 
 	 * @return list of available ImageViews to connect with.
 	 * 
 	 * */
@@ -268,7 +263,6 @@ public class ImageView extends JInternalFrame implements Cloneable, FilterContro
 	/**
 	 * 
 	 * Sets the custom {@code ImagePanel} object for {@code this} {@code ImageView}.<p>
-	 * 
 	 * @param imgPan 	{@code ImagePanel} object.
 	 * 
 	 * */
@@ -296,7 +290,6 @@ public class ImageView extends JInternalFrame implements Cloneable, FilterContro
 	/**
 	 * 
 	 * Get non-edited or non-transformed original image.
-	 * 
 	 * @return img original image
 	 * 
 	 * */
@@ -308,7 +301,6 @@ public class ImageView extends JInternalFrame implements Cloneable, FilterContro
 	/**
 	 * 
 	 * Get edited or transformed image.
-	 * 
 	 * @return img copied image from original
 	 * 
 	 * */
