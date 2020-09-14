@@ -4,13 +4,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.NoninvertibleTransformException;
-import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -18,98 +12,70 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 
-import org.lemon.AppGlobalProperties;
-import org.lemon.gui.drawing.image.DrawingCanvasOnImage;
-import org.lemon.tools.SelectionTool;
-import org.lemon.tools.select.LassoSelectionTool;
+import org.lemon.filter.basic.ResizeImage;
+import org.lemon.gui.canvas.DrawingCanvasOnImage;
 import org.lemon.tools.select.PolygonalSelectTool;
+import org.lemon.utils.Utils;
 
 /**
+ * 
  * Class description: This class extends JLabel and takes image as param and apply it as its icon.
+ * 
  * */
 public class ImagePanel extends JPanel {
 	
+	/**
+	 * Serial UID
+	 * */
 	private static final long serialVersionUID = 1L;
 	
+	private BufferedImage src, srcCopy;;
+	private PanelMode panelMode;
 	
-	private BufferedImage img;
-	private int panelMode;
-	
-	private ImagePanel self;
 	private JLabel imgContainer;
 	
-	/*different types of mouseListeners for different tools*/
 	private DrawingCanvasOnImage brushToolListener;
-	private PolygonalSelectTool polySelectionToolListener;
-	private LassoSelectionTool lassoSelectionToolListener;
-	private ImageZoomAndPanListener zoomAndPanListener;
-	
-	private SelectionTool.SelectedArea selectedArea = null;
-	
-	private boolean init = true;
-    private int zoomLevel = 0;
-    private int minZoomLevel = -20;
-    private int maxZoomLevel = 10;
-    private double zoomMultiplicationFactor = 1.2;
-
-    private Point dragStartScreen;
-    private Point dragEndScreen;
-    
-    private AffineTransform coordTransform = new AffineTransform();
-	
-	
 	
 	/*current mouse listener in this panel*/
 	private MouseAdapter currentMouseListsner;
 	
-	
-	private AppGlobalProperties agp;
-	
+	private final Dimension MAX_IMG_SIZE = new Dimension(500, 500); 
 	
 	//default constructor
 	public ImagePanel() {}
 	
 	
-	
-	/**
-	 * Select panel mode for {@code ImagePanel}
-	 * */
-	public class PanelMode {
-		//flags
-		//default state
-		public static final int 	DEFAULT_MODE = 0;
-			
-		//for canvas on image
-		public static final int 	CANVAS_MODE = 1;
-		
-		//for snapping tool on image
-		public static final int 	SNAP_MODE = 2;
-		
-		//for drawing shapes in image
-		public static final int 	SHAPES_MODE = 3;
-		
-		//for zooming and panning the image
-		public static final int ZOOM_AND_PAN_MODE = 4;
-		
-		public static final int 	defaultMode = DEFAULT_MODE;
-		public static final int 	canvasMode = CANVAS_MODE;
-		public static final int 	snapMode = SNAP_MODE;
-		public static final int 	shapesMode = SHAPES_MODE;
-		public static final int		zoomAndPanMode = ZOOM_AND_PAN_MODE;
-	}
-	
-	
-	
 	//if only image is passed as param then by default set canvas false.
 	public ImagePanel(BufferedImage img) {
-		this(img, null, PanelMode.DEFAULT_MODE);
+		this(img, PanelMode.DEFAULT_MODE);
 	}
 	
 	
-	public ImagePanel(BufferedImage img, AppGlobalProperties agp, int panelMode) {
-		this.img = img;
+	public ImagePanel(BufferedImage img, PanelMode panelMode) {
+		this.src = img;
 		this.panelMode = panelMode;
-		this.agp = agp;
+		
+		
+		if( src != null ) {
+			this.src = img;
+			this.srcCopy = Utils.getImageCopy(src);
+			
+			var resize = new ResizeImage(srcCopy); 
+			
+			if(src.getHeight() > MAX_IMG_SIZE.height && src.getWidth() > MAX_IMG_SIZE.width) {
+				srcCopy = resize.getImageSizeOf(MAX_IMG_SIZE.width, MAX_IMG_SIZE.height);
+			}
+			else if(src.getHeight() > MAX_IMG_SIZE.height) {
+				srcCopy = resize.getImageSizeOf(src.getWidth(), MAX_IMG_SIZE.height);
+			}
+			else if(src.getWidth() > MAX_IMG_SIZE.width) {
+				srcCopy = resize.getImageSizeOf(MAX_IMG_SIZE.width, src.getHeight());
+			}
+			
+			if(resize.isDone()) {
+				srcCopy.getGraphics().dispose();
+			}
+		}
 		
 		//layout for panel
 		//BoxLayout layout = new BoxLayout(getContentPane(), BoxLayout.Y_AXIS);
@@ -117,246 +83,151 @@ public class ImagePanel extends JPanel {
 		Border border = BorderFactory.createLineBorder(Color.GRAY, 1);
 		setBorder(border);	
 		
-		this.imgContainer = new JLabel(new ImageIcon(img));
-		
-		add(imgContainer);
-		
 		setBackground(Color.WHITE);
 		
-		this.panelMode = PanelMode.ZOOM_AND_PAN_MODE;
+		this.panelMode = PanelMode.SNAP_MODE;
 		initCurrentTool(this.panelMode);
-		
-		self = this;
-		
 	}
 	
 	
-	
-//	@Override
-//	protected void paintComponent(Graphics g) {
-//		super.paintComponent(g);
-//		
-//        Graphics2D g2 = (Graphics2D) g;
-//        int x = (int) (this.getWidth() - (img.getWidth() * .2)) / 2;
-//        int y = (int) (this.getHeight() - (img.getHeight() * .2)) / 2;
-//        x = 0;
-//        y = 0;
-//
-//        AffineTransform at = new AffineTransform();
-//        at.translate(x, y);
-//        at.scale(1, 1);
-//        
-//        if (init) {
-//            g2.setTransform(at);
-//            init = false;
-//            coordTransform = g2.getTransform();
-//        } else {
-//            g2.setTransform(coordTransform);
-//        }
-//
-//        g2.drawImage(img, 0, 0, this);
-//        
-//        g2.dispose();
-//	}
-	
-	
-	
-	private void initCurrentTool(int tool) {
-		//panelMode switching
-		switch(tool) {
+	@Override
+	protected void paintComponent(Graphics g) {
+		super.paintComponent(g);
 		
-		case PanelMode.CANVAS_MODE: {
-			//canvas mode on image i.e drawing on image
-			brushToolListener = new DrawingCanvasOnImage(this, agp.getGLobalColor());
-			addMouseMotionListener(brushToolListener);
-			addMouseListener(brushToolListener);
-			
-			currentMouseListsner = brushToolListener;
-		}
-		break;
-		
-		case PanelMode.SNAP_MODE: {
-			//snapping mode in image i.e grab area of image
-			//polySelectionToolListener = new PolygonalSelectTool(img, this);
-			//lassoSelectionToolListener = new LassoSelectionTool(img, this);
-			addMouseListener(lassoSelectionToolListener);
-			addMouseMotionListener(lassoSelectionToolListener);
-			currentMouseListsner = lassoSelectionToolListener;
-		}
-		break;
-		
-		case PanelMode.ZOOM_AND_PAN_MODE: {
-			imgContainer.addMouseListener(zoomAndPanListener);
-			imgContainer.addMouseMotionListener(zoomAndPanListener);
-			imgContainer.addMouseWheelListener(zoomAndPanListener);
-			currentMouseListsner = zoomAndPanListener;
-		}
-		break;
-		
-		
-		}
+        Graphics2D g2 = (Graphics2D) g;
+
+        g2.drawImage(src, 0, 0, this);
+        g2.dispose();
 	}
 	
 	
-	private Point2D.Float transformPoint(Point p1) throws NoninvertibleTransformException {
-        AffineTransform inverse = coordTransform.createInverse();
-        Point2D.Float p2 = new Point2D.Float();
-        inverse.transform(p1, p2);
-        return p2;
-    }
-	
-	
-	
-	/*
-	 * Class which exetnds Abstract class MouseAdapter and overrides some functions.
-	 * This class is used for zooming and panning the image on the screen.
-	 * */
-	private class ImageZoomAndPanListener extends MouseAdapter {
+	private void initCurrentTool( PanelMode tool ) {
+		switch( tool ) {
 		
+		case CANVAS_MODE: {
+			currentMouseListsner = new DrawingCanvasOnImage( this, Color.black );
+			addMouseMotionListener( currentMouseListsner );
+			addMouseListener( currentMouseListsner );
+		}
+		break;	
 		
-		/*init starrting and ending point of affine transformation*/
-		@Override
-		public void mousePressed(MouseEvent e) {
-			super.mousePressed(e);
-			dragStartScreen = e.getPoint();
-            dragEndScreen = null;
+		case SNAP_MODE: {
+			currentMouseListsner = new PolygonalSelectTool( src, this );
+			addMouseMotionListener( currentMouseListsner );
+			addMouseListener( currentMouseListsner );
+		}
+		break;
+		
+		default: {
+			break;
 		}
 		
-		
-		/*pan the image*/
-		@Override
-		public void mouseDragged(MouseEvent e) {
-			super.mouseDragged(e);
-			pan(e);
 		}
-		
-		
-		/*zoom the image*/
-		@Override
-        public void mouseWheelMoved(MouseWheelEvent e) {
-            if (e.isControlDown()) {
-                zoom(e);
-            }
-        }
-	}
-	
-	
-	/*pan image on mouse drag*/
-	private void pan(MouseEvent e) {
-        try {
-            dragEndScreen = e.getPoint();
-            Point2D.Float dragStart = transformPoint(dragStartScreen);
-            Point2D.Float dragEnd = transformPoint(dragEndScreen);
-            double dx = dragEnd.getX() - dragStart.getX();
-            double dy = dragEnd.getY() - dragStart.getY();
-            coordTransform.translate(dx, dy);
-            dragStartScreen = dragEndScreen;
-            dragEndScreen = null;
-            repaint();
-        } catch (NoninvertibleTransformException ex) {
-            ex.printStackTrace();
-        }
-    }
-	
-	
-	/*
-	 * Zoom image on mouse wheel change
-	 * */
-	private void zoom(MouseWheelEvent e) {
-		try {
-            int wheelRotation = e.getWheelRotation();
-            Point p = e.getPoint();
-            if (wheelRotation > 0) {
-                if (zoomLevel < maxZoomLevel) {
-                    zoomLevel++;
-                    Point2D p1 = transformPoint(p);
-                    coordTransform.scale(1 / zoomMultiplicationFactor, 1 / zoomMultiplicationFactor);
-                    Point2D p2 = transformPoint(p);
-                    coordTransform.translate(p2.getX() - p1.getX(), p2.getY() - p1.getY());
-                    repaint();
-                }
-            } else {
-                if (zoomLevel > minZoomLevel) {
-                    zoomLevel--;
-                    Point2D p1 = transformPoint(p);
-                    coordTransform.scale(zoomMultiplicationFactor, zoomMultiplicationFactor);
-                    Point2D p2 = transformPoint(p);
-                    coordTransform.translate(p2.getX() - p1.getX(), p2.getY() - p1.getY());
-                    repaint();
-                }
-            }
-        } catch (NoninvertibleTransformException ex) {
-            ex.printStackTrace();
-        }
 	}
 	
 	
 	/**
+	 * 
 	 * Returns currently applied canvas mouse listener if applied else returns {@code null}.
 	 * @return {@code DrawingCanvasOnImage} current canvas mouse listener.
+	 * 
 	 * */
 	public DrawingCanvasOnImage getCanvasModeListener() {
-		return this.brushToolListener;
+		return brushToolListener;
 	}
 	
 	
-	
 	/**
+	 * 
 	 * @return {@code MouseAdapter} currently applied mouse listener.
+	 * 
 	 * */
 	public MouseAdapter getCurrentMouseListener() {
 		return currentMouseListsner;
 	}
 	
 	
-	
 	/**
-	 * @param panelMode Mode for this ImagePanel.<p>
-	 * eg. PanelMode.SNAP_MODE, PanelMode.CANVAS_MODE etc.
+	 * 
+	 * @param panelMode Mode for this {@code ImagePanel}
+	 * 
 	 * */
-	public void setPanelMode(int panelMode) {
+	public void setPanelMode( PanelMode panelMode ) {
 		this.panelMode = panelMode;
 	}
 	
 	
-	
 	/** 
+	 * 
 	 * @return {@code this} {@code ImagePanel} 's panelMode (int).
+	 * 
 	 * */
-	public int getPanelMode() {
-		return this.panelMode;
+	public PanelMode getPanelMode() {
+		return panelMode;
 	}
 	
 	
-	
 	/**
+	 * 
 	 * @return	Current image which is applied to {@code this} {@code ImagePanel}.
+	 * 
 	 * */
 	public BufferedImage getImage() {
-		return this.img;
+		return src;
+	}
+	
+	
+	/**
+	 * 
+	 * Get non-edited or non-transformed original image.
+	 * @return img original image
+	 * 
+	 * */
+	public BufferedImage getActualImage() {
+		return src;
+	}
+	
+	
+	/**
+	 * 
+	 * Get edited or transformed image.
+	 * @return img copied image from original
+	 * 
+	 * */
+	public BufferedImage getCurrentImage() {
+		return srcCopy;
 	}
 	
 	
 	@Override
 	public Dimension getPreferredSize() {
-		return new Dimension(img.getWidth(), img.getHeight());
+		return new Dimension( src.getWidth(), src.getHeight() );
 	}
 	
 	
 	/**
+	 * 
 	 * Sets the new image to {@code this ImagePanel}.
 	 * @param img	{@code BufferedImage} object.
+	 * 
 	 * */
-	public void setImage(BufferedImage imgg) {
-		this.img = imgg;
-		this.imgContainer.setIcon(new ImageIcon(imgg));
+	public void setImage( BufferedImage imgg ) {
+		this.src = imgg;
+		this.imgContainer.setIcon( new ImageIcon( imgg ));
+	}
+	
+	
+	public boolean hasAreaSelected() {
+		boolean has = false;
+		if( currentMouseListsner instanceof PolygonalSelectTool ) {
+			has = ( (PolygonalSelectTool) currentMouseListsner ).isAreaSelected();
+		}
+		return has;
 	}
 	
 	
 	@Override
 	public String toString() {
-		return "Image info: H = " + this.img.getHeight() + " W = " + this.img.getWidth();
+		return "Image info: H = " + this.src.getHeight() + " W = " + this.src.getWidth();
 	}
-	
-
 }
