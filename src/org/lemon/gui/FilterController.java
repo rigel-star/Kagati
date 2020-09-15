@@ -1,6 +1,6 @@
 package org.lemon.gui;
 
-import org.lemon.LemonObject;
+import org.lemon.lang.LemonObject;
 
 /**
  * {@code FilterController}'s is used in filter controller GUI(like the {@code HSBController}) component to 

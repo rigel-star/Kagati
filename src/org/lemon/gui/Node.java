@@ -6,7 +6,7 @@ import java.util.Stack;
 
 import javax.swing.JComponent;
 
-import org.lemon.LemonObject;
+import org.lemon.lang.LemonObject;
 import org.lemon.math.Vec2d;
 
 @LemonObject(type = LemonObject.HELPER_CLASS)

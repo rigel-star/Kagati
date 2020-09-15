@@ -2,7 +2,7 @@ package org.lemon.gui;
 
 import java.util.List;
 
-import org.lemon.LemonObject;
+import org.lemon.lang.LemonObject;
 
 /**
  * The component which can be controlled by {@code FilterController}

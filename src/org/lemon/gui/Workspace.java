@@ -18,7 +18,7 @@ import java.util.List;
 import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 
-import org.lemon.LemonObject;
+import org.lemon.lang.LemonObject;
 import org.lemon.utils.Pair;
 
 /**
@@ -293,6 +293,7 @@ public class Workspace extends JDesktopPane implements ComponentListener {
 			}
 			
 			start = null;
+			end = null;
 			connectingLine = false;
 			connect = null;
 			repaint();
