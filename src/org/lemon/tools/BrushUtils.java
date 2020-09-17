@@ -1,4 +1,4 @@
-package org.lemon.tools.brush.utils;
+package org.lemon.tools;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
