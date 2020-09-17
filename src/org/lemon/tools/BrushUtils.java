@@ -3,7 +3,6 @@ package org.lemon.tools;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
-import org.lemon.tools.BrushTool;
 import org.lemon.tools.brush.NormalBrushTool;
 import org.lemon.tools.brush.SoftBrushTool;
 import org.lemon.tools.brush.WobbleBrushTool;
