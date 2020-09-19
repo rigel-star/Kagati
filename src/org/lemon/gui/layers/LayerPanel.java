@@ -9,51 +9,56 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
-import org.lemon.filters.ResizeImage;
+import org.lemon.filter.basic.ResizeImage;
 import org.lemon.gui.ImageView;
 
 public class LayerPanel extends JPanel {
-	private static final long serialVersionUID = 1L;
 	
+	/**
+	 * Texture UID
+	 * */
+	private static final long serialVersionUID = 1L;
 	
 	private Layer layer = null;
 	private BufferedImage indiImg = null;
 	private String title;
 	
-	
 	private JTextArea nameField = null;
 	private JLabel imgField = null;
-	
-	
+		
 	
 	/**
 	 * If you want new empty {@code Layer}, pass {@code EmptyLayer}.
 	 * @param layer
 	 * */
-	public LayerPanel(Layer layer) {
+	public LayerPanel( Layer layer ) {
+		
 		this.layer = layer;
 		this.init();
 		
-		if(layer instanceof EmptyLayer) {
-			var empcanv = (EmptyLayer.EmptyCanvas) layer.getLayerComponent();
+		if( layer == null )
+			layer = new EmptyLayer();
+		
+		if( layer instanceof EmptyLayer ) {
+			var empcanv = ( EmptyLayer.EmptyCanvas ) layer.getLayerComponent();
 			title = layer.getTitle();
 			indiImg = empcanv.getEmptyImage();
 		}
-		else if(layer.getLayerComponent() instanceof ImageView) {
-			var view = ((ImageView) layer.getLayerComponent());//.getImage();
+		else if( layer.getLayerComponent() instanceof ImageView ) {
+			var view = ((ImageView) layer.getLayerComponent() );//.getImage();
 			title = layer.getTitle();
-			indiImg = view.getActualImage();
+			indiImg = view.getCurrentImage();
 		}
 		
-		if(indiImg != null)
-			indiImg = new ResizeImage(indiImg).getImageSizeOf(50, 50);
+		if( indiImg != null )
+			indiImg = new ResizeImage( indiImg ).getImageSizeOf( 50, 50 );
 		
-		nameField.setText(title);
-		imgField.setIcon(new ImageIcon(indiImg));
+		nameField.setText( title );
+		imgField.setIcon( new ImageIcon( indiImg ) );
 		
-		setLayout(new BorderLayout());
-		add(imgField, BorderLayout.WEST);
-		add(nameField, BorderLayout.EAST);
+		setLayout( new BorderLayout() );
+		add( imgField, BorderLayout.WEST );
+		add( nameField, BorderLayout.EAST );
 	}
 	
 	
@@ -81,6 +86,5 @@ public class LayerPanel extends JPanel {
 	public Dimension getPreferredSize() {
 		return new Dimension(150, 60);
 	}
-	
-	
+		
 }
