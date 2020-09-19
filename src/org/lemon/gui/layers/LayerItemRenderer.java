@@ -9,7 +9,7 @@ import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
-public class LayerRenderer implements ListCellRenderer<Layer> {
+public class LayerItemRenderer implements ListCellRenderer<Layer> {
 
 	
 	private static final Border SAFE_NO_FOCUS_BORDER = new EmptyBorder(1, 1, 1, 1);
