@@ -11,7 +11,8 @@ public abstract class ImageGraphics {
 	public abstract void draw( Shape shape );
 	
 	public abstract void dispose();
-
+	
+	public abstract void clear();
 	
 	/**
 	 * 
@@ -51,4 +52,5 @@ public abstract class ImageGraphics {
 		
 		return new LImage( img );
 	}
+	
 }

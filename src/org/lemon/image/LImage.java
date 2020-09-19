@@ -7,20 +7,28 @@ import java.awt.image.Raster;
 
 import org.lemon.filter.GrayImageFilter;
 
+
+/**
+ * 
+ * Image data is represented in 1 dimensional int array 
+ * on {@code LImage}. But can be accessed with 2 dimensional coordinate.
+ * 
+ * */
 public class LImage extends ImageGraphics {
+	
+	public final static int GRAY = 0xA;
+	public final static int DEFAULT = 0xB;
 
 	private BufferedImage asBufferedImg = null;
 	private Raster raster = null;
 	private DataBuffer data = null;
+	private int[] dataArr = null;
 	
 	private boolean disposed = false;
 	
 	public int width = 0;
 	public int height = 0;
-	public int type = BufferedImage.TYPE_INT_ARGB;
-	
-	public final static int GRAY = 00;
-	public final static int DEFAULT = 11;
+	public int typ = DEFAULT;
 	
 	
 	public LImage( int w, int h, int type ) {
@@ -37,24 +45,44 @@ public class LImage extends ImageGraphics {
 		asBufferedImg = img;
 		width = img.getWidth();
 		height = img.getHeight();
-		type = DEFAULT;
 		raster = img.getData();
-		initImageType( type );
+		data = raster.getDataBuffer();
+		dataArr = new int[width * height];
 	}
 	
 	
-	public LImage(Raster raster, int w, int h, int type) {
+	public LImage( Raster raster, int w, int h, int type ) {
 		
 		width = w;
 		height = h;
-		this.type = type;
+		typ = type;
 		
 		asBufferedImg = new BufferedImage( w, h, BufferedImage.TYPE_INT_ARGB );
 		
 		if( raster != null ) {
+			
 			asBufferedImg.setData( raster );
 			this.raster = raster;
 			data = raster.getDataBuffer();
+			
+			int dataType = data.getDataType();
+			
+			switch( dataType ) {
+			
+			case DataBuffer.TYPE_BYTE: {
+				break;
+			}
+			
+			case DataBuffer.TYPE_INT: {
+				dataArr = (int[]) raster.getDataElements( 0, 0, w, h, dataArr );
+				break;
+			}
+			
+			}
+			
+		}
+		else {
+			dataArr = new int[w * h];
 		}
 		
 		initImageType( type );
@@ -79,18 +107,46 @@ public class LImage extends ImageGraphics {
 	}
 	
 	
+	/**
+	 * 
+	 * Draw temporarily on image with {@code this draw} method.
+	 * On {@code clear} method call, all the previously drawn 
+	 * shapes and images will be cleared. That is why temporarily 
+	 * is mentioned.
+	 * @param shape		Shape to draw
+	 * 
+	 * */
 	@Override
-	public void draw(Shape shape) {
+	public void draw( Shape shape ) {
 		
-		if(disposed) 
+		if( disposed ) 
 			return;
 		
 	}
 	
 	
+	/**
+	 * 
+	 * Disposes of this images drawing capability.
+	 * {@code draw} method can't be used after {@code dispose}
+	 * has been called.
+	 * 
+	 * */
 	@Override
 	public void dispose() {
 		disposed = true;
+	}
+	
+	
+	/**
+	 * 
+	 * Clears all the shapes and other data added or drawn
+	 * later on image. 
+	 * 
+	 * */
+	@Override
+	public void clear() {
+		
 	}
 	
 	
@@ -140,8 +196,33 @@ public class LImage extends ImageGraphics {
 	
 	/**
 	 * 
-	 * Get {@code DataBuffer} attached with this image.
+	 * Change specified x, y coordinated pixel on image.
+	 * @param x 		x-coord
+	 * @param y 		y-coord
+	 * @param pixData	pixel data
 	 * 
+	 * */
+	public void setPixel( int x, int y, int pixData ) {
+		dataArr[x * width + y] = pixData;
+	}
+	
+	
+	/**
+	 * 
+	 * Get specific x, y coordinated pixel from image.
+	 * @param x 		x-coord
+	 * @param y 		y-coord
+	 * @return Pixel data of that coordinate
+	 * 
+	 * */
+	public int getPixel( int x, int y ) {
+		return dataArr[x * width + y];
+	}
+	
+	
+	/**
+	 * 
+	 * Get {@code DataBuffer} attached with this image.
 	 * @return {@code DataBuffer}
 	 * 
 	 * */
@@ -153,7 +234,6 @@ public class LImage extends ImageGraphics {
 	/**
 	 * 
 	 * Get {@code Raster} attached with this image.
-	 * 
 	 * @return {@code Raster} data
 	 * 
 	 * */
@@ -165,7 +245,6 @@ public class LImage extends ImageGraphics {
 	/**
 	 * 
 	 * Get {@code this LImage} as {@code BufferedImage}.
-	 * 
 	 * @return {@code BufferedImage} version of this {@code LImage}
 	 * 
 	 * */
