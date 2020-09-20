@@ -155,10 +155,10 @@ public class LImage extends ImageGraphics {
 	* Set the pixels to this image.
 	* 
 	* @param x       the left edge of the pixel block
-    * @param y       the right edge of the pixel block
-    * @param width   the width of the pixel arry
-    * @param height  the height of the pixel arry
-    * @param pixels  the array of pixels to set
+    	* @param y       the right edge of the pixel block
+    	* @param width   the width of the pixel arry
+    	* @param height  the height of the pixel arry
+    	* @param pixels  the array of pixels to set
 	*
 	*/
 	public void setPixels( int x, int y, int width, int height, int[] pixels ) {
@@ -176,14 +176,14 @@ public class LImage extends ImageGraphics {
 	 * 
 	 * Get the all pixels of this image.
 	 * 
-     * @param x       the left edge of the pixel block
-     * @param y       the right edge of the pixel block
-     * @param width   the width of the pixel arry
-     * @param height  the height of the pixel arry
-     * @param pixels  the array to hold the returned pixels. May be null.
-     * @return the pixels
-     * 
-     */
+     	 * @param x       the left edge of the pixel block
+     	 * @param y       the right edge of the pixel block
+     	 * @param width   the width of the pixel arry
+     	 * @param height  the height of the pixel arry
+     	 * @param pixels  the array to hold the returned pixels. May be null.
+     	 * @return the pixels
+     	 * 
+     	 */
 	public int[] getPixels( int x, int y, int width, int height, int[] pixels ) {
 		BufferedImage image = getAsBufferedImage();
 		int type = image.getType();
@@ -191,7 +191,7 @@ public class LImage extends ImageGraphics {
 		if ( type == BufferedImage.TYPE_INT_ARGB || type == BufferedImage.TYPE_INT_RGB )
 			return (int [])image.getRaster().getDataElements( x, y, width, height, pixels );
 		return image.getRGB( x, y, width, height, pixels, 0, width );
-    }
+    	}
 	
 	
 	/**
@@ -203,7 +203,7 @@ public class LImage extends ImageGraphics {
 	 * 
 	 * */
 	public void setPixel( int x, int y, int pixData ) {
-		dataArr[x * width + y] = pixData;
+		dataArr[x + y * width] = pixData;
 	}
 	
 	
@@ -216,7 +216,7 @@ public class LImage extends ImageGraphics {
 	 * 
 	 * */
 	public int getPixel( int x, int y ) {
-		return dataArr[x * width + y];
+		return dataArr[x + y * width];
 	}
 	
 	
