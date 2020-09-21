@@ -9,7 +9,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
 
-import org.lemon.filter.ResizeImageFilter;
 import org.lemon.image.LImage;
 import org.lemon.image.Texture;
 
@@ -36,7 +35,6 @@ public class TexturePanel extends JPanel {
 		setBorder( new EmptyBorder( 5, 5, 5, 5 ));
 		
 		LImage img = tx.getDrawable();
-		img = new ResizeImageFilter( 70, 70 ).filter( img );
 		
 		imgField.setIcon( new ImageIcon( img.getAsBufferedImage() ));
 		nameField.setText( tx.getName() );
@@ -55,7 +53,7 @@ public class TexturePanel extends JPanel {
 			
 			@Override
 			public Dimension getPreferredSize() {
-				return new Dimension( 90, 85 );
+				return new Dimension( 75, 75 );
 			}
 		};
 	}
