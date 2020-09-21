@@ -15,7 +15,8 @@ public class Node {
 	public Vec2d start = null, end = null, mid = null;
 	private JComponent  parent;
 	
-	private Stack<FilterControllable> cons = new Stack<>();
+	private Stack<ControllableNode> cons = new Stack<>();
+	
 	
 	public Node(Vec2d start, Vec2d end) {
 		this(start, end, null);
@@ -44,7 +45,7 @@ public class Node {
 	}
 	
 	
-	public void addConnection(FilterControllable controllable) {
+	public void addConnection(ControllableNode controllable) {
 		cons.push(controllable);
 		System.out.println("Added!");
 		System.out.println("Count: " + cons.size());
@@ -56,14 +57,12 @@ public class Node {
 	}
 	
 	
-	public Stack<FilterControllable> getConnections() {
+	public Stack<ControllableNode> getConnections() {
 		return cons;
 	}
 	
 	
 	public Shape getDrawable() {
 		return new Ellipse2D.Double(start.x - 5, start.y - 5, 10, 10);
-	}
-	
-	
+	}	
 }

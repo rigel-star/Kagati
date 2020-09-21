@@ -21,92 +21,102 @@ import javax.swing.JOptionPane;
 import org.lemon.lang.LemonObject;
 import org.lemon.utils.Pair;
 
-/**
- * Main background pane of application, which handles editing and drawing panels in application.
- * */
-@LemonObject(type = LemonObject.GUI_CLASS)
+
+@LemonObject( type = LemonObject.GUI_CLASS )
 public class Workspace extends JDesktopPane implements ComponentListener {
+	
+	/**
+	 * Serial UID
+	 * */
 	private static final long serialVersionUID = 1L;
 	
-	
 	private List<Node> nodes = new ArrayList<Node>();
-	private List<FilterControllable> fcontrollables = new ArrayList<>();
-	private List<FilterController> fcontrollers = new ArrayList<>();
+	private List<ControllableNode> fcontrollables = new ArrayList<>();
+	private List<ControllerNode> fcontrollers = new ArrayList<>();
 	
 	private Graphics2D wpGraphics = null;
 	private Line2D.Double connect = null;
 	private Color nodeColor = new Color(55, 164, 237);
 	
 	/**
+	 * 
 	 * This boolean value will be checked when connecting the nodes.
-	 * While connecting the nodes, the workspace have to be repainted everytime to show the connecting line in real time.
-	 * But while repainting the workspace, every node will be rechecked and repainted on every repaint() method call and
-	 * it is long process. So, to avoid the node reinitializing process, I will check if the nodes are getting connected.
-	 *  If the nodes are getting connected I will avoid node reinitialization.
-	 *  See {@code paintComponent} method to understand what i'm talking about.
+	 * While connecting the nodes, the workspace have to be repainted 
+	 * everytime to show the connecting line in real time.
+	 * But while repainting the workspace, every node will be rechecked 
+	 * and repainted on every repaint() method call and
+	 * it is long process. So, to avoid the node reinitializing process, 
+	 * this will check if the nodes are getting connected.
+	 * If the nodes are getting connected this will avoid node reinitialization.
+	 * See {@code paintComponent} method to understand what i'm talking about.
+	 * 
 	 * */
-	private boolean connectingLine = false;
+	private boolean connectingNode = false;
 	
 	
 	//TODO:: remove null nodes
 	public Workspace() {
 		
-		setSize(5000, 5000);
-		setBackground(new Color(160, 160, 160));
-		setVisible(true);
-		
+		setSize( 5000, 5000 );
+		setBackground( new Color( 160, 160, 160 ));
+		setVisible( true );
+		addComponentListener( this );
 		fetchNodes();
 		
-		addComponentListener(this);
-		
 		var mh = new MouseHandler();
-		addMouseListener(mh);
-		addMouseMotionListener(mh);
+		addMouseListener( mh );
+		addMouseMotionListener( mh );
 	}
 	
 	
 	@Override
-	public void paintComponent(Graphics g) {
-		super.paintComponent(g);
+	public void paintComponent( Graphics g ) {
+		super.paintComponent( g );
 		wpGraphics = (Graphics2D) g;
 		
-		fcontrollables.stream().forEach(fc -> {
+		fcontrollables.stream().forEach( fc -> {
 			var node = fc.getNode();
-			drawNode(wpGraphics, node);
+			drawNode( wpGraphics, node );
 		});
 		
-		fcontrollers.stream().forEach(fc -> {
-			for(Node node: fc.getNodes()) {
-				drawNode(wpGraphics, node);
+		fcontrollers.stream().forEach( fc -> {
+			for( Node node: fc.getNodes() ) {
+				drawNode( wpGraphics, node );
 			}
 		});
 		
-		if(connect != null) {
-			wpGraphics.setPaint(Color.white);
-			wpGraphics.setStroke(new BasicStroke(1));
-			wpGraphics.draw(connect);
+		if( connect != null ) {
+			wpGraphics.setPaint( Color.white );
+			wpGraphics.setStroke( new BasicStroke( 1 ) );
+			wpGraphics.draw( connect );
 		}
 	}
 	
 	
 	/**
+	 * 
 	 * Refresh's all the listeners.
+	 * 
 	 * */
 	public void refresh() {
 		
-		for(Component c: getComponents()) {
-			if(c.getComponentListeners().length == 0)
-				c.addComponentListener(this);
+		for( Component c: getComponents() ) {
+			if( c.getComponentListeners().length == 0 )
+				c.addComponentListener( this );
 		}
 		
 	}
 	
 	
-	/*fetch all the nodes*/
+	/**
+	 * 
+	 * Fetch all the nodes.
+	 * 
+	 * */
 	public void fetchNodes() {
 		for(Component c: getComponents()) {
-			if(c instanceof FilterController) {
-				var con = (FilterController) c;
+			if(c instanceof ControllerNode) {
+				var con = (ControllerNode) c;
 				
 				if(!fcontrollers.contains(con))
 					fcontrollers.add(con);
@@ -118,8 +128,8 @@ public class Workspace extends JDesktopPane implements ComponentListener {
 					
 				}
 			}
-			else if(c instanceof FilterControllable) {
-				var fc = (FilterControllable) c;
+			else if(c instanceof ControllableNode) {
+				var fc = (ControllableNode) c;
 				
 				if(!fcontrollables.contains(fc))
 					fcontrollables.add(fc);
@@ -140,13 +150,13 @@ public class Workspace extends JDesktopPane implements ComponentListener {
 			g2d.setPaint(Color.white);
 			g2d.drawOval((int) node.start.x - 5, (int) node.start.y - 5, 10, 10);
 			
-			if(connectingLine)
+			if(connectingNode)
 				return;
 			
-			if(node.getParent() instanceof FilterControllable) {
+			if(node.getParent() instanceof ControllableNode) {
 				
 			}
-			else if(node.getParent() instanceof FilterController) {
+			else if(node.getParent() instanceof ControllerNode) {
 			
 				node.getConnections().forEach(c -> {
 						
@@ -265,77 +275,87 @@ public class Workspace extends JDesktopPane implements ComponentListener {
 		public void mouseDragged(MouseEvent e) {
 			super.mouseDragged(e);
 			
-			connectingLine = true;
+			connectingNode = true;
 			
-			if(start != null) {
+			if( start != null ) {
 				end = e.getPoint();
-				connect = new Line2D.Double(start, end);
+				connect = new Line2D.Double( start, end );
 				repaint();
 			}
 		}
 		
 		
 		@Override
-		public void mouseReleased(MouseEvent e) {
-			super.mouseReleased(e);
+		public void mouseReleased( MouseEvent e ) {
+			super.mouseReleased( e );
 			
-			for(Node node: nodes) {
-				if(node.getDrawable().contains(end)) {
-					/*if start and end node are not same*/
-					if(!startNode.equals(node)) {
+			for( Node node: nodes ) {
+				if( node.getDrawable().contains( end )) {
+					if( !startNode.equals( node )) { //if start and end node are not same
 						endNode = node;
+					} else {
+						return;
 					}
 				}
 			}
 			
-			if(startNode != null && endNode != null) {
-				connectNodes(startNode, endNode);
+			if( startNode != null && endNode != null ) {
+				connectNodes( startNode, endNode );
 			}
 			
 			start = null;
 			end = null;
-			connectingLine = false;
+			connectingNode = false;
 			connect = null;
 			repaint();
-		}
+		}	
 		
 		
-		
-		/*connect two nodes*/
-		private void connectNodes(Node startNode, Node endNode) {
-			if(startNode.getParent() instanceof FilterController) {
-				if(endNode.getParent() instanceof FilterControllable) {
-					if(!startNode.getConnections().contains((FilterControllable) endNode.getParent())) {
-						startNode.addConnection((FilterControllable) endNode.getParent());
-						var controllable = (FilterControllable) endNode.getParent();
-						controllable.addController((FilterController) startNode.getParent());
+		/**
+		 * 
+		 * Connect two nodes.
+		 * @param startNode		Node to start from.
+		 * @param endNode		Node to end with.
+		 * 
+		 * */
+		private void connectNodes( Node startNode, Node endNode ) {
+			
+			if( startNode.getParent() instanceof ControllerNode ) {
+				
+				if( endNode.getParent() instanceof ControllableNode ) {
+					
+					if( !startNode.getConnections().contains((ControllableNode) endNode.getParent() ) ) {
+						
+						startNode.addConnection((ControllableNode) endNode.getParent() );
+						var controllable = (ControllableNode) endNode.getParent();
+						controllable.addController( (ControllerNode) startNode.getParent() );
 					}
 					else {
-						JOptionPane.showMessageDialog(endNode.getParent(), "Already connected!");
+						JOptionPane.showMessageDialog( endNode.getParent(), "Already connected!" );
 					}
 				}
 				else {
-					JOptionPane.showMessageDialog(endNode.getParent(), "Connect with image!");
+					JOptionPane.showMessageDialog( endNode.getParent(), "Connect with image!" );
 				}
 			}
-			else if(startNode.getParent() instanceof FilterControllable) {
-				if(endNode.getParent() instanceof FilterController) {
-					if(!endNode.getConnections().contains((FilterControllable) startNode.getParent())) {
-						endNode.addConnection((FilterControllable) startNode.getParent());
-						var controllable = (FilterControllable) startNode.getParent();
-						controllable.addController((FilterController) endNode.getParent());
+			else if( startNode.getParent() instanceof ControllableNode ) {
+				
+				if( endNode.getParent() instanceof ControllerNode ) {
+					
+					if(!endNode.getConnections().contains( (ControllableNode) startNode.getParent()) ) {
+						
+						endNode.addConnection((ControllableNode) startNode.getParent());
+						var controllable = (ControllableNode) startNode.getParent();
+						controllable.addController((ControllerNode) endNode.getParent());
 					}
 					else {
-						JOptionPane.showMessageDialog(endNode.getParent(), "Already connected!");
+						JOptionPane.showMessageDialog( endNode.getParent(), "Already connected!" );
 					}
 				}
 				else {
-					JOptionPane.showMessageDialog(endNode.getParent(), "Connect with filter!");
+					JOptionPane.showMessageDialog( endNode.getParent(), "Connect with filter!" );
 				}
 			}
-		}
-		
-		
+		}	
 	}
-	
 }

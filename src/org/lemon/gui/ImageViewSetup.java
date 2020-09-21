@@ -8,7 +8,13 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridLayout;
+import java.awt.Point;
+import java.awt.Toolkit;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -36,7 +42,7 @@ public class ImageViewSetup extends JWindow {
 	 * Serial UID
 	 */
 	private static final long serialVersionUID = 1L;
-
+	
 	private final static int V_GAP = 10;
 	private final static int H_GAP = 10;
 	private final static int BORDER = 12;
@@ -63,17 +69,37 @@ public class ImageViewSetup extends JWindow {
 	
 	GridBagConstraints gbc = new GridBagConstraints();
 	
+	public static final int NEW_DOC = 0x1;
+	public static final int EXISTING_DOC = 0x2;
+	
+	
 	/**
 	 * 
-	 * Constructs {@code ImageViewSetting} with specified {@code ImageView}.
+	 * Constructs {@code ImageViewSetup} with specified {@code ImageView}
 	 * @param view		image container
 	 * 
 	 * */
 	public ImageViewSetup( @Nullable ImageView view ) {
+		this( view, EXISTING_DOC );
+	}
+	
+	
+	/**
+	 * 
+	 * Constructs {@code ImageViewSetup} with specified {@code ImageView}
+	 * and document type.
+	 * @param view		image container
+	 * @param docType	document type ( eg. ImageViewSetup.NEW_DOC etc.. )
+	 * 
+	 * */
+	public ImageViewSetup( @Nullable ImageView view, int docType ) {
 		
 		init();
 		
-		setLocationRelativeTo( null );
+		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+		Dimension size = getPreferredSize();
+		Point loc = new Point( (screen.width >> 1) - (size.width >> 1), (screen.height >> 1) - (size.height >> 1) );
+		setLocation( loc );
 		getRootPane().setBorder( BorderFactory.createLineBorder( Color.GRAY, 4 ) );
 
 		var main = new JPanel();
@@ -99,6 +125,9 @@ public class ImageViewSetup extends JWindow {
 		
 		if( view != null ) {
 			header.setTitle( view.getTitle() );
+			titleFld.setText( view.getTitle() );
+			widthFld.setText( String.valueOf( view.getImagePanel().getImage().getWidth() ));
+			heightFld.setText( String.valueOf( view.getImagePanel().getImage().getWidth() ));
 		}
 		
 		Container c = getContentPane();
@@ -113,7 +142,17 @@ public class ImageViewSetup extends JWindow {
 	
 	
 	public static void main( String[] args ) {
-		new ImageViewSetup( null );
+		
+		BufferedImage img = null;
+		
+		try {
+			img = ImageIO.read( new File( "C:\\Users\\Ramesh\\Desktop\\opencv\\mack.jpg" ) );
+		} catch( IOException ex ) {
+			ex.printStackTrace();
+		}
+		
+		var view = new ImageView( img, "mack.jpg" );
+		new ImageViewSetup( view );
 	}
 	
 	
@@ -178,7 +217,7 @@ public class ImageViewSetup extends JWindow {
 	 * */
 	private JPanel createButtonPanel() {
 		
-		buttonsContainer.setLayout( new GridLayout( 3, 1, V_GAP, H_GAP ));
+		buttonsContainer.setLayout( new GridLayout( 2, 1, V_GAP, H_GAP ));
 
 		buttonsContainer.add( okBttn );
 		buttonsContainer.add( cancelBttn );
