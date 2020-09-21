@@ -8,7 +8,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.lemon.filters.ResizeImage;
+import org.lemon.filter.ResizeImageFilter;
+import org.lemon.image.LImage;
 import org.lemon.utils.Utils;
 
 
@@ -76,16 +77,20 @@ public class ImagePreviewPanel extends JPanel {
 	 * */
 	private BufferedImage resize(BufferedImage img, int w, int h) {
 		
-		if(img.getHeight() == h && img.getWidth() == w) {
+		if( img.getHeight() == h && img.getWidth() == w ) {
 			return img;
 		}
-		return new ResizeImage(img).getImageSizeOf(w, h);
+		return new ResizeImageFilter( w, h )
+											.filter( new LImage( img ))
+											.getAsBufferedImage();
 	}
 	
 	
 	
 	/**
-	 * Update the preview.
+	 * 
+	 * Update {@code this ImagePreviewPanel}
+	 * 
 	 * */
 	public void update() {
 		this.imgContainer.revalidate();
@@ -94,17 +99,23 @@ public class ImagePreviewPanel extends JPanel {
 	
 	
 	/**
-	 * Update with new image.
+	 * 
+	 * Update {@code this ImagePreviewPanel} with
+	 * new image.
+	 * @param nimg 		New image to update with.
+	 * 
 	 * */
-	public void update(BufferedImage nimg) {
+	public void update( BufferedImage nimg ) {
 		this.original = nimg;
-		this.imgContainer.setIcon(new ImageIcon(nimg));
+		this.imgContainer.setIcon( new ImageIcon( nimg ) );
 		this.imgContainer.revalidate();
 	}
 	
 	
 	/**
-	 * @return img untouched original image
+	 * 
+	 * @return Original image
+	 * 
 	 * */
 	public BufferedImage getOriginalImage() {
 		return original;
@@ -112,7 +123,10 @@ public class ImagePreviewPanel extends JPanel {
 	
 	
 	/**
-	 * @return img modified image(copy of original)
+	 * 
+	 * Get copy of original image.
+	 * @return Copied image.
+	 * 
 	 * */
 	public BufferedImage getCopyImage() {
 		return copy;
@@ -120,7 +134,9 @@ public class ImagePreviewPanel extends JPanel {
 
 	
 	/**
-	 * @return img final rendered image
+	 * 
+	 * @return Final rendered image.
+	 * 
 	 * */
 	public BufferedImage getFinalImage() {
 		return resize(copy, WIDTH, HEIGHT);

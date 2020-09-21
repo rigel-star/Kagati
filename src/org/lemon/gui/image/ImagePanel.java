@@ -7,21 +7,30 @@ import java.awt.Graphics2D;
 import java.awt.event.MouseAdapter;
 import java.awt.image.BufferedImage;
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 
-import org.lemon.filter.basic.ResizeImage;
+import org.lemon.filter.ResizeImageFilter;
 import org.lemon.gui.canvas.DrawingCanvasOnImage;
+import org.lemon.image.LImage;
+import org.lemon.lang.LemonObject;
 import org.lemon.tools.select.PolygonalSelectTool;
 import org.lemon.utils.Utils;
 
 /**
  * 
- * Class description: This class extends JLabel and takes image as param and apply it as its icon.
+ * {@code ImagePanel} holds the specified image with specified
+ * {@code PanelMode} within it. Mainly, {@code ImagePanel} is used 
+ * as a image holder for {@code ImageView}. {@code ImagePanel} 
+ * can do many different tasks by applying different types of
+ * mouse listeners on it. For e.g. {@code SelectionTool}, 
+ * {@code BrushTool} and other tool listeners are the listeners 
+ * that {@code ImagePanel} recognises. For specifiying the mouse 
+ * listener for {@code ImagePanel}, pass {@code PanelMode} while 
+ * creating object or call {@code setPanelMode()}.
  * 
  * */
+@LemonObject( type = LemonObject.GUI_CLASS )
 public class ImagePanel extends JPanel {
 	
 	/**
@@ -32,77 +41,105 @@ public class ImagePanel extends JPanel {
 	private BufferedImage src, srcCopy;;
 	private PanelMode panelMode;
 	
-	private JLabel imgContainer;
-	
 	private DrawingCanvasOnImage brushToolListener;
 	
-	/*current mouse listener in this panel*/
+	/**
+	 * current mouse listener in this panel
+	 * */
 	private MouseAdapter currentMouseListsner;
 	
 	private final Dimension MAX_IMG_SIZE = new Dimension(500, 500); 
 	
-	//default constructor
-	public ImagePanel() {}
 	
-	
-	//if only image is passed as param then by default set canvas false.
-	public ImagePanel(BufferedImage img) {
-		this(img, PanelMode.DEFAULT_MODE);
+	/**
+	 * 
+	 * Constructs {@code ImagePanel} with null image and 
+	 * DEFAULT {@code PanelMode}.
+	 * 
+	 * */
+	public ImagePanel() {
+		
 	}
 	
 	
-	public ImagePanel(BufferedImage img, PanelMode panelMode) {
+	/**
+	 * 
+	 * Constructs {@code ImagePanel} with image.
+	 * @param img 		Image for {@code this ImagePanel}.
+	 * 
+	 * */
+	public ImagePanel( BufferedImage img ) {
+		this( img, PanelMode.DEFAULT_MODE );
+	}
+	
+	
+	/**
+	 * 
+	 * Constructs {@code ImagePanel} with image and {@code PanelMode}.
+	 * @param img 		Image for {@code this ImagePanel}.
+	 * @param mode		{@code PanelMode} for {@code this ImagePanel}.
+	 * 
+	 * */
+	public ImagePanel(BufferedImage img, PanelMode mode) {
 		this.src = img;
-		this.panelMode = panelMode;
+		this.panelMode = mode;
 		
 		
 		if( src != null ) {
 			this.src = img;
 			this.srcCopy = Utils.getImageCopy(src);
 			
-			var resize = new ResizeImage(srcCopy); 
+			var resize = new ResizeImageFilter();
 			
 			if(src.getHeight() > MAX_IMG_SIZE.height && src.getWidth() > MAX_IMG_SIZE.width) {
-				srcCopy = resize.getImageSizeOf(MAX_IMG_SIZE.width, MAX_IMG_SIZE.height);
+				
+				resize.setNewWidth( MAX_IMG_SIZE.width );
+				resize.setNewHeight( MAX_IMG_SIZE.height );
 			}
 			else if(src.getHeight() > MAX_IMG_SIZE.height) {
-				srcCopy = resize.getImageSizeOf(src.getWidth(), MAX_IMG_SIZE.height);
+				
+				resize.setNewWidth( src.getWidth() );
+				resize.setNewHeight( MAX_IMG_SIZE.height );
 			}
 			else if(src.getWidth() > MAX_IMG_SIZE.width) {
-				srcCopy = resize.getImageSizeOf(MAX_IMG_SIZE.width, src.getHeight());
+				
+				resize.setNewWidth( MAX_IMG_SIZE.width );
+				resize.setNewHeight( src.getHeight() );
 			}
 			
-			if(resize.isDone()) {
-				srcCopy.getGraphics().dispose();
-			}
+			srcCopy = resize.filter( new LImage( srcCopy )).getAsBufferedImage();
+			srcCopy.getGraphics().dispose();
 		}
-		
-		//layout for panel
-		//BoxLayout layout = new BoxLayout(getContentPane(), BoxLayout.Y_AXIS);
 				
-		Border border = BorderFactory.createLineBorder(Color.GRAY, 1);
-		setBorder(border);	
+		Border border = BorderFactory.createLineBorder( Color.GRAY, 1 );
+		setBorder( border );	
 		
-		setBackground(Color.WHITE);
+		setBackground( Color.WHITE );
 		
-		this.panelMode = PanelMode.SNAP_MODE;
-		initCurrentTool(this.panelMode);
+		this.panelMode = mode;
+		initPanelMode( mode );
 	}
 	
 	
 	@Override
-	protected void paintComponent(Graphics g) {
+	protected void paintComponent( Graphics g ) {
 		super.paintComponent(g);
 		
         Graphics2D g2 = (Graphics2D) g;
 
-        g2.drawImage(src, 0, 0, this);
+        g2.drawImage( src, 0, 0, this );
         g2.dispose();
 	}
 	
 	
-	private void initCurrentTool( PanelMode tool ) {
-		switch( tool ) {
+	/**
+	 * 
+	 * Check and set the specified {@code PanelMode} on this {@code ImagePanel}.
+	 * @param mode 		{@code PanelMode}
+	 * 
+	 * */
+	private void initPanelMode( PanelMode mode ) {
+		switch( mode ) {
 		
 		case CANVAS_MODE: {
 			currentMouseListsner = new DrawingCanvasOnImage( this, Color.black );
@@ -159,7 +196,7 @@ public class ImagePanel extends JPanel {
 	
 	/** 
 	 * 
-	 * @return {@code this} {@code ImagePanel} 's panelMode (int).
+	 * @return Current {@code PanelMode}.
 	 * 
 	 * */
 	public PanelMode getPanelMode() {
@@ -213,7 +250,7 @@ public class ImagePanel extends JPanel {
 	 * */
 	public void setImage( BufferedImage imgg ) {
 		this.src = imgg;
-		this.imgContainer.setIcon( new ImageIcon( imgg ));
+		//this.imgContainer.setIcon( new ImageIcon( imgg ));
 	}
 	
 	
