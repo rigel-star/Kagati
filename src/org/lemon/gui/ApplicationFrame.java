@@ -34,7 +34,7 @@ import org.lemon.gui.dialogs.PixelateImageDialog;
 import org.lemon.gui.image.ImageInfoPanel;
 import org.lemon.gui.layers.Layer;
 import org.lemon.gui.image.PanelMode;
-import org.lemon.gui.menus.EditMenu;
+import org.lemon.gui.menus.NodeMenu;
 import org.lemon.gui.menus.FileMenu;
 import org.lemon.gui.menus.Menu3D;
 import org.lemon.gui.panels.ImageAnalyzePanel;
@@ -123,7 +123,7 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 		this.layerContainer = new LayerContainer(mainWorkspace);
 		
 		fileMenu = new FileMenu(this);
-		editMenu = new EditMenu(mainWorkspace);
+		editMenu = new NodeMenu(mainWorkspace);
 		threeDMenu = new Menu3D(this);
 		
 		File f = new File("C:\\Users\\Ramesh\\Documents\\3D Images\\dog2.jpg");
