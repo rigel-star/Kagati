@@ -9,89 +9,79 @@ import javax.swing.JMenuItem;
 
 import org.lemon.gui.ImageView;
 import org.lemon.gui.Workspace;
-import org.lemon.gui.filter.BlurFilterController;
-import org.lemon.gui.filter.HSBAdjustController;
-import org.lemon.gui.filter.TextureController;
+import org.lemon.gui.node.BlurFilterNode;
+import org.lemon.gui.node.HSBAdjustNode;
+import org.lemon.gui.node.TextureNode;
 
-public class EditMenu extends JMenu implements ActionListener {
-	private static final long serialVersionUID = 1L;
-
+public class NodeMenu extends JMenu implements ActionListener {
 	
-	private JMenu rotate;
-	private JMenuItem blur, crop, flipRight, flipHorizontal, hsbControl, texture;
+	/**
+	 * Serial UID
+	 * */
+	private static final long serialVersionUID = 1L;
+	
+	private JMenuItem blur, hsbControl, texture;
 	
 	private Workspace workspace;
 	
 	
-	public EditMenu(Workspace workspace) {
+	public NodeMenu( Workspace workspace ) {
 		
 		this.workspace = workspace;
 		
-		setText("Edit");
+		setText( "Node" );
 		
-		this.init();
-		this.addAll();
+		init();
+		addAll();
 	}
 	
 	
 	private void init() {
-		this.blur = new JMenuItem("Blur");
-		this.crop = new JMenuItem("Crop");
-		this.rotate = new JMenu("Rotate");
-		this.hsbControl = new JMenuItem("HSB");
-		this.texture = new JMenuItem("Texture");
-		
-		this.flipHorizontal = new JMenuItem("Flip Horizontal");
-		this.flipRight = new JMenuItem("Flip Right");
+		this.blur = new JMenuItem( "Blur" ) ;
+		this.hsbControl = new JMenuItem( "HSB" );
+		this.texture = new JMenuItem( "Texture" );
 	}
 	
 	
 	private void addAll() {
 		
-		rotate.add(flipHorizontal);
-		rotate.add(flipRight);
-		add(rotate);
+		hsbControl.addActionListener( this );
+		add( hsbControl );
 		
-		add(crop);
+		blur.addActionListener( this );
+		add( blur );
 		
-		hsbControl.addActionListener(this);
-		add(hsbControl);
-		
-		blur.addActionListener(this);
-		add(blur);
-		
-		add(texture);
+		texture.addActionListener( this );
+		add( texture );
 		
 	}
 
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
+	public void actionPerformed( ActionEvent e ) {
 		
-		Component comp = null;
-		
-		if(e.getSource() == hsbControl) {
+		Component node = null;
+		Component selected = workspace.getSelectedFrame();;
+
+		if( e.getSource() == hsbControl ) {
 			
-			if(workspace.getSelectedFrame() instanceof ImageView) {
+			if( selected instanceof ImageView ) {
 				var v = (ImageView) workspace.getSelectedFrame();
-				comp = new HSBAdjustController(v, v.getImagePanel().getImage());
+				node = new HSBAdjustNode( v, v.getImagePanel().getImage() );
 			}
 		}
 		
-		else if(e.getSource() == blur) {
-			comp = new BlurFilterController();
+		else if( e.getSource() == blur ) {
+			node = new BlurFilterNode();
 		}
 		
-		else if(e.getSource() == texture) {
-			comp = new TextureController();
+		else if( e.getSource() == texture ) {
+			node = new TextureNode();
 		}
 		
-		workspace.add(comp);
+		workspace.add( node );
 		workspace.fetchNodes();
 		workspace.refresh();
 		workspace.revalidate();
-	}
-	
-	
-	
+	}	
 }

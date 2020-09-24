@@ -7,10 +7,10 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
 import org.lemon.gui.ApplicationFrame;
-import org.lemon.gui.CanvasViewSetup;
 import org.lemon.gui.ImageView;
+import org.lemon.gui.ImageViewSetup;
 import org.lemon.gui.image.ChooseImage;
-import org.lemon.gui.image.ImagePanel.PanelMode;
+import org.lemon.gui.image.PanelMode;
 import org.lemon.gui.layers.Layer;
 
 /**
@@ -30,14 +30,18 @@ public class FileMenu extends JMenu implements ActionListener {
 		this.frame = frame;
 		
 		setText( "File" );
-		this.init();
-		this.addAll();
-		this.actionEvents();
+		init();
+		addAll();
+		actionEvents();
 		
 	}
 	
 	
-	/*init every component of this menu*/
+	/**
+	 * 
+	 * init every component of this menu
+	 * 
+	 * */
 	private void init() {
 		this.newFile = new JMenuItem( "New..." );
 		this.openFile = new JMenuItem( "Open..." );
@@ -45,7 +49,11 @@ public class FileMenu extends JMenu implements ActionListener {
 	}
 	
 	
-	/*add every menu item to this menu*/
+	/**
+	 * 
+	 * add every menu item to this menu
+	 * 
+	 * */
 	private void addAll() {
 		add( newFile );
 		add( openFile );
@@ -53,7 +61,11 @@ public class FileMenu extends JMenu implements ActionListener {
 	}
 
 	
-	/*init action event for every component*/
+	/**
+	 * 
+	 * init action event for every component
+	 * 
+	 * */
 	private void actionEvents() {
 		newFile.addActionListener( this );
 		openFile.addActionListener( this );
@@ -78,7 +90,7 @@ public class FileMenu extends JMenu implements ActionListener {
 	 * 
 	 * */
 	private void newCanvas() {
-		new CanvasViewSetup( frame.getWorkspace() );
+		new ImageViewSetup( frame.getWorkspace() );
 	}
 	
 	
@@ -91,7 +103,7 @@ public class FileMenu extends JMenu implements ActionListener {
 		var imgChoose = new ChooseImage();
 		var img = imgChoose.getChoosenImage();
 		var title = imgChoose.getChoosenFile().getName();
-		var imgView = new ImageView(img, title, true, PanelMode.snapMode);
+		var imgView = new ImageView(img, title, true, PanelMode.SNAP_MODE);
 
 		frame.getWorkspace().add(imgView);
 		frame.getWorkspace().fetchNodes();
