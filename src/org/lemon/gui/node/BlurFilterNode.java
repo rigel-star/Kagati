@@ -18,37 +18,40 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 
-import org.lemon.LemonObject;
 import org.lemon.filter.BlurFilter;
 import org.lemon.filter.GaussianBlurImageFilter;
-import org.lemon.gui.FilterControllable;
-import org.lemon.gui.FilterController;
+import org.lemon.gui.ControllableNode;
+import org.lemon.gui.ControllerNode;
 import org.lemon.gui.ImageView;
-import org.lemon.gui.Node;
 import org.lemon.gui.image.ImagePanel;
 import org.lemon.image.LImage;
+import org.lemon.lang.LemonObject;
 import org.lemon.math.Vec2d;
 import org.lemon.tools.select.PolygonalSelectTool;
 
 import org.rampcv.filters.blur.BoxBlur;
 
 
-@LemonObject(type = LemonObject.GUI_CLASS)
-public class BlurFilterController extends JInternalFrame implements FilterController, ActionListener {
+@LemonObject( type = LemonObject.GUI_CLASS )
+public class BlurFilterNode extends JInternalFrame implements ControllerNode, ActionListener {
+	
+	/**
+	 * Serial UID
+	 * */
 	private static final long serialVersionUID = 1L;
 	
-	private static final Logger LOGGER = Logger.getLogger( BlurFilterController.class.getName() );
+	private static final Logger LOGGER = Logger.getLogger( BlurFilterNode.class.getName() );
 	
-	private Node[] nodes = new Node[1];
-	private Node imgNode = null;
+	private NodePt[] nodes = new NodePt[1];
+	private NodePt imgNode = null;
 	
 	//spin blur control widgets
-	private JLabel degreeSliderTxt = new JLabel("Angle:");
+	private JLabel degreeSliderTxt = new JLabel( "Angle:" );
 	private JSlider degreeSlider = null;
 	
 	private JPanel controlPanel = null;
 	
-	private JLabel blurChooserTxt = new JLabel("Blurs:");
+	private JLabel blurChooserTxt = new JLabel( "Blurs:" );
 	private JComboBox<String> blurChooser = null;
 	
 	private JPanel spinBlurPanel = new JPanel();
@@ -61,19 +64,20 @@ public class BlurFilterController extends JInternalFrame implements FilterContro
 	
 	private String choosenBlur = GAUSS;
 	
-	public BlurFilterController() {
+	
+	public BlurFilterNode() {
 		
 		init();
 		
 		setSize( 200, 140 );
-		setTitle( "Blur Controller" );
+		setTitle( "Blur" );
 		setResizable( false );
 		setVisible( true );
 		setClosable( true );
 		setLocation( 20, 50 );
 		
 		var start = new Point( getLocation().x + this.getWidth(), getLocation().y + (this.getHeight() / 2) );
-		imgNode = new Node( new Vec2d(start), null, this );
+		imgNode = new NodePt( new Vec2d( start ), null, this );
 		nodes[0] = imgNode;
 		
 		blurChooserPanel.add( blurChooserTxt );
@@ -82,20 +86,20 @@ public class BlurFilterController extends JInternalFrame implements FilterContro
 		spinBlurPanel.add( degreeSliderTxt );
 		spinBlurPanel.add( degreeSlider );
 		
-		controlPanel.add(blurChooserPanel);
-		controlPanel.add(spinBlurPanel);
+		controlPanel.add( blurChooserPanel );
+		controlPanel.add( spinBlurPanel );
 		
 		Container c = getContentPane();
-		c.add(controlPanel);
+		c.add( controlPanel );
 		
 	}
 	
 	
 	private void init() {
-		degreeSlider = new JSlider(JSlider.HORIZONTAL, 0, 36, 0);
-		degreeSlider.setMinorTickSpacing(2);
-		degreeSlider.setPaintTicks(true);
-		degreeSlider.setPreferredSize(new Dimension(130, 36));
+		degreeSlider = new JSlider( JSlider.HORIZONTAL, 0, 36, 0 );
+		degreeSlider.setMinorTickSpacing( 2 );
+		degreeSlider.setPaintTicks( true );
+		degreeSlider.setPreferredSize( new Dimension( 130, 36 ));
 		
 		String[] blurs = {
 				"Select",
@@ -105,18 +109,18 @@ public class BlurFilterController extends JInternalFrame implements FilterContro
 				SPIN
 		};
 		
-		blurChooser = new JComboBox<String>(blurs);
-		blurChooser.addActionListener(this);
-		blurChooser.setPreferredSize(new Dimension(130, 40));
+		blurChooser = new JComboBox<String>( blurs );
+		blurChooser.addActionListener( this );
+		blurChooser.setPreferredSize( new Dimension( 130, 40 ) );
 		
 		spinBlurPanel = new JPanel();
-		spinBlurPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+		spinBlurPanel.setLayout( new FlowLayout( FlowLayout.LEFT ));
 		
 		blurChooserPanel = new JPanel();
-		blurChooserPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+		blurChooserPanel.setLayout( new FlowLayout(FlowLayout.LEFT) );
 		
 		controlPanel = new JPanel();
-		controlPanel.setLayout(new FlowLayout(FlowLayout.TRAILING));
+		controlPanel.setLayout( new FlowLayout( FlowLayout.TRAILING ));
 	}
 	
 	
@@ -169,7 +173,7 @@ public class BlurFilterController extends JInternalFrame implements FilterContro
 			return;
 		}
 		
-		for( FilterControllable fc: imgNode.getConnections() ) {	
+		for( ControllableNode fc: imgNode.getConnections() ) {	
 			
 			if( fc instanceof ImageView ) {
 				view = ( (ImageView) fc ).getImagePanel();
@@ -246,13 +250,13 @@ public class BlurFilterController extends JInternalFrame implements FilterContro
 	
 	
 	@Override
-	public Node[] getNodes() {
+	public NodePt[] getNodePts() {
 		return nodes;
 	}
 
 	
 	@Override
-	public void updateNodes() {
+	public void updateNodePts() {
 		imgNode.start.x = this.getLocation().x + this.getWidth();
 		imgNode.start.y = this.getLocation().y + (this.getHeight() / 2);
 	}

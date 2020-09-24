@@ -1,4 +1,4 @@
-package org.lemon.gui.filter;
+package org.lemon.gui.node;
 
 import java.awt.Container;
 import java.awt.FlowLayout;
@@ -16,10 +16,9 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
-import org.lemon.LemonObject;
-import org.lemon.gui.FilterController;
+import org.lemon.gui.ControllerNode;
 import org.lemon.gui.ImageView;
-import org.lemon.gui.Node;
+import org.lemon.lang.LemonObject;
 import org.lemon.math.Vec2d;
 import org.lemon.utils.Utils;
 
@@ -27,21 +26,21 @@ import org.rampcv.filters.Brightness;
 import org.rampcv.filters.Saturation;
 
 
-@LemonObject(type = LemonObject.GUI_CLASS)
-public class HSBAdjustController extends JInternalFrame implements 
+@LemonObject( type = LemonObject.GUI_CLASS )
+public class HSBAdjustNode extends JInternalFrame implements 
 																ChangeListener,
 																Runnable,
-																FilterController {
+																ControllerNode {
 
 	private static final long serialVersionUID = 1L;
 	
 	/* node control points */
 	private final int nodeCount = 1;
-	private Node imgNode = null;
-	private Node[] nodes = new Node[nodeCount];
+	private NodePt imgNode = null;
+	private NodePt[] nodes = new NodePt[nodeCount];
 	
 	//image node text
-	private JLabel imgNodeTxt = new JLabel("Image");
+	private JLabel imgNodeTxt = new JLabel( "Image" );
 	
 	/*
 	 * jslider: hue, saturation and brightness
@@ -67,7 +66,7 @@ public class HSBAdjustController extends JInternalFrame implements
 	private int operation = 0;
 	
 	
-	public HSBAdjustController() {
+	public HSBAdjustNode() {
 		
 	}
 	
@@ -80,7 +79,7 @@ public class HSBAdjustController extends JInternalFrame implements
 	 * @param src the image to modify
 	 * 
 	 * */
-	public HSBAdjustController(JComponent comp, BufferedImage src) {
+	public HSBAdjustNode(JComponent comp, BufferedImage src) {
 		this.init();
 		this.comp = comp;
 		this.src = src;
@@ -91,7 +90,7 @@ public class HSBAdjustController extends JInternalFrame implements
 		 * the connector node
 		 * */
 		var start = new Point(getLocation().x + this.getWidth(), getLocation().y + (this.getHeight() - 15));
-		imgNode = new Node(new Vec2d(start), null, this);
+		imgNode = new NodePt(new Vec2d(start), null, this);
 		nodes[0] = imgNode;
 		
 		
@@ -105,12 +104,12 @@ public class HSBAdjustController extends JInternalFrame implements
 		}
 		
 		
-		setSize(225, 220);
-		setResizable(false);
-		setTitle("HSB Controller");
-		setVisible(true);
-		setClosable(true);
-		setLocation(20, 50);
+		setSize( 225, 220 );
+		setResizable( false );
+		setTitle( "HSB" );
+		setVisible( true );
+		setClosable( true );
+		setLocation( 20, 50 );
 		
 		
 		editPanel.setLayout(new FlowLayout(FlowLayout.TRAILING));
@@ -167,10 +166,10 @@ public class HSBAdjustController extends JInternalFrame implements
 	public void stateChanged(ChangeEvent e) {
 		
 		if(e.getSource() == brgtjs) {
-			operation = HSBAdjustController.BRGT;
+			operation = HSBAdjustNode.BRGT;
 		}
 		else if(e.getSource() == satrjs) {
-			operation = HSBAdjustController.SATR;
+			operation = HSBAdjustNode.SATR;
 		}
 		
 		new Thread(this).start();
@@ -184,11 +183,11 @@ public class HSBAdjustController extends JInternalFrame implements
 		
 		switch(operation) {
 		
-		case HSBAdjustController.HUE: {
+		case HSBAdjustNode.HUE: {
 			break;
 		}
 		
-		case HSBAdjustController.SATR: {
+		case HSBAdjustNode.SATR: {
 			
 			if(satrjs.getValue() == 0)
 				return;
@@ -197,7 +196,7 @@ public class HSBAdjustController extends JInternalFrame implements
 			break;
 		}
 		
-		case HSBAdjustController.BRGT: {
+		case HSBAdjustNode.BRGT: {
 			
 			if(brgtjs.getValue() == 0)
 				return;
@@ -220,14 +219,14 @@ public class HSBAdjustController extends JInternalFrame implements
 	
 	
 	@Override
-	public void updateNodes() {
+	public void updateNodePts() {
 		imgNode.start.x = this.getLocation().x + this.getWidth();
 		imgNode.start.y = this.getLocation().y + this.getHeight() - 30;
 	}
 	
 	
 	@Override
-	public Node[] getNodes() {
+	public NodePt[] getNodePts() {
 		return nodes;
 	}
 	
