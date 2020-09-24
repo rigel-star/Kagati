@@ -20,6 +20,7 @@ import org.lemon.filter.ResizeImageFilter;
 import org.lemon.gui.image.ImagePanel;
 import org.lemon.gui.image.ImageViewMenu;
 import org.lemon.gui.image.PanelMode;
+import org.lemon.gui.node.NodePt;
 import org.lemon.image.LImage;
 import org.lemon.math.Vec2d;
 import org.lemon.utils.Utils;
@@ -29,10 +30,11 @@ import org.rampcv.utils.Tools;
 /**
  * 
  * ImageView is for holding image opened by user in application.
- * Parent of {@code ImageView} is {@code Workspace}.
+ * Parent of {@code ImageView} is {@code Workspace}. Calling {@code getParent} 
+ * returns the {@code Workspace}.
  * 
  * */
-public class ImageView extends JInternalFrame implements Cloneable, FilterControllable, ViewHolder {
+public class ImageView extends JInternalFrame implements Cloneable, ControllableNode, ViewHolder {
 	private static final long serialVersionUID = 1L;
 	
 	private ImageView 				connection;
@@ -50,8 +52,8 @@ public class ImageView extends JInternalFrame implements Cloneable, FilterContro
 	private ImageViewMenu			menu;
 	
 	/*filterly controllable node*/
-	private Node controllableNode = null;
-	private List<FilterController> controllers = new ArrayList<>();
+	private NodePt controllableNode = null;
+	private List<ControllerNode> controllers = new ArrayList<>();
 	
 	/*Connections for this imageview*/
 	private Map<String, ImageView> 	connections = new HashMap<String, ImageView>();
@@ -171,7 +173,7 @@ public class ImageView extends JInternalFrame implements Cloneable, FilterContro
 		revalidateListeners();
 		
 		var pt = new Point( this.getLocation().x, this.getLocation().y + 40 );
-		controllableNode = new Node( new Vec2d(pt), null, this );
+		controllableNode = new NodePt( new Vec2d(pt), null, this );
 	}
 	
 	
@@ -366,26 +368,26 @@ public class ImageView extends JInternalFrame implements Cloneable, FilterContro
 
 
 	@Override
-	public void addController( FilterController controller ) {
+	public void addController( ControllerNode controller ) {
 		controllers.add( controller );
 	}
 
 
 	@Override
-	public List<FilterController> getControllers() {
+	public List<ControllerNode> getControllers() {
 		return controllers;
 	}
 	
 	
 	@Override
-	public void updateNode() {
+	public void updateNodePt() {
 		controllableNode.start.x = this.getLocation().x;
 		controllableNode.start.y = this.getLocation().y + 30;
 	}
 	
 	
 	@Override
-	public Node getNode() {
+	public NodePt getNodePt() {
 		return controllableNode;
 	}
 	

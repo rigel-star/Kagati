@@ -10,11 +10,9 @@ import java.awt.GridBagConstraints;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.Toolkit;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -23,8 +21,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JWindow;
 
+import org.lemon.gui.image.PanelMode;
 import org.lemon.lang.LemonObject;
-import org.lemon.lang.Nullable;
+import org.lemon.lang.NonNull;
 
 import sround.awt.RoundJTextField;
 
@@ -32,11 +31,10 @@ import sround.awt.RoundJTextField;
 @LemonObject( type = LemonObject.GUI_CLASS )
 /**
  * 
- * Edit (Resize, rotate or any other transformation) 
- * the image attached with specified {@code ImageView}.
+ * Create new canvas.
  * 
  * */
-public class ImageViewSetup extends JWindow {
+public class ImageViewSetup extends JWindow implements ActionListener {
 	
 	/**
 	 * Serial UID
@@ -69,32 +67,18 @@ public class ImageViewSetup extends JWindow {
 	
 	GridBagConstraints gbc = new GridBagConstraints();
 	
-	public static final int NEW_DOC = 0x1;
-	public static final int EXISTING_DOC = 0x2;
-	
+	private Workspace workspace = null;
 	
 	/**
 	 * 
-	 * Constructs {@code ImageViewSetup} with specified {@code ImageView}
-	 * @param view		image container
+	 * Constructs {@code ImageViewSetup} with specified {@code Workspace}.
+	 * @param wk		{@View} container
 	 * 
 	 * */
-	public ImageViewSetup( @Nullable ImageView view ) {
-		this( view, EXISTING_DOC );
-	}
-	
-	
-	/**
-	 * 
-	 * Constructs {@code ImageViewSetup} with specified {@code ImageView}
-	 * and document type.
-	 * @param view		image container
-	 * @param docType	document type ( eg. ImageViewSetup.NEW_DOC etc.. )
-	 * 
-	 * */
-	public ImageViewSetup( @Nullable ImageView view, int docType ) {
+	public ImageViewSetup( @NonNull Workspace wk ) {
 		
 		init();
+		this.workspace = wk;
 		
 		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 		Dimension size = getPreferredSize();
@@ -121,14 +105,12 @@ public class ImageViewSetup extends JWindow {
 		main.add( new Gap(), pos.nextCol() );
 		main.add( createButtonPanel(), pos.nextCol() );
 		
-		var header = new Header( "xxx.jpg", 20 );
+		var header = new Header( "New", 20 );
 		
-		if( view != null ) {
-			header.setTitle( view.getTitle() );
-			titleFld.setText( view.getTitle() );
-			widthFld.setText( String.valueOf( view.getImagePanel().getImage().getWidth() ));
-			heightFld.setText( String.valueOf( view.getImagePanel().getImage().getWidth() ));
-		}
+		header.setTitle( "New" );
+		titleFld.setText( "New" );
+		widthFld.setText( "300" );
+		heightFld.setText( "300" );
 		
 		Container c = getContentPane();
 		
@@ -138,21 +120,6 @@ public class ImageViewSetup extends JWindow {
 		
 		setVisible( true );
 		pack();
-	}
-	
-	
-	public static void main( String[] args ) {
-		
-		BufferedImage img = null;
-		
-		try {
-			img = ImageIO.read( new File( "C:\\Users\\Ramesh\\Desktop\\opencv\\mack.jpg" ) );
-		} catch( IOException ex ) {
-			ex.printStackTrace();
-		}
-		
-		var view = new ImageView( img, "mack.jpg" );
-		new ImageViewSetup( view );
 	}
 	
 	
@@ -255,7 +222,7 @@ public class ImageViewSetup extends JWindow {
 		
 		var font2 = new Font( null, Font.PLAIN, 12 );
 		
-		titleFld = new RoundJTextField( "dog2.jpg", 150, 25 );
+		titleFld = new RoundJTextField( "img", 150, 25 );
 		titleFld.setFont( font2 );
 		
 		widthFld = new RoundJTextField( "300", 150, 25 );
@@ -267,10 +234,12 @@ public class ImageViewSetup extends JWindow {
 		okBttn = new JButton( "Ok" );
 		okBttn.setPreferredSize( new Dimension( 100, 30 ));
 		okBttn.setFont( font2 );
+		okBttn.addActionListener( this );
 		
 		cancelBttn = new JButton( "Cancel" );
 		cancelBttn.setPreferredSize( new Dimension( 100, 30 ));
 		cancelBttn.setFont( font2 );
+		cancelBttn.addActionListener( this );
 		
 		labelsContainer = new JPanel();
 		buttonsContainer = new JPanel();
@@ -320,5 +289,26 @@ public class ImageViewSetup extends JWindow {
 	@Override
 	public Dimension getPreferredSize() {
 		return new Dimension( 580, 300 );
+	}
+	
+	
+	@Override
+	public void actionPerformed( ActionEvent e ) {
+		
+		if( e.getSource() == okBttn ) {
+
+			int width = Integer.parseInt( widthFld.getText() );
+			int height = Integer.parseInt( heightFld.getText() );
+			String title = titleFld.getText();
+			
+			var view = new CanvasView( width, height, Color.white, title, true, PanelMode.CANVAS_MODE );
+			workspace.add( view );
+			workspace.revalidate();
+			
+			dispose();
+		}
+		else if( e.getSource() == cancelBttn ) {
+			dispose();
+		}
 	}
 }
