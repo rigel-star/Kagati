@@ -1,45 +1,38 @@
 package org.lemon.gui.layers;
 
-
 import java.util.Enumeration;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 
-import org.lemon.utils.IDManager;
+import org.lemon.gui.Layer;
 
 public class LayerList extends JList<Layer> {
 	
 	/**
 	 * Serial UID
 	 * */
-	private static final long serialVersionUID = 1L;
-	
+	private static final long serialVersionUID = 1L;	
 	
 	private static DefaultListModel<Layer> model = new DefaultListModel<>();
 	private static LayerItemRenderer renderer = new LayerItemRenderer();
-	private IDManager<Layer> idMngr = new IDManager<Layer>();
-	
 	
 	public LayerList() {
-		super(model);
-		setCellRenderer(renderer);
+		super( model );
+		setCellRenderer( renderer );
 	}
 	
 	
 	public void refresh() {
-		for(Enumeration<Layer> enu = model.elements(); enu.hasMoreElements();) {
+		for( Enumeration<Layer> enu = model.elements(); enu.hasMoreElements(); ) {
 			Layer layer  = enu.nextElement();
 			layer.getLayerComponent().repaint();
 		}
 	}
 	
 	
-	public void add(Layer l) {
-		model.addElement(l);
-		int id = idMngr.next();
-		l.id = id;
-		idMngr.add(id, l);
+	public void add( Layer l ) {
+		model.addElement( l );
 	}
 	
 	
@@ -48,9 +41,7 @@ public class LayerList extends JList<Layer> {
 	}
 	
 	
-	public void remove(Layer l) {
-		model.removeElement(l);
+	public void remove( Layer l ) {
+		model.removeElement( l );
 	}
-	
-
 }

@@ -7,7 +7,7 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
 
-public class EmptyLayer extends Layer {
+public class EmptyLayer extends ViewLayer {
 	
 	public EmptyLayer() {
 		super(new EmptyCanvas(), "New Layer", NORMAL_LAYER);
