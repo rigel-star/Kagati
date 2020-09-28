@@ -12,57 +12,70 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import org.lemon.gui.layers.EmptyLayer;
-import org.lemon.gui.layers.Layer;
+import org.lemon.gui.layers.ViewLayer;
 import org.lemon.gui.layers.LayerList;
+import org.lemon.gui.layers.NodeLayer;
+import org.lemon.gui.node.NodePt;
 
 public class LayerContainer extends JInternalFrame {
+	
+	/**
+	 * Serial UID
+	 * */
 	private static final long serialVersionUID = 1L;
-	
-	
+		
 	private LayerList layerList = new LayerList();
 	private JScrollPane scroll = new JScrollPane(layerList);
 	private Workspace workspace = null;
 
-	
 	private Layer background = null;
 	
-	
 	/**
-	 * LayerContainer contains all the access to {@code JInternalFrame}'s opened on main {@code Workspace} of application.
-	 * Like {@code ImageView}, {@code DrawingPanel} etc.
-	 * @param workspace Main {@code Workspace} of this application.
-	 * */
-	public LayerContainer(Workspace workspace) {
+	 * 
+	 * @param workspace		Default workspace.
+	 *
+	 **/
+	public LayerContainer( Workspace workspace ) {
 		
 		this.workspace = workspace;
 		
-		setTitle("Layers");
-		setClosable(false);
-		setBorder(BorderFactory.createLineBorder(Color.black, 1));
-		setMaximizable(false);
-		setIconifiable(false);
-		setLayout(new BorderLayout());
+		setTitle( "Layers" );
+		setClosable( false );
+		setBorder( BorderFactory.createLineBorder( Color.black, 1 ) );
+		setMaximizable( false );
+		setIconifiable( false );
+		setLayout( new BorderLayout() );
 		
-		add(scroll);
-		add(new BottomMenu(), BorderLayout.SOUTH);
+		add( scroll );
+		add( new BottomMenu(), BorderLayout.SOUTH );
 		
-		setVisible(true);
+		setVisible( true );
 	}
 	
 	
-	public void addLayer(Layer layer) {
-		if(layer.getProperty() == Layer.BACKGROUND_LAYER || getLayerCount() == 0) {
+	public void addLayer( Layer layer ) {
+		
+		if( layer instanceof ViewLayer ) {
 			
-			if(background != null) {
-				background.setTitle("Layer");
+			var vlay = (ViewLayer) layer;
+			if( vlay.getProperty() == ViewLayer.BACKGROUND_LAYER || getLayerCount() == 0 ) {
+				
+				if( background != null ) {
+					vlay.setTitle( "Layer" );
+				}
+				
+				vlay.setTitle( "Background" );
+				background = vlay;
 			}
-			
-			background = layer;
-			layer.setTitle("Background");
 		}
 		
-		layerList.add(layer);
+		else if( layer instanceof NodeLayer ) {
+			
+			var nlay = (NodeLayer) layer;
+			background = nlay;
+		}
+		
+		layerList.add( layer );
 		scroll.revalidate();
 	}
 	
@@ -74,7 +87,7 @@ public class LayerContainer extends JInternalFrame {
 	
 	@Override
 	public Dimension getPreferredSize() {
-		return new Dimension(150, 200);
+		return new Dimension( 150, 200 );
 	}
 	
 	
@@ -82,60 +95,64 @@ public class LayerContainer extends JInternalFrame {
 	 * Lies in the bottom of LayerContainer. This class contains command like for deleting or copying layers.
 	 * */
 	private class BottomMenu extends JPanel {
+		
+		/**
+		 * Serial UID
+		 * */
 		private static final long serialVersionUID = 1L;
 		
 		private JButton deleteLayerBtn;
 		private JButton copyLayerBtn;
 		private JButton newLayerBtn;
 		
-		
 		public BottomMenu() {
 			init();
-			setLayout(new FlowLayout(FlowLayout.CENTER));
+			setLayout( new FlowLayout( FlowLayout.CENTER ));
 			
-			add(newLayerBtn);
-			add(copyLayerBtn);
-			add(deleteLayerBtn);
+			add( newLayerBtn );
+			add( copyLayerBtn );
+			add( deleteLayerBtn );
 		}
 		
 		
-		/*init widgets for bottom menu*/
+		/**
+		 * 
+		 * init widgets for bottom menu
+		 * 
+		 * */
 		private void init() {
 			
-			this.newLayerBtn = new JButton("New");
-			newLayerBtn.addActionListener(action -> {
-				layerList.add(new EmptyLayer());
-				revalidate();
-			});
-			
+			this.newLayerBtn = new JButton( "New" );
 			
 			this.copyLayerBtn = new JButton("Cop");
 			copyLayerBtn.addActionListener(action -> {
 				
 			});	
 			
-			
 			this.deleteLayerBtn = new JButton("Del");
 			deleteLayerBtn.addActionListener(action -> {
 				
-				int option = JOptionPane.showConfirmDialog(layerList, "Delete this layer?");
+				int option = JOptionPane.showConfirmDialog( layerList, "Delete this layer?" );
 				
-				switch(option) {
+				switch( option ) {
 				
-				case 0:{
+				case 0: {
 					Layer lay = layerList.getSelectedValue();
-					
-					if(lay.getLayerComponent() instanceof FilterControllable) {
-						var fcon = (FilterControllable) lay.getLayerComponent();
-						//setting node position null cause workspace will paint node even if the component is 
-						//deleted cause node is still in node list.
-						//so if we set node to null then workspace wont get any position to paint node.
-						fcon.getNode().start = null;
+					if( lay.getLayerComponent() instanceof ControllableNode ) {
+						var fcon = (ControllableNode) lay.getLayerComponent();
+						/*
+						 * Setting node position null cause workspace will 
+						 * paint node even if the component is 
+						 * deleted cause node is still in node list.
+						 * So if we set node to null then workspace 
+						 * wont get any position to paint node.
+						 */
+						fcon.getNodePt().start = null;
 					}
-					else if(lay.getLayerComponent() instanceof FilterController) {
-						var fcon = (FilterController) lay.getLayerComponent();
+					else if( lay.getLayerComponent() instanceof ControllerNode ) {
+						var fcon = (ControllerNode) lay.getLayerComponent();
 						//read upper comment to understand why im setting node positions null
-						for(Node node: fcon.getNodes()) {
+						for( NodePt node: fcon.getNodePts() ) {
 							node.start = null;
 						}
 					}

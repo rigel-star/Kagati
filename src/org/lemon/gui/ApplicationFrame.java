@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -32,13 +33,14 @@ import org.lemon.gui.dialogs.DenoiseImageDialog;
 import org.lemon.gui.dialogs.NegativeImageDialog;
 import org.lemon.gui.dialogs.PixelateImageDialog;
 import org.lemon.gui.image.ImageInfoPanel;
-import org.lemon.gui.layers.Layer;
+import org.lemon.gui.layers.NodeLayer;
+import org.lemon.gui.layers.ViewLayer;
 import org.lemon.gui.image.PanelMode;
 import org.lemon.gui.menus.NodeMenu;
+import org.lemon.gui.node.BlurFilterNode;
 import org.lemon.gui.menus.FileMenu;
 import org.lemon.gui.menus.Menu3D;
 import org.lemon.gui.panels.ImageAnalyzePanel;
-import org.lemon.gui.panels.OpacityControlPanel;
 import org.lemon.gui.panels.ToolInfoPanel;
 import org.lemon.gui.toolbars.SaveChangesToolBar;
 import org.lemon.tools.LemonTool;
@@ -88,9 +90,9 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 	
 	
 	//image controllers and analyze panels
-	OpacityControlPanel 		opacityPanel;
 	private ImageInfoPanel 				imgInfoPanel;
 	private ImageView 					imageView;
+	private BlurFilterNode blurNode 	= new BlurFilterNode();
 	
 	/*All tools container*/
 	private LemonToolPanel 				mainToolPanel;
@@ -131,16 +133,18 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 		this.choosenImage = ImageIO.read(f);
 		this.choosenImgName = f.getName();
 		
-		toolBarsContainer.setLayout(new FlowLayout(FlowLayout.TRAILING));
-		toolBarsContainer.add(saveChngsToolBar);
+		toolBarsContainer.setLayout( new FlowLayout( FlowLayout.TRAILING ));
+		toolBarsContainer.add( saveChngsToolBar );
 		
-		this.imageView = new ImageView(this.choosenImage, this.choosenImgName, true, PanelMode.CANVAS_MODE);
+		this.imageView = new ImageView( choosenImage, choosenImgName, true, PanelMode.CANVAS_MODE );
 		
-		this.imgInfoPanel = new ImageInfoPanel(this.choosenImage);
-		this.opacityPanel = new OpacityControlPanel(this.choosenImage);
+		this.imgInfoPanel = new ImageInfoPanel( choosenImage );
 		
 		//layers
-		this.layerContainer.addLayer(new Layer(imageView, imageView.getTitle()));
+		layerContainer.addLayer( new ViewLayer( imageView, imageView.getTitle() ) );
+		layerContainer.addLayer( new NodeLayer( blurNode, new ImageIcon( "icons/layer/blur.png" ), "Blur" ));
+		layerContainer.addLayer( new NodeLayer( blurNode, new ImageIcon( "icons/layer/texture.png" ), "Texture" ));
+		layerContainer.addLayer( new NodeLayer( blurNode, new ImageIcon( "icons/layer/adjust.png" ), "HSB Adjust" ));
 		
 		//analyze panel properties
 		analyzeMenu = new ImageAnalyzePanel();
@@ -151,7 +155,7 @@ public class ApplicationFrame extends JFrame implements ActionListener {
 		
 		//different blend modes
 		blendModes = new JMenu("Blend");
-		this.initBlendModes();
+		initBlendModes();
 		
 		//main menu items
 		filter = new JMenu("Filter");

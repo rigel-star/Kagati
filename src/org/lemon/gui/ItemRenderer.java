@@ -92,6 +92,4 @@ public class ItemRenderer implements ListCellRenderer<JPanel>{
 	public void setSelectionForeground( Color c ) {
 		this.fg = c;
 	}
-	
-
 }
