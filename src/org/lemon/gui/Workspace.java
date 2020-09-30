@@ -30,7 +30,7 @@ public class Workspace extends JDesktopPane implements ComponentListener {
 	 * */
 	private static final long serialVersionUID = 1L;
 	
-	private List<Node> nodes = new ArrayList<Node>();
+	private List<NodePt> nodes = new ArrayList<NodePt>();
 	private List<ControllableNode> fcontrollables = new ArrayList<>();
 	private List<ControllerNode> fcontrollers = new ArrayList<>();
 	
@@ -75,12 +75,12 @@ public class Workspace extends JDesktopPane implements ComponentListener {
 		wpGraphics = (Graphics2D) g;
 		
 		fcontrollables.stream().forEach( fc -> {
-			var node = fc.getNode();
+			var node = fc.getNodePt();
 			drawNode( wpGraphics, node );
 		});
 		
 		fcontrollers.stream().forEach( fc -> {
-			for( Node node: fc.getNodes() ) {
+			for( NodePt node: fc.getNodePts() ) {
 				drawNode( wpGraphics, node );
 			}
 		});
@@ -114,35 +114,35 @@ public class Workspace extends JDesktopPane implements ComponentListener {
 	 * 
 	 * */
 	public void fetchNodes() {
-		for(Component c: getComponents()) {
-			if(c instanceof ControllerNode) {
+		for( Component c: getComponents() ) {
+			if( c instanceof ControllerNode ) {
 				var con = (ControllerNode) c;
 				
-				if(!fcontrollers.contains(con))
-					fcontrollers.add(con);
+				if( !fcontrollers.contains( con ) )
+					fcontrollers.add( con );
 
-				for(Node node: con.getNodes()) {
-					if(!nodes.contains(node)) {
-						nodes.add(node);
+				for( NodePt node: con.getNodePts() ) {
+					if( !nodes.contains( node )) {
+						nodes.add( node );
 					}
 					
 				}
 			}
-			else if(c instanceof ControllableNode) {
+			else if( c instanceof ControllableNode ) {
 				var fc = (ControllableNode) c;
 				
-				if(!fcontrollables.contains(fc))
-					fcontrollables.add(fc);
+				if( !fcontrollables.contains( fc ) )
+					fcontrollables.add( fc );
 				
-				if(!nodes.contains(fc.getNode())) {
-					nodes.add(fc.getNode());
+				if( !nodes.contains( fc.getNodePt() )) {
+					nodes.add( fc.getNodePt() );
 				}
 			}
 		}
 	}
 
 	
-	private void drawNode(Graphics2D g2d, Node node) {
+	private void drawNode(Graphics2D g2d, NodePt node) {
 		g2d.setPaint(nodeColor);
 		
 		if(node != null && node.start != null) {
@@ -153,24 +153,25 @@ public class Workspace extends JDesktopPane implements ComponentListener {
 			if(connectingNode)
 				return;
 			
-			if(node.getParent() instanceof ControllableNode) {
+			if( node.getComponent() instanceof ControllableNode ) {
 				
 			}
-			else if(node.getParent() instanceof ControllerNode) {
+			else if( node.getComponent() instanceof ControllerNode ) {
 			
-				node.getConnections().forEach(c -> {
-						
-					g2d.setPaint(Color.white);
-					g2d.setStroke(new BasicStroke(1));
+				node.getConnections().forEach(nd -> {
+					
+					ControllableNode c = (ControllableNode) nd;
+					g2d.setPaint( Color.white );
+					g2d.setStroke( new BasicStroke( 1 ) );
 					
 					/*
 					var curve = new QuadCurve2D.Double((int) node.start.x, (int) node.start.y,
 														(int) node.mid.x, (int) node.mid.y,
 														(int) node.end.x, (int) node.end.y);								
 					*/
-					if(c.getNode().start != null) {
-						var line = new Line2D.Double(node.start.x, node.start.y, c.getNode().start.x, c.getNode().start.y);
-						g2d.draw(line);
+					if( c.getNodePt().start != null ) {
+						var line = new Line2D.Double( node.start.x, node.start.y, c.getNodePt().start.x, c.getNodePt().start.y);
+						g2d.draw( line );
 					}
 				});
 			}
@@ -184,14 +185,14 @@ public class Workspace extends JDesktopPane implements ComponentListener {
 	private void updateNodes() {
 		
 		fcontrollables.forEach(fc -> {
-			if(fc.getNode().start != null)
-				fc.updateNode();
+			if(fc.getNodePt().start != null)
+				fc.updateNodePt();
 		});
 		
 		fcontrollers.forEach(fc -> {
-			for(Node node: fc.getNodes()) {
+			for(NodePt node: fc.getNodePts()) {
 				if(node.start != null) {
-					fc.updateNodes();
+					fc.updateNodePts();
 				}
 			}
 		});
@@ -199,10 +200,12 @@ public class Workspace extends JDesktopPane implements ComponentListener {
 	}
 	
 	
-	/*drawing curve between two connections*/
-	public void draw(Graphics2D g2d, Pair p) {
-		g2d.setPaint(Color.white);
-		g2d.setStroke(new BasicStroke(3));
+	/**
+	 * Drawing curve between two connections.
+	 * */
+	public void draw( Graphics2D g2d, Pair p ) {
+		g2d.setPaint( Color.white );
+		g2d.setStroke( new BasicStroke( 3 ) );
 		
 		var v1 = p.getFirstPoint();
 		var v2 = p.getSecondPoint();
@@ -217,12 +220,12 @@ public class Workspace extends JDesktopPane implements ComponentListener {
 		
 		var ctrlPoint = v1.midpoint(v2);
 		
-		var curve = new QuadCurve2D.Double(begin.x, begin.y,
+		var curve = new QuadCurve2D.Double( begin.x, begin.y,
 															ctrlPoint.x, ctrlPoint.y,
-																stop.x, stop.y);
-		g2d.fillOval(begin.x - 5, begin.y, 10, 10);
-		g2d.fillOval(stop.x - 5, stop.y, 10, 10);
-		g2d.draw(curve);
+																stop.x, stop.y );
+		g2d.fillOval( begin.x - 5, begin.y, 10, 10 );
+		g2d.fillOval( stop.x - 5, stop.y, 10, 10 );
+		g2d.draw( curve );
 		
 	}
 	
@@ -254,13 +257,13 @@ public class Workspace extends JDesktopPane implements ComponentListener {
 		public MouseHandler() {}
 		
 		private Point start = null, end = null;
-		private Node startNode = null, endNode;
+		private NodePt startNode = null, endNode;
 		
 		@Override
 		public void mousePressed(MouseEvent e) {
 			super.mousePressed(e);
 			
-			for(Node node: nodes) {
+			for(NodePt node: nodes) {
 				if(node.getDrawable().contains(e.getX(), e.getY())) {
 					start = e.getPoint();
 					end = start;
@@ -289,7 +292,7 @@ public class Workspace extends JDesktopPane implements ComponentListener {
 		public void mouseReleased( MouseEvent e ) {
 			super.mouseReleased( e );
 			
-			for( Node node: nodes ) {
+			for( NodePt node: nodes ) {
 				if( node.getDrawable().contains( end )) {
 					if( !startNode.equals( node )) { //if start and end node are not same
 						endNode = node;
@@ -318,42 +321,42 @@ public class Workspace extends JDesktopPane implements ComponentListener {
 		 * @param endNode		Node to end with.
 		 * 
 		 * */
-		private void connectNodes( Node startNode, Node endNode ) {
+		private void connectNodes( NodePt startNode, NodePt endNode ) {
 			
-			if( startNode.getParent() instanceof ControllerNode ) {
+			if( startNode.getComponent() instanceof ControllerNode ) {
 				
-				if( endNode.getParent() instanceof ControllableNode ) {
+				if( endNode.getComponent() instanceof ControllableNode ) {
 					
-					if( !startNode.getConnections().contains((ControllableNode) endNode.getParent() ) ) {
+					if( !startNode.getConnections().contains((ControllableNode) endNode.getComponent() ) ) {
 						
-						startNode.addConnection((ControllableNode) endNode.getParent() );
-						var controllable = (ControllableNode) endNode.getParent();
-						controllable.addController( (ControllerNode) startNode.getParent() );
+						startNode.addConnection((ControllableNode) endNode.getComponent() );
+						var controllable = (ControllableNode) endNode.getComponent();
+						controllable.addController( (ControllerNode) startNode.getComponent() );
 					}
 					else {
-						JOptionPane.showMessageDialog( endNode.getParent(), "Already connected!" );
+						JOptionPane.showMessageDialog( endNode.getComponent(), "Already connected!" );
 					}
 				}
 				else {
-					JOptionPane.showMessageDialog( endNode.getParent(), "Connect with image!" );
+					JOptionPane.showMessageDialog( endNode.getComponent(), "Connect with image!" );
 				}
 			}
-			else if( startNode.getParent() instanceof ControllableNode ) {
+			else if( startNode.getComponent() instanceof ControllableNode ) {
 				
-				if( endNode.getParent() instanceof ControllerNode ) {
+				if( endNode.getComponent() instanceof ControllerNode ) {
 					
-					if(!endNode.getConnections().contains( (ControllableNode) startNode.getParent()) ) {
+					if(!endNode.getConnections().contains( (ControllableNode) startNode.getComponent()) ) {
 						
-						endNode.addConnection((ControllableNode) startNode.getParent());
-						var controllable = (ControllableNode) startNode.getParent();
-						controllable.addController((ControllerNode) endNode.getParent());
+						endNode.addConnection((ControllableNode) startNode.getComponent());
+						var controllable = (ControllableNode) startNode.getComponent();
+						controllable.addController((ControllerNode) endNode.getComponent());
 					}
 					else {
-						JOptionPane.showMessageDialog( endNode.getParent(), "Already connected!" );
+						JOptionPane.showMessageDialog( endNode.getComponent(), "Already connected!" );
 					}
 				}
 				else {
-					JOptionPane.showMessageDialog( endNode.getParent(), "Connect with filter!" );
+					JOptionPane.showMessageDialog( endNode.getComponent(), "Connect with filter!" );
 				}
 			}
 		}	
