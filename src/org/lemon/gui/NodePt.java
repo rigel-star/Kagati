@@ -1,4 +1,4 @@
-package org.lemon.gui.node;
+package org.lemon.gui;
 
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
@@ -6,7 +6,6 @@ import java.util.Stack;
 
 import javax.swing.JComponent;
 
-import org.lemon.gui.ControllableNode;
 import org.lemon.lang.LemonObject;
 import org.lemon.math.Vec2d;
 
@@ -35,7 +34,7 @@ public class NodePt {
 	public Vec2d start = null, end = null, mid = null;
 	private JComponent  parent;
 	
-	private Stack<ControllableNode> cons = new Stack<>();
+	private Stack<Node> cons = new Stack<>();
 	
 	
 	public NodePt( Vec2d start, Vec2d end ) {
@@ -53,11 +52,23 @@ public class NodePt {
 	}
 	
 	
+	/**
+	 * 
+	 * Set start point for this {@link NodePt}.
+	 * @param start 	New start point.
+	 * 
+	 * */
 	public void setStart( Vec2d start ) {
 		this.start = start;
 	}
 	
 	
+	/**
+	 * 
+	 * Set end point for this {@link NodePt}.
+	 * @param end 	New end point.
+	 * 
+	 * */
 	public void setEnd( Vec2d end ) {
 		this.end = end;
 		if( end != null )
@@ -70,16 +81,33 @@ public class NodePt {
 	}
 	
 	
-	public JComponent getParent() {
+	/**
+	 * 
+	 * @return Get {@code JComponent} attached with 
+	 * 			this {@link NodePt}.
+	 * 
+	 * */
+	public JComponent getComponent() {
 		return parent;
 	}
 	
 	
-	public Stack<ControllableNode> getConnections() {
+	/**
+	 * 
+	 * @return Connections of this {@link NodePt} which are other 
+	 * 				{@link NodePt}'s.
+	 * 
+	 * */
+	public Stack<Node> getConnections() {
 		return cons;
 	}
 	
 	
+	/**
+	 * 
+	 * @return Get the {@code Shape} of this {@link NodePt}.
+	 * 
+	 * */
 	public Shape getDrawable() {
 		return new Ellipse2D.Double( start.x - 5, start.y - 5, 10, 10 );
 	}	
