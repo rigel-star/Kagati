@@ -15,6 +15,7 @@ import javax.swing.border.EmptyBorder;
 
 import org.lemon.filter.ResizeImageFilter;
 import org.lemon.gui.ControllerNode;
+import org.lemon.gui.NodePt;
 import org.lemon.gui.TextureChooser;
 import org.lemon.image.Texture;
 import org.lemon.image.WoodTexture;
@@ -67,7 +68,6 @@ public class TextureNode extends JInternalFrame implements ControllerNode {
 		
 		add( txtrHolder, BorderLayout.NORTH );
 		add( zoomPan, BorderLayout.SOUTH );
-		
 	}
 	
 	

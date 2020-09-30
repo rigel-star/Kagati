@@ -20,9 +20,10 @@ import javax.swing.JSlider;
 
 import org.lemon.filter.BlurFilter;
 import org.lemon.filter.GaussianBlurImageFilter;
-import org.lemon.gui.ControllableNode;
-import org.lemon.gui.ControllerNode;
 import org.lemon.gui.ImageView;
+import org.lemon.gui.Node;
+import org.lemon.gui.NodePt;
+import org.lemon.gui.ControllerNode;
 import org.lemon.gui.image.ImagePanel;
 import org.lemon.image.LImage;
 import org.lemon.lang.LemonObject;
@@ -173,7 +174,7 @@ public class BlurFilterNode extends JInternalFrame implements ControllerNode, Ac
 			return;
 		}
 		
-		for( ControllableNode fc: imgNode.getConnections() ) {	
+		for( Node fc: imgNode.getConnections() ) {	
 			
 			if( fc instanceof ImageView ) {
 				view = ( (ImageView) fc ).getImagePanel();
