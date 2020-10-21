@@ -1,38 +1,25 @@
 # Lemon
 
-## Note: Screenshots may not be up to date.
-
-Image editing software with some Smart Tools.
+Lemon, a work in progress by RigelStar, is early stage Image Manipulation Program for Windows environment. Currently, not much is implemented but progress is stilll going on. 
+You may see some dependencies has been used(though they all are created by RigelStar) but those will shortly be removed and everything will be from scratch.
 
 ## What can this software do:
-1. Vanishing Point Filter (Currently under construction. Does not work right now).
-2. Color Range Tool
-3. Many basic filters
-4. Not much artistic filter
-5. Crop, resize images
-6. Blend images
+- Some Basic Filters
+- Vanishing Point Filter (Currently under construction).
+- Color Range Tool
+- Crop, Resize Images (Written but not implemented).
+- Basic Layer System
+- Basic Node System (Currently under construction).
 
-## Upcoming features
-1. Layer System
-2. Decent working Vanishing Point Filter
-3. Custom Color Picker
+### Main features to come (Under construction features)
+- Filter which are written but not implemented will shortly be implemented.
+- Working Node System
+- Basic 3D Filters
+- Texture Generator
 
-Mini version of photoshop :D
-
--> A work in progress by RigelStar.
-
-# Libs used
-1. RampCV
-2. PikselPainter
-both are mine easy to use libraries
-
-# Screenshots
+## Getting Started
+Lemon project is written in Eclipse environment so Eclipse IDE is recommended. Lemon is officially untested on other development environments whilst we focus on a Windows build.
 
 # Home View
+Currently this software looks like this but many changes are being made daily but not commited on GitHub.
 ![pic1](icons/scrnshot/scrns1c.png)
-
-# Vanishing Point Filter
-![pic2](icons/scrnshot/scrns2c.png)
-
-# Color Range Tool
-![pic3](icons/scrnshot/scrns3c.PNG)
