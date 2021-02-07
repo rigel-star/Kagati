@@ -8,7 +8,6 @@ import javax.swing.UIManager;
 
 import org.lemon.gui.ApplicationFrame;
 
-
 /**
  * 
  * @author Ramesh Poudel
@@ -18,15 +17,15 @@ import org.lemon.gui.ApplicationFrame;
  */
 public class Lemon {
 
-	public static void main(String[] args) throws IOException {
+	public static void main( String[] args ) throws IOException {
 		
-		SwingUtilities.invokeLater(new Runnable() {
+		SwingUtilities.invokeLater( new Runnable() {
 
 			@Override
 			public void run() {
 
 				/**
-				 * enabling dark theme for nimbus
+				 * Enabling dark theme for nimbus
 				 * */
 				UIManager.put("control", new Color(100, 100, 100));
 				UIManager.put("info", new Color(100, 100, 100));
@@ -51,7 +50,9 @@ public class Lemon {
 					ex3.printStackTrace();
 
 					try {
-						/* if nimbus is not supported */
+						/**
+						 * If nimbus is not supported. 
+						 * */
 						UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
 					} catch (Exception ex) {
@@ -59,12 +60,7 @@ public class Lemon {
 					}
 
 				}
-
-				try {
-					new ApplicationFrame();
-				} catch (IOException ex) {
-					ex.printStackTrace();
-				}
+				new ApplicationFrame();
 			}
 		});
 	}

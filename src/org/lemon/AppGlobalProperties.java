@@ -3,6 +3,8 @@ package org.lemon;
 import java.awt.Color;
 
 import org.lemon.gui.ApplicationFrame;
+import org.lemon.lang.Info;
+import org.lemon.lang.LemonObject;
 import org.lemon.tools.LemonTool;
 
 
