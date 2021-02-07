@@ -6,10 +6,10 @@ import java.io.IOException;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 
+import org.lemon.graphics.Texture;
+import org.lemon.graphics.texture.WoodTexture;
 import org.lemon.image.LImage;
 import org.lemon.image.LImageIO;
-import org.lemon.image.Texture;
-import org.lemon.image.WoodTexture;
 
 public class TextureList extends JList<TexturePanel> {
 	
@@ -36,8 +36,7 @@ public class TextureList extends JList<TexturePanel> {
 			@Override
 			public String getName() {
 				return "Pebble";
-			}
-			
+			}	
 			
 			@Override
 			public LImage getDrawable() {
@@ -53,21 +52,17 @@ public class TextureList extends JList<TexturePanel> {
 		}));
 	}
 	
-	
 	public void add( TexturePanel tx ) {
 		model.addElement( tx );
 	}
-	
 	
 	public void remove( TexturePanel tx ) {
 		model.removeElement( tx );
 	}
 	
-	
 	public void remove( int index ) {
 		model.removeElementAt( index );
 	}
-
 	
 	public int getTextureCount() {
 		return model.size();

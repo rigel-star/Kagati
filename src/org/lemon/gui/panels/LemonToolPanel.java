@@ -10,7 +10,6 @@ import javax.swing.border.Border;
 
 import org.lemon.gui.ApplicationFrame;
 
-
 public class LemonToolPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	
@@ -24,7 +23,7 @@ public class LemonToolPanel extends JPanel {
 		this(null, null);
 	}
 	
-	public LemonToolPanel(ApplicationFrame parent) {
+	public LemonToolPanel( ApplicationFrame parent ) {
 		this(parent, null);
 	}
 	
@@ -43,12 +42,10 @@ public class LemonToolPanel extends JPanel {
 		setBorder(layoutBorder);
 		setSize(200, 300);
 		
-		this.toolMenu = new LemonToolsMenu(parent);
+		this.toolMenu = new LemonToolsMenu( parent.getWorkspace() );
 		
-		add(toolMenu);
-				
+		add( toolMenu );			
 	}
-	
 	
 	
 	/**
@@ -69,5 +66,4 @@ public class LemonToolPanel extends JPanel {
 	public Component getTarget() {
 		return this.target;
 	}
-	
 }

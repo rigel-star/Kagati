@@ -10,7 +10,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
 import org.lemon.gui.ImageView;
-import org.lemon.gui.dialogs.SharePixelsDialog;
 import org.lemon.tools.brush.gui.BrushGUI;
 
 
@@ -59,7 +58,7 @@ public class ImageViewMenu extends JPopupMenu {
 		
 		var sharePixel = new JMenuItem("Share pixels");
 		sharePixel.addActionListener(action -> {
-			new SharePixelsDialog(this.context.getActualImage(), this.context.getConnection().getActualImage());
+			//new SharePixelsDialog(this.context.getActualImage(), this.context.getConnection().getActualImage());
 		});
 		
 		var blend = new JMenuItem("Blend");
@@ -146,7 +145,7 @@ public class ImageViewMenu extends JPopupMenu {
 	private JMenuItem createBrushMenu() {
 		var brush = new JMenuItem("Brushes...");
 		
-		if(context.getImagePanel().getPanelMode() == PanelMode.CANVAS_MODE) {
+		if( context.getImagePanel().getPanelMode() == ImagePanel.PanelMode.CANVAS_MODE) {
 			brush.addActionListener(action -> {
 				var mouse = MouseInfo.getPointerInfo().getLocation();
 				//new BrushToolOptions(context, mouse.x, mouse.y);

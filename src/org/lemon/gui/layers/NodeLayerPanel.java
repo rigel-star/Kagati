@@ -10,6 +10,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.lemon.filter.ResizeImageFilter;
+import org.lemon.gui.Layer;
+import org.lemon.gui.Node;
 import org.lemon.image.LImage;
 import org.lemon.lang.NonNull;
 
@@ -30,8 +32,10 @@ public class NodeLayerPanel extends JPanel {
 		
 		this.init();
 		
-		ImageIcon ic = layer.getIcon();
-		BufferedImage ig = new BufferedImage( ic.getIconWidth(), ic.getIconHeight(), BufferedImage.TYPE_INT_ARGB );
+		ImageIcon ic = ((Node) layer.getLayerComponent()).getNodeIcon();
+		final int icW = ic.getIconWidth();
+		final int icH = ic.getIconHeight();
+		BufferedImage ig = new BufferedImage( icW, icH, BufferedImage.TYPE_INT_RGB );
 		Graphics2D g2 = ig.createGraphics();
 		ic.paintIcon( null, g2, 0, 0 );
 		g2.dispose();
@@ -46,25 +50,16 @@ public class NodeLayerPanel extends JPanel {
 		add( nameField, BorderLayout.EAST );
 	}
 	
-	
+	/**
+	 * Initialize the widgets.
+	 * */
 	private void init() {
 		this.nameField = new JLabel( "Node Layer" );
-		this.imgField = new JLabel() {
-			
-			/**
-			 * Serial UID
-			 * */
-			private static final long serialVersionUID = 1L;
-			
-			@Override
-			public Dimension getPreferredSize() {
-				return new Dimension( 50, 50 );
-			}
-		};
+		this.imgField = new JLabel();
+		imgField.setPreferredSize( new Dimension( 50, 50 ));
 	}
 	
-	
-	public NodeLayer getLayer() {
+	public Layer getLayer() {
 		return layer;
 	}
 }

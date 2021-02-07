@@ -121,9 +121,7 @@ public class ImagePreviewPanel extends JPanel {
 		return original;
 	}
 	
-	
 	/**
-	 * 
 	 * Get copy of original image.
 	 * @return Copied image.
 	 * 
@@ -132,16 +130,11 @@ public class ImagePreviewPanel extends JPanel {
 		return copy;
 	}
 
-	
 	/**
-	 * 
 	 * @return Final rendered image.
 	 * 
 	 * */
 	public BufferedImage getFinalImage() {
 		return resize(copy, WIDTH, HEIGHT);
 	}
-	
-	
-	
 }

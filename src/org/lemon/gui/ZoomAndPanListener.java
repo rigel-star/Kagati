@@ -56,7 +56,6 @@ public class ZoomAndPanListener extends MouseAdapter {
 		frame.setVisible(true);
 		frame.setResizable(false);
 	}
-
 	
 	static class ZoomAndPanCanvas extends Canvas {
 		private static final long serialVersionUID = 1L;
@@ -78,7 +77,6 @@ public class ZoomAndPanListener extends MouseAdapter {
 		
 	}
 	
-	
 	public ZoomAndPanListener(Component targetComponent, int minZoomLevel, int maxZoomLevel,
 																			double zoomMultiplicationFactor) {
 		this.targetComponent = targetComponent;
@@ -87,31 +85,23 @@ public class ZoomAndPanListener extends MouseAdapter {
 		this.zoomMultiplicationFactor = zoomMultiplicationFactor;
 	}
 
-	
-
 	@Override
 	public void mousePressed(MouseEvent e) {
 		System.out.println("Mouse drag started.");
 		dragStartScreen = e.getPoint();
 		dragEndScreen = null;
 	}
-	
-	
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		moveCamera(e);
 		targetComponent.repaint();
 	}
-
-	
 	
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		zoomCamera(e);
 	}
-
-	
 	
 	private void moveCamera(MouseEvent e) {
 		try {
@@ -127,8 +117,6 @@ public class ZoomAndPanListener extends MouseAdapter {
 			ex.printStackTrace();
 		}
 	}
-
-	
 	
 	private void zoomCamera(MouseWheelEvent e) {
 		try {
@@ -157,8 +145,6 @@ public class ZoomAndPanListener extends MouseAdapter {
 			ex.printStackTrace();
 		}
 	}
-
-	
 	
 	private Point2D.Float transformPoint(Point p1) throws NoninvertibleTransformException {
 		AffineTransform inverse = coordTransform.createInverse();
@@ -167,26 +153,18 @@ public class ZoomAndPanListener extends MouseAdapter {
 		inverse.transform(p1, p2);
 		return p2;
 	}
-
-
 	
 	public int getZoomLevel() {
 		return zoomLevel;
 	}
-
-	
 	
 	public void setZoomLevel(int zoomLevel) {
 		this.zoomLevel = zoomLevel;
 	}
-
-	
 	
 	public AffineTransform getCoordTransform() {
 		return coordTransform;
 	}
-
-	
 	
 	public void setCoordTransform(AffineTransform coordTransform) {
 		this.coordTransform = coordTransform;

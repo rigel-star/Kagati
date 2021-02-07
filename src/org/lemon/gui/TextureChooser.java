@@ -3,14 +3,21 @@ package org.lemon.gui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.lemon.graphics.Texture;
 import org.lemon.gui.texture.TextureList;
-import org.lemon.image.Texture;
+import org.lemon.gui.texture.TexturePanel;
 import org.lemon.lang.LemonObject;
 
 
@@ -21,7 +28,6 @@ import org.lemon.lang.LemonObject;
  * */
 @LemonObject( type = LemonObject.GUI_CLASS )
 public class TextureChooser extends JDialog {
-	
 	
 	/**
 	 * Serial UID
@@ -36,15 +42,20 @@ public class TextureChooser extends JDialog {
 	private JPanel buttonPanel = null;
 	
 	private JButton okBttn = null, cancelBttn = null;
+	private JLabel txtrHolder = null;
 	
+	private Texture texture;
 	
 	static {
 		list = new TextureList();
 	}
 	
-	
-	public TextureChooser() {
+	/**
+	 * @param txtrHolder 	{@code JLabel} holding texture.
+	 * */
+	public TextureChooser( JLabel txtrHolder ) {
 		
+		this.txtrHolder = txtrHolder;
 		this.init();
 		
 		setTitle( "Textures" );
@@ -63,11 +74,9 @@ public class TextureChooser extends JDialog {
 		main.add( list, BorderLayout.CENTER );
 		main.add( buttonPanel, BorderLayout.EAST );
 		
-		add( main, BorderLayout.CENTER );
-		
+		add( main, BorderLayout.CENTER );	
 		setVisible( true );
 	}
-	
 	
 	/**
 	 * 
@@ -79,30 +88,55 @@ public class TextureChooser extends JDialog {
 		okBttn = new JButton( "Ok" );
 		okBttn.setPreferredSize( new Dimension( 90, 30 ));
 		
+		okBttn.addActionListener( new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				TexturePanel selected = list.getSelectedValue();
+				if ( selected != null ) {
+					txtrHolder.setIcon( new ImageIcon( selected.getTexture().getDrawable().getAsBufferedImage() ));
+					txtrHolder.repaint();
+					texture = selected.getTexture();
+				}
+				dispose();
+			}
+		});
+		
 		cancelBttn = new JButton( "Cancel" );
 		cancelBttn.setPreferredSize( new Dimension( 90, 30 ));
+		cancelBttn.addActionListener( new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				dispose();
+			}
+		});
 		
 		buttonPanel = new JPanel();
 		buttonPanel.setPreferredSize( new Dimension( 100, HEIGHT ));
 		buttonPanel.setLayout( new FlowLayout( FlowLayout.CENTER, H_GAP, V_GAP ) );
 	}
 	
-	
 	public Texture getChoosenTexture() {
-		return null;
+		return texture;
 	}
-	
 	
 	@Override
 	public Dimension getPreferredSize() {
 		return new Dimension( 300, 200 );
 	}
 	
-	
-	public static void main(String[] args) {
+	class WindowHandler extends WindowAdapter {
 		
-		new TextureChooser();
-		
+		@Override
+		public void windowClosing( WindowEvent e ) {
+			super.windowClosed( e );
+			TexturePanel selected = list.getSelectedValue();
+			
+			if ( selected != null ) {
+				txtrHolder.setIcon( new ImageIcon( selected.getTexture().getDrawable().getAsBufferedImage() ));
+				txtrHolder.repaint();
+			}
+		}
 	}
-	
 }

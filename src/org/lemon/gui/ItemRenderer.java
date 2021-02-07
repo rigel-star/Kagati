@@ -18,11 +18,7 @@ public class ItemRenderer implements ListCellRenderer<JPanel>{
     private static final Border DEFAULT_NO_FOCUS_BORDER = new EmptyBorder(1, 1, 1, 1);
     protected static Border noFocusBorder = DEFAULT_NO_FOCUS_BORDER;
     
-    
-    public ItemRenderer() {
-    	
-	}
-    
+    public ItemRenderer() {	}
     
     public Border getNoFocusBorder() {
     	
@@ -39,7 +35,6 @@ public class ItemRenderer implements ListCellRenderer<JPanel>{
             return noFocusBorder;
         }
     }
-    
 	
 	@Override
 	public Component getListCellRendererComponent( JList<? extends JPanel> list, JPanel value, int index,
@@ -61,7 +56,6 @@ public class ItemRenderer implements ListCellRenderer<JPanel>{
         if ( isSelected ) {
             pan.setBackground( bg == null ? list.getSelectionBackground() : bg );
             pan.setForeground( fg == null ? list.getSelectionForeground() : fg );
-            
         } else {
         	pan.setBackground( list.getBackground() );
         	pan.setForeground( list.getForeground() );
@@ -83,11 +77,9 @@ public class ItemRenderer implements ListCellRenderer<JPanel>{
 		return pan;
 	}
 	
-	
 	public void setSelectionBackground( Color c ) {
 		this.bg = c;
 	}
-	
 	
 	public void setSelectionForeground( Color c ) {
 		this.fg = c;

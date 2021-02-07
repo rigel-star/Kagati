@@ -13,16 +13,19 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
-import javax.swing.JInternalFrame;
+import javax.swing.ImageIcon;
 import javax.swing.border.Border;
 
 import org.lemon.filter.ResizeImageFilter;
+import org.lemon.gui.NodePt.NodePtType;
 import org.lemon.gui.image.ImagePanel;
 import org.lemon.gui.image.ImageViewMenu;
-import org.lemon.gui.image.PanelMode;
-import org.lemon.gui.node.NodePt;
+import org.lemon.gui.node.NodeComponent;
+import org.lemon.gui.node.ReceiverNode;
+import org.lemon.gui.node.SenderNode;
 import org.lemon.image.LImage;
-import org.lemon.math.Vec2d;
+import org.lemon.lang.NonNull;
+import org.lemon.math.Vec2;
 import org.lemon.utils.Utils;
 
 import org.rampcv.utils.Tools;
@@ -34,36 +37,38 @@ import org.rampcv.utils.Tools;
  * returns the {@code Workspace}.
  * 
  * */
-public class ImageView extends JInternalFrame implements Cloneable, ControllableNode, ViewHolder {
+public class ImageView extends NodeComponent implements Cloneable, ReceiverNode, ViewHolder {
+	
+	/**
+	 * Serial UID
+	 * */
 	private static final long serialVersionUID = 1L;
 	
 	private ImageView 				connection;
-	
 	private ImageView 				self = this;
-	
 	private ImagePanel 				imgPan = null;
 	
 	private BufferedImage 			src, srcCopy;
 	
 	private String 					title = null;
-	
 	private boolean 				close;
 	
 	private ImageViewMenu			menu;
 	
 	/*filterly controllable node*/
 	private NodePt controllableNode = null;
-	private List<ControllerNode> controllers = new ArrayList<>();
+	private List<SenderNode> controllers = new ArrayList<>();
 	
 	/*Connections for this imageview*/
 	private Map<String, ImageView> 	connections = new HashMap<String, ImageView>();
 	private List<String> 			conOptionsTitles = new ArrayList<String>();
 	private List<ImageView> 		conOptionsViews = new ArrayList<ImageView>();
 	
-	
 	private MouseEventsHandler 		meh;
 	
-	private final Dimension MAX_IMG_SIZE = new Dimension(500, 500); 
+	private final Dimension MAX_IMG_SIZE = new Dimension(500, 500);
+	
+	private LayerContainer lycont = null;
 	
 	/**
 	 * 
@@ -74,49 +79,42 @@ public class ImageView extends JInternalFrame implements Cloneable, Controllable
 	 * */
 	public boolean imageIsActual = true;
 	
-	
-	public ImageView() {
-		this( LImage.createImage( 100, 100, BufferedImage.TYPE_INT_ARGB ).getAsBufferedImage() );
+	public ImageView( @NonNull final LayerContainer lycont ) {
+		this( LImage.createImage( 100, 100, BufferedImage.TYPE_INT_ARGB ).getAsBufferedImage(), lycont );
 	}
-	
 	
 	/*Note image can't be null*/
-	public ImageView( BufferedImage img ) {
-		this( img, null, false, PanelMode.DEFAULT_MODE );
+	public ImageView( BufferedImage img, @NonNull final LayerContainer lycont ) {
+		this( img, null, false, ImagePanel.PanelMode.DEFAULT_MODE, lycont );
 	}
 	
-	
-	public ImageView( BufferedImage img, String title ) {
-		this( img, title, false, PanelMode.DEFAULT_MODE );
+	public ImageView( BufferedImage img, String title, @NonNull final LayerContainer lycont ) {
+		this( img, title, false, ImagePanel.PanelMode.DEFAULT_MODE, lycont );
 	}
 	
-	
-	public ImageView( BufferedImage img, boolean closeable ) {
-		this( img, null, closeable, PanelMode.DEFAULT_MODE );
+	public ImageView( BufferedImage img, boolean closeable, @NonNull final LayerContainer lycont ) {
+		this( img, null, closeable, ImagePanel.PanelMode.DEFAULT_MODE, lycont );
 	}
 	
-	
-	public ImageView( BufferedImage img, PanelMode panelMode ) {
-		this( img, null, false, panelMode );
+	public ImageView( BufferedImage img, ImagePanel.PanelMode panelMode, @NonNull final LayerContainer lycont ) {
+		this( img, null, false, panelMode, lycont );
 	}
 	
-	
-	public ImageView( BufferedImage img, String title, PanelMode panelMode ) {
-		this( img, title, false, panelMode );
+	public ImageView( BufferedImage img, String title, ImagePanel.PanelMode panelMode, @NonNull final LayerContainer lycont ) {
+		this( img, title, false, panelMode, lycont );
 	}
 	
-	
-	public ImageView( BufferedImage img, boolean closeable, PanelMode panelMode ) {
-		this( img, null, closeable, panelMode);
+	public ImageView( BufferedImage img, boolean closeable, ImagePanel.PanelMode panelMode, @NonNull final LayerContainer lycont ) {
+		this( img, null, closeable, panelMode, lycont );
 	}
 	
-	
-	public ImageView( BufferedImage img, String title, boolean closeable ) {
-		this(img, title, closeable, PanelMode.DEFAULT_MODE );
+	public ImageView( BufferedImage img, String title, boolean closeable, @NonNull final LayerContainer lycont ) {
+		this(img, title, closeable, ImagePanel.PanelMode.DEFAULT_MODE, lycont );
 	}
 	
-	
-	public ImageView( BufferedImage img, String title, boolean closeable, PanelMode panelMode )  {
+	public ImageView( BufferedImage img, String title, boolean closeable, ImagePanel.PanelMode panelMode, @NonNull final LayerContainer lycont )  {
+        super( lycont );
+        this.lycont = lycont;
         
 		if( img == null )
 			throw new NullPointerException( "Image can't be null." );
@@ -154,11 +152,10 @@ public class ImageView extends JInternalFrame implements Cloneable, Controllable
 		setTitle( this.title );
 		setClosable( closeable );
 		setVisible( true );
-		setSize( new Dimension(srcCopy.getWidth(), srcCopy.getHeight()) );
+		setSize( new Dimension( srcCopy.getWidth(), srcCopy.getHeight() ));
 		setLayout( new BorderLayout() );
 		setMaximizable( true );
 		setIconifiable( true );
-		
 		add( imgPan, BorderLayout.CENTER );
 		
 		/* 
@@ -173,18 +170,16 @@ public class ImageView extends JInternalFrame implements Cloneable, Controllable
 		revalidateListeners();
 		
 		var pt = new Point( this.getLocation().x, this.getLocation().y + 40 );
-		controllableNode = new NodePt( new Vec2d(pt), null, this );
+		controllableNode = new NodePt( new Vec2(pt), null, this, NodePtType.RECEIVER );
 	}
-	
 	
 	@Override
 	public Object clone() throws CloneNotSupportedException {
 		var newImg = Tools.copyImage( getActualImage() );
 		ImageView duplicate = new ImageView( newImg, getTitle(), getCloseableState(), 
-												getImagePanel().getPanelMode() );
+												getImagePanel().getPanelMode(), lycont );
 		return duplicate;
 	}
-	
 	
 	/**
 	 * 
@@ -197,13 +192,11 @@ public class ImageView extends JInternalFrame implements Cloneable, Controllable
 		getImagePanel().addMouseMotionListener( meh );
 	}
 	
-	
 	/**
-	 * 
 	 * Connect two ImageViews.
+	 * 
 	 * @param {@code ImageView} to connect with
 	 * @return {@code false} if connectTo is null else {@code true}.
-	 * 
 	 * */
 	public boolean setConnection( ImageView connectTo ) {
 		/*set this imageviews connection*/
@@ -211,23 +204,19 @@ public class ImageView extends JInternalFrame implements Cloneable, Controllable
 		return true;
 	}
 	
-	
 	/**
-	 * 
 	 * Get connected ImageView object.
-	 * @return connection
 	 * 
+	 * @return Connection
 	 * */
 	public ImageView getConnection() {
 		return this.connection;
 	}
 	
-	
 	/**
-	 * 
 	 * Set connection options for this ImageView.
-	 * @param {{@code List<String>}  of options
 	 * 
+	 * @param {{@code List<String>}  of options
 	 * */
 	public void setConOptions( List<String> optionsTitle, List<ImageView> views ) {
 		connections.clear();
@@ -239,34 +228,28 @@ public class ImageView extends JInternalFrame implements Cloneable, Controllable
 		}
 	}
 	
-	
 	/**
-	 * 
 	 * Get all the available connections titles for this ImageView.
-	 * @return list of connections titles
 	 * 
+	 * @return list of connections titles
 	 * */
 	public List<String> getConOptionsTitles() {
 		return this.conOptionsTitles;
 	}
 	
-	
 	/**
-	 * 
 	 * Get all the available connections of this {@code ImageView}.
-	 * @return list of available ImageViews to connect with.
 	 * 
+	 * @return list of available imageviews to connect with.
 	 * */
 	public List<ImageView> getConOptionsViews(){
 		return this.conOptionsViews;
 	}
 	
-	
 	/**
-	 * 
 	 * Sets the custom {@code ImagePanel} object for {@code this} {@code ImageView}.<p>
+	 *
 	 * @param imgPan 	{@code ImagePanel} object.
-	 * 
 	 * */
 	public void setImagePanel( ImagePanel imgPan ) {
 		this.imgPan.setImage( imgPan.getImage() );
@@ -274,58 +257,46 @@ public class ImageView extends JInternalFrame implements Cloneable, Controllable
 		revalidate();
 	}
 	
-	
 	/**
-	 * 
 	 * Get {@code ImagePanel} attached with this {@code ImageView} in a 
 	 * manner that the modification of the {@code LImage} attached with
 	 * {@code ImagePanel} brings changes in {@code this ImageView}.
 	 * 
 	 * @return 			{@code ImagePanel} attached with this {@code ImageView}
-	 * 
 	 * */
 	public ImagePanel getImagePanel() {
 		return imgPan;
 	}
 	
-	
 	/**
-	 * 
 	 * Get non-edited or non-transformed original image.
-	 * @return img original image
 	 * 
+	 * @return img original image
 	 * */
 	public BufferedImage getActualImage() {
 		return src;
 	}
 	
-	
 	/**
-	 * 
 	 * Get edited or transformed image.
-	 * @return img copied image from original
 	 * 
+	 * @return img copied image from original
 	 * */
 	public BufferedImage getCurrentImage() {
 		return srcCopy;
 	}
 	
-	
 	/**
-	 * 
-	 * @return		{@code true} if {@code this ImageView} is closeable else returns {@code false}
-	 * 
+	 * @return		{@code True} if {@code this ImageView} is closeable else returns {@code false}
 	 * */
 	public boolean getCloseableState() {
 		return this.close;
 	}
 	
-	
 	@Override
 	public String getTitle() {
 		return this.title;
 	}
-	
 	
 	@Override
 	public void setTitle( String title ) {
@@ -334,19 +305,14 @@ public class ImageView extends JInternalFrame implements Cloneable, Controllable
 	
 	
 	/**
-	 * 
 	 * @return Properties of this {@code ImageView}.
-	 * 
 	 * */
 	public ImageViewProperties getProperties() {
 		return new ImageViewProperties( this );
 	}
 	
-	
 	/**
-	 * 
 	 * Mouse events handler for ImageView.
-	 * 
 	 * */
 	private class MouseEventsHandler extends MouseAdapter {
 		
@@ -360,35 +326,38 @@ public class ImageView extends JInternalFrame implements Cloneable, Controllable
 				//show available options
 				menu = new ImageViewMenu( self );
 				menu.show( self, e.getX(), e.getY() );
-				
 			}
-		}
-		
+		}	
 	}
 
-
 	@Override
-	public void addController( ControllerNode controller ) {
+	public void addSender( SenderNode controller ) {
 		controllers.add( controller );
 	}
-
-
+	
 	@Override
-	public List<ControllerNode> getControllers() {
+	public List<SenderNode> getSenders() {
 		return controllers;
 	}
 	
-	
 	@Override
-	public void updateNodePt() {
+	public void updateReceiverNodePt() {
 		controllableNode.start.x = this.getLocation().x;
 		controllableNode.start.y = this.getLocation().y + 30;
 	}
 	
-	
 	@Override
-	public NodePt getNodePt() {
+	public NodePt getReceiverNodePt() {
 		return controllableNode;
 	}
 	
+	@Override
+	public NodeType getNodeType() {
+		return NodeType.RECEIVER;
+	}
+
+	@Override
+	public ImageIcon getNodeIcon() {
+		return new ImageIcon( src );
+	}
 }

@@ -6,7 +6,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.GridBagConstraints;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.Toolkit;
@@ -16,17 +15,15 @@ import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.JWindow;
 
-import org.lemon.gui.image.PanelMode;
 import org.lemon.lang.LemonObject;
 import org.lemon.lang.NonNull;
 
 import sround.awt.RoundJTextField;
-
 
 @LemonObject( type = LemonObject.GUI_CLASS )
 /**
@@ -34,7 +31,7 @@ import sround.awt.RoundJTextField;
  * Create new canvas.
  * 
  * */
-public class ImageViewSetup extends JWindow implements ActionListener {
+public class ImageViewSetup extends JDialog implements ActionListener {
 	
 	/**
 	 * Serial UID
@@ -65,15 +62,13 @@ public class ImageViewSetup extends JWindow implements ActionListener {
 	private JPanel titleContainer = null;
 	private JPanel measureContainer = null;
 	
-	GridBagConstraints gbc = new GridBagConstraints();
+	//private static GridBagConstraints gbc = new GridBagConstraints();
 	
 	private Workspace workspace = null;
 	
 	/**
-	 * 
 	 * Constructs {@code ImageViewSetup} with specified {@code Workspace}.
 	 * @param wk		{@View} container
-	 * 
 	 * */
 	public ImageViewSetup( @NonNull Workspace wk ) {
 		
@@ -106,14 +101,12 @@ public class ImageViewSetup extends JWindow implements ActionListener {
 		main.add( createButtonPanel(), pos.nextCol() );
 		
 		var header = new Header( "New", 20 );
-		
 		header.setTitle( "New" );
 		titleFld.setText( "New" );
 		widthFld.setText( "300" );
 		heightFld.setText( "300" );
 		
 		Container c = getContentPane();
-		
 		c.setLayout( new BorderLayout() );
 		c.add( main, BorderLayout.CENTER );
 		c.add( header, BorderLayout.NORTH );
@@ -124,30 +117,21 @@ public class ImageViewSetup extends JWindow implements ActionListener {
 	
 	
 	/**
-	 * 
 	 * {@code JPanel} which holds the title of specific {@ImageView}.
-	 * 
 	 * */
 	private JPanel createTitlePanel() {
-		
 		titleContainer.setLayout( new FlowLayout( FlowLayout.LEFT ));
-		
 		titleContainer.add( titleLbl );
 		titleContainer.add( titleFld );
-		
 		return titleContainer;
 	}
 	
 	
 	/**
-	 * 
 	 * {@code JPanel} which holds the measurement fields.
-	 * 
 	 * */
 	private JPanel createMeasurementPanel() {
-		
 		measureContainer.setLayout( new GridLayout( 3, 2, 5, 5 ));
-		
 		measureContainer.add( widthFld );
 		measureContainer.add( createMeasureTypeComboBox() );
 		measureContainer.add( heightFld );
@@ -160,9 +144,7 @@ public class ImageViewSetup extends JWindow implements ActionListener {
 	
 	
 	/**
-	 * 
 	 * {@code JPanel} which holds the labels.
-	 * 
 	 * */
 	private JPanel createLabelPanel() {
 		
@@ -178,9 +160,7 @@ public class ImageViewSetup extends JWindow implements ActionListener {
 	
 	
 	/**
-	 * 
 	 * {@code JPanel} which holds the buttons.
-	 * 
 	 * */
 	private JPanel createButtonPanel() {
 		
@@ -194,9 +174,7 @@ public class ImageViewSetup extends JWindow implements ActionListener {
 	
 	
 	/**
-	 * 
 	 * Initialize the widgets.
-	 * 
 	 * */
 	private void init() {
 		
@@ -291,7 +269,6 @@ public class ImageViewSetup extends JWindow implements ActionListener {
 		return new Dimension( 580, 300 );
 	}
 	
-	
 	@Override
 	public void actionPerformed( ActionEvent e ) {
 		
@@ -301,7 +278,8 @@ public class ImageViewSetup extends JWindow implements ActionListener {
 			int height = Integer.parseInt( heightFld.getText() );
 			String title = titleFld.getText();
 			
-			var view = new CanvasView( width, height, Color.white, title, true, PanelMode.CANVAS_MODE );
+			var view = new CanvasView( width, height, Color.white, title, 
+					true, org.lemon.gui.image.ImagePanel.PanelMode.CANVAS_MODE, workspace.getLayerContainer() );
 			workspace.add( view );
 			workspace.revalidate();
 			

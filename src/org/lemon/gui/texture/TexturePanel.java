@@ -9,8 +9,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
 
+import org.lemon.graphics.Texture;
 import org.lemon.image.LImage;
-import org.lemon.image.Texture;
 
 public class TexturePanel extends JPanel {
 
@@ -23,7 +23,6 @@ public class TexturePanel extends JPanel {
 	
 	private JTextArea nameField = null;
 	private JLabel imgField = null;
-	
 	
 	public TexturePanel( Texture tx ) {
 		
@@ -41,8 +40,7 @@ public class TexturePanel extends JPanel {
 		
 		add( imgField, BorderLayout.CENTER );
 		add( nameField, BorderLayout.SOUTH );
-	}
-	
+	}	
 	
 	private void init() {
 		
@@ -58,9 +56,7 @@ public class TexturePanel extends JPanel {
 		};
 	}
 	
-	
 	public Texture getTexture() {
 		return texture;
 	}
-
 }

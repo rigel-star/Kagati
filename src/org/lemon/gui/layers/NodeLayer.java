@@ -1,23 +1,24 @@
 package org.lemon.gui.layers;
 
-import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 
 import org.lemon.gui.Layer;
+import org.lemon.gui.node.NodeComponent;
 
 /**
  * 
- * Like {@code Layer} which holds image, {@code NodeLayer} 
- * holds the {@code ControllerNode}s. For e.g. if any 
- * {@code ControllerNode} added to the program then it 
- * will be attached to the new {@code NodeLayer} and shown 
- * in {@code LayerContainer}. 
+ * Like {@link ViewLayer} which holds {@link ReceiverNode}s 
+ * (For e.g. {@link ImageView}), {@link NodeLayer} holds the 
+ * {@link SenderNode}s (For e.g. {@link BlurFilterNodeComponent}). 
+ * If any {@link SenderNode} added to the program then it 
+ * will be attached to the new {@link NodeLayer} and shown in 
+ * {@link LayerContainer}. 
  * <p>
- * {@code NodeLayer} won't not hold {@code ControllableNode}s 
- * because even if the {@code ControllableNode}s are nodes, 
+ * {@link NodeLayer} won't hold {@link ReceiverNode}s 
+ * because even if the {@link ReceiverNode}s are nodes, 
  * they belong to the view holder category because they hold 
- * images within themselves. So, {@code ControllableNode}s are 
- * attached with {@code Layer} instead of {@code NodeLayer}.
+ * images within themselves. So, {@link ReceiverNode}s are 
+ * attached with {@link ViewLayer} instead of {@link NodeLayer}.
  * 
  * @author Ramesh Poudel
  * 
@@ -26,31 +27,24 @@ public class NodeLayer implements Layer {
 	
 	private JComponent comp = null;
 	private String title = null;
-	private ImageIcon ic = null;
 	
-	public NodeLayer( JComponent comp, ImageIcon imgIcon, String title ) {
+	public NodeLayer( JComponent comp, String title ) {
 		this.comp = comp;
 		this.title = title;
-		this.ic = imgIcon;
+		if ( comp instanceof NodeComponent ) {
+			((NodeComponent) comp).attachLayer( this );
+		}
 	}
-	
-	
-	public ImageIcon getIcon() {
-		return ic;
-	}
-	
 	
 	@Override
-	public void setTitle(String title) {
+	public void setTitle( String title ) {
 		this.title = title;
 	}
-	
 	
 	@Override
 	public String getTitle() {
 		return title;
 	}
-	
 	
 	@Override
 	public JComponent getLayerComponent() {

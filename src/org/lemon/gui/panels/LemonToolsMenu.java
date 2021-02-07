@@ -12,24 +12,24 @@ import java.util.Map;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JColorChooser;
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
-import org.lemon.gui.ApplicationFrame;
+import org.lemon.gui.ColorPicker;
 import org.lemon.gui.ImageView;
 import org.lemon.gui.Workspace;
-import org.lemon.gui.drawing.image.DrawingCanvasOnImage;
-import org.lemon.gui.toolbars.BrushToolBar;
+import org.lemon.gui.canvas.DrawingCanvasOnImage;
+import org.lemon.gui.toolbars.BrushToolbar;
 import org.lemon.tools.select.PolygonalSelectTool;
 
-
-public class LemonToolsMenu extends JInternalFrame implements ActionListener{
-
-	private static final long serialVersionUID = 1L;
+public class LemonToolsMenu extends JInternalFrame implements ActionListener {
 	
+	/**
+	 * Serial UID
+	 * */
+	private static final long serialVersionUID = 1L;
 	
 	private JButton						pencilTool;
 	private JButton 					brushTool;
@@ -38,128 +38,82 @@ public class LemonToolsMenu extends JInternalFrame implements ActionListener{
 	private JButton						colPickerTool;
 	private JButton						handTool;
 	
-	
-	
 	private PolygonalSelectTool 		polyToolListener;
 	private DrawingCanvasOnImage		brushToolListener;
-
-	
 	
 	//panels
 	private JPanel 						right;
 	
-	private ApplicationFrame 			parent;
+	private Workspace 			workspace;
 	private JInternalFrame[]			contexts;
 	
-	
 	/**
-	 * All toolbars of application stored in a list.
+	 * Tool bars related to each tool.
 	 * */
 	private Map<JButton, JToolBar> 		toolMap = new HashMap<>();
 	
-	
-	/**
-	 * Tools menu for editing all sorts of canvas on application.
-	 * <p>
-	 * Only ImageView for now.
-	 * */
-	public LemonToolsMenu(ApplicationFrame parent) {
+	public LemonToolsMenu( Workspace workspace ) {
 		
-		//this.col = col;
-		this.parent = parent;
+		init();
+		this.workspace = workspace;
 		
-		right = new JPanel();
-		
-		right.setLayout(new BoxLayout(right, BoxLayout.Y_AXIS));
+		toolMap.put( brushTool, new BrushToolbar(null, null) );
 		
 		setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
-		
-		setResizable(true);
-		setClosable(false);
-		setSize(200, 300);
-		setVisible(true);
-		setBackground(Color.white);
-		setLocation(30, 40);
+		setResizable( true );
+		setClosable( false );
+		setSize( 200, 300 );
+		setVisible( true );
+		setBackground( Color.white );
+		setLocation( 30, 40 );
 		
 		addAll();
 		initListeners();
-		initToolMap();
 		
 		Container c = getContentPane();
-		c.add(right);
+		c.add( right );
+	}
+	
+	
+	/**
+	 * Init the widgets.
+	 * */
+	private void init() {
 		
+		this.handTool = new JButton();
+		handTool.setIcon( new ImageIcon( "icons/tools/move.png" ));
+		
+		this.right = new JPanel();
+		right.setLayout( new BoxLayout( right, BoxLayout.Y_AXIS ) );
+		
+		this.pencilTool = new JButton();
+		pencilTool.setIcon( new ImageIcon( "icons/tools/pencil.png" ));
+		
+		this.polySnappingTool = new JButton();
+		polySnappingTool.setIcon( new ImageIcon( "icons/tools/cutter.png" ));
+		
+		this.brushTool = new JButton();
+		brushTool.setIcon( new ImageIcon( "icons/tools/brush.png" ));
+		
+		this.cropTool = new JButton();
+		cropTool.setIcon( new ImageIcon( "icons/tools/crop.png" ));
+		
+		this.colPickerTool = new JButton( "COLOR" );
+		var color = Color.BLACK;
+		colPickerTool.setBackground( color );
+		colPickerTool.setForeground( color );
 	}
 	
 	
 	/*add all buttons (tools) to menu*/
 	private void addAll() {
-		right.add(createMoveTool());
-		right.add(createPencilTool());
-		right.add(createBrushTool());
-		right.add(createPolySelectTool());
-		right.add(createCropTool());
-		right.add(createColorPickerTool());
+		right.add( handTool );
+		right.add( pencilTool );
+		right.add( brushTool );
+		right.add( polySnappingTool );
+		right.add( cropTool );
+		right.add( colPickerTool );
 	}
-	
-	
-	
-	private void initToolMap() {
-		toolMap.put(brushTool, new BrushToolBar(parent.getGlobalProperties(), null));
-	}
-	
-	
-	/*create move tool*/
-	private JButton createMoveTool() {
-		this.handTool = new JButton();
-		handTool.setIcon(new ImageIcon("icons/tools/move.png"));
-		return handTool;
-	}
-	
-	
-	
-	/*create pencil tool button*/
-	private JButton createPencilTool() {
-		this.pencilTool = new JButton();
-		pencilTool.setIcon(new ImageIcon("icons/tools/pencil.png"));
-		return pencilTool;
-	}
-	
-	
-	/*create polygonal selection tool button*/
-	private JButton createPolySelectTool() {
-		this.polySnappingTool = new JButton();
-		polySnappingTool.setIcon(new ImageIcon("icons/tools/cutter.png"));
-		return polySnappingTool;
-	}
-	
-	
-	/*create brush tool button*/
-	private JButton createBrushTool() {
-		this.brushTool = new JButton();
-		brushTool.setIcon(new ImageIcon("icons/tools/brush.png"));
-		return brushTool;
-	}
-	
-	
-	/*create crop tool button*/
-	private JButton createCropTool() {
-		this.cropTool = new JButton();
-		cropTool.setIcon(new ImageIcon("icons/tools/crop.png"));
-		return cropTool;
-	}
-	
-	
-	/*create color picker tool*/
-	private JButton createColorPickerTool() {
-		this.colPickerTool = new JButton("COLOR");
-		
-		var color = this.parent.getGlobalProperties().getGLobalColor();
-		colPickerTool.setBackground(color);
-		colPickerTool.setForeground(color);
-		
-		return colPickerTool;
-	}
-	
 	
 	
 	/*init all components listeners*/
@@ -167,74 +121,73 @@ public class LemonToolsMenu extends JInternalFrame implements ActionListener{
 		this.handTool.addActionListener(this);
 		this.brushTool.addActionListener(this);
 		this.polySnappingTool.addActionListener(this);
-		this.colPickerTool.addActionListener(this);
+		this.colPickerTool.addActionListener( this );
 	}
 
 	
 	@Override
-	public void actionPerformed(ActionEvent e) {
+	public void actionPerformed( ActionEvent e ) {
 		
 		ImageView view = null;
-		Workspace workspace = parent.getMainWorkspace();
 		this.contexts = workspace.getAllFrames();
 		
-		
-		if(e.getSource() == this.handTool) {
+		if( e.getSource() == handTool ) {
 			
-			for(JInternalFrame c: contexts) {
+			for(JInternalFrame c: contexts ) {
 				
-				if(c instanceof ImageView) {
+				if( c instanceof ImageView ) {
 					
 				}
 			}
 		}
 		
-		else if(e.getSource() == this.brushTool) {
+		else if( e.getSource() == brushTool ) {
 			
-			for(JInternalFrame c: contexts) {
-				if(c instanceof ImageView) {
+			for( JInternalFrame c: contexts ) {
+				if( c instanceof ImageView ) {
 					view = (ImageView) c;
 					var pan = view.getImagePanel();
-					brushToolListener = new DrawingCanvasOnImage(pan, parent.getGlobalProperties().getGLobalColor());
+					brushToolListener = new DrawingCanvasOnImage(pan, Color.black);
 					ifImageView(pan, brushToolListener);
 					view.revalidateListeners();
 				} 
 			}
 		}
 		
-		else if(e.getSource() == this.polySnappingTool) {
+		else if(e.getSource() == polySnappingTool) {
 			
 			for(JInternalFrame c: contexts) {
 				if(c instanceof ImageView) {
 					view = (ImageView) c;
 					var pan = view.getImagePanel();
-					polyToolListener = new PolygonalSelectTool(pan.getImage(), pan);
+					polyToolListener = new PolygonalSelectTool(pan.getImage(), view);
 					ifImageView(pan, polyToolListener);
 					view.revalidateListeners();
 				}
 			}
 		}
 		
-		else if(e.getSource() == this.colPickerTool) {
+		else if(e.getSource() == colPickerTool) {
 			pickColor();
 		}
 		
-		parent.revalidate();
-		
+		workspace.revalidate();
 	}
-	
 	
 	
 	/**
 	 * Change the global color of application including BrushTool, PencilTool color
 	 * */
 	private void pickColor() {
-		var col = JColorChooser.showDialog(parent, "Color Picker", Color.white);
-		parent.getGlobalProperties().setGlobalColor(col);
-		colPickerTool.setForeground(col);
-		colPickerTool.setBackground(col);
+		//var col = JColorChooser.showDialog(parent, "Color Picker", Color.white);
+		var colPick = new ColorPicker( "Color Picker" );
+		var col = colPick.getColor();
+		
+		if( col != null ) {
+			colPickerTool.setForeground( col );
+			colPickerTool.setBackground( col );
+		}
 	}
-	
 	
 	
 	/*if the context is imageview*/
@@ -261,22 +214,21 @@ public class LemonToolsMenu extends JInternalFrame implements ActionListener{
 	
 	/*apply poly snapping tool to the specific container*/
 	private void applyPolySelectTool(JComponent container, PolygonalSelectTool tool) {
-		container.addMouseListener(tool);
-		container.addMouseMotionListener(tool);
+		container.addMouseListener( tool );
+		container.addMouseMotionListener( tool );
 	}
 	
 	
 	/*remove each and every mouse listener which is applied to the specific container*/
-	private void removePrevListeners(JComponent container) {
+	private void removePrevListeners( JComponent container ) {
 		var l1 = container.getMouseListeners();
 		var l2 = container.getMouseMotionListeners();
 		
-		for(MouseListener md: l1) {
-			container.removeMouseListener(md);
+		for( MouseListener md: l1 ) {
+			container.removeMouseListener( md );
 		}
-		for(MouseMotionListener md: l2) {
-			container.removeMouseMotionListener(md);
+		for( MouseMotionListener md: l2 ) {
+			container.removeMouseMotionListener( md );
 		}
 	}
-
 }

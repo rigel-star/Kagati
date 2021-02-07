@@ -137,8 +137,6 @@ public class ImageZoomAndPanListener extends JPanel {
         }
     }
 
-    
-    
     private Point2D.Float transformPoint(Point p1) throws NoninvertibleTransformException {
         AffineTransform inverse = coordTransform.createInverse();
         Point2D.Float p2 = new Point2D.Float();
@@ -146,12 +144,9 @@ public class ImageZoomAndPanListener extends JPanel {
         return p2;
     }
 
-    
-    
     public Dimension getPreferredSize() {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         return new Dimension(screenSize.width, screenSize.height);
     }
 
-    
 }

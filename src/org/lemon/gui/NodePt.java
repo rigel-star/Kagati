@@ -7,7 +7,7 @@ import java.util.Stack;
 import javax.swing.JComponent;
 
 import org.lemon.lang.LemonObject;
-import org.lemon.math.Vec2d;
+import org.lemon.math.Vec2;
 
 /**
  * 
@@ -31,84 +31,96 @@ import org.lemon.math.Vec2d;
 @LemonObject( type = LemonObject.HELPER_CLASS )
 public class NodePt {
 	
-	public Vec2d start = null, end = null, mid = null;
+	public Vec2 start = null, end = null, mid = null;
 	private JComponent  parent;
 	
 	private Stack<Node> cons = new Stack<>();
 	
-	
-	public NodePt( Vec2d start, Vec2d end ) {
-		this( start, end, null );
+	public enum NodePtType {
+		
+		RECEIVER,
+		SENDER
+		
 	}
 	
+	private NodePtType nodePtType = null;
 	
-	public NodePt( Vec2d start, Vec2d end, JComponent parent ) {
-		this.parent = parent;
+	public NodePt( Vec2 start ) {
+		this( start, null );
+	}
+	
+	public NodePt( Vec2 start, Vec2 end ) {
+		this( start, end, null, null );
+	}
+	
+	public NodePt( Vec2 start, Vec2 end, JComponent comp, NodePtType type ) {
+		this.parent = comp;
 		this.start = start;
 		this.end = end;
+		this.nodePtType = type;
 		
 		if( end != null )
 			this.mid = start.midpoint( end );
 	}
 	
-	
 	/**
-	 * 
 	 * Set start point for this {@link NodePt}.
 	 * @param start 	New start point.
 	 * 
 	 * */
-	public void setStart( Vec2d start ) {
+	public void setStart( Vec2 start ) {
 		this.start = start;
 	}
 	
-	
 	/**
-	 * 
 	 * Set end point for this {@link NodePt}.
 	 * @param end 	New end point.
 	 * 
 	 * */
-	public void setEnd( Vec2d end ) {
+	public void setEnd( Vec2 end ) {
 		this.end = end;
 		if( end != null )
 			this.mid = start.midpoint( end );
 	}
 	
-	
-	public void addConnection( ControllableNode controllable ) {
-		cons.push( controllable ); 
+	public void addConnection( Node node ) {
+		cons.push( node ); 
 	}
 	
-	
-	/**
-	 * 
+	/** 
 	 * @return Get {@code JComponent} attached with 
 	 * 			this {@link NodePt}.
-	 * 
 	 * */
 	public JComponent getComponent() {
 		return parent;
 	}
 	
-	
 	/**
-	 * 
 	 * @return Connections of this {@link NodePt} which are other 
 	 * 				{@link NodePt}'s.
-	 * 
 	 * */
 	public Stack<Node> getConnections() {
 		return cons;
 	}
 	
-	
 	/**
-	 * 
 	 * @return Get the {@code Shape} of this {@link NodePt}.
-	 * 
 	 * */
 	public Shape getDrawable() {
 		return new Ellipse2D.Double( start.x - 5, start.y - 5, 10, 10 );
-	}	
+	}
+	
+	/**
+	 * Set node point type.
+	 * */
+	public void setNodePtType( NodePtType type ) {
+		this.nodePtType = type;
+	}
+	
+	/**
+	 * Get node point type.
+	 * */
+	public NodePtType getNodePtType() {
+		return nodePtType;
+	}
 }

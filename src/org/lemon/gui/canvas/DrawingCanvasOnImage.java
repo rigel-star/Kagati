@@ -26,7 +26,6 @@ public class DrawingCanvasOnImage extends MouseAdapter {
 	private int newX, newY, oldX, oldY;
 	private Color sColor;
 	
-	
 	public DrawingCanvasOnImage(ImagePanel panel, Color c) {
 		//assigning globals
 		this.ip = panel;
@@ -35,7 +34,6 @@ public class DrawingCanvasOnImage extends MouseAdapter {
 		brushTool = new NormalBrushTool(g2d, c);
 		brushTool.setStrokeColor(sColor);
 	}
-	
 	
 	
 	public void setBrush(BrushTool brush) {
@@ -68,8 +66,6 @@ public class DrawingCanvasOnImage extends MouseAdapter {
 		oldY = newY;
 	}
 	
-
-	
 	
 	@Override
 	public void mouseDragged(MouseEvent e) {
@@ -89,11 +85,9 @@ public class DrawingCanvasOnImage extends MouseAdapter {
 	}
 
 	
-	
 	@Override
 	public void mouseMoved(MouseEvent e) {
 		var cursor = new Cursor(Cursor.CROSSHAIR_CURSOR);
 		this.ip.setCursor(cursor);
 	}
-	
 }

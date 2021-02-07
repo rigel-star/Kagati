@@ -48,42 +48,60 @@ public class ImagePanel extends JPanel {
 	 * */
 	private MouseAdapter currentMouseListsner;
 	
-	private final Dimension MAX_IMG_SIZE = new Dimension(500, 500); 
-	
+	private final Dimension MAX_IMG_SIZE = new Dimension(500, 500);
 	
 	/**
 	 * 
-	 * Constructs {@code ImagePanel} with null image and 
-	 * DEFAULT {@code PanelMode}.
+	 * {@code ImagePanel} will perform the task as per which 
+	 * mode is applied to that {@code ImagePanel}. 
 	 * 
 	 * */
-	public ImagePanel() {
+	public enum PanelMode {
 		
+		/**
+		 * Default mode for {@code ImagePanel} states that, 
+		 * the {@code ImagePanel} can do nothing and nor tool
+		 *  is selected is selected.
+		 * */
+		DEFAULT_MODE,
+		
+		/**
+		 * Canvas mode for {@code ImagePanel} states that, 
+		 * {@code BrushTool} or other painting task is currently selected.
+		 * */
+		CANVAS_MODE,
+		
+		/**
+		 * Snap mode for {@code ImagePanel} states that, 
+		 * {@code SelectionTool} is selected.
+		 * */
+		SNAP_MODE,	
 	}
 	
+	/**
+	 * Constructs {@code ImagePanel} with null image and 
+	 * DEFAULT {@code PanelMode}.
+	 * */
+	public ImagePanel() {}
 	
 	/**
-	 * 
 	 * Constructs {@code ImagePanel} with image.
-	 * @param img 		Image for {@code this ImagePanel}.
 	 * 
+	 * @param img 		Image for {@code this ImagePanel}.
 	 * */
 	public ImagePanel( BufferedImage img ) {
 		this( img, PanelMode.DEFAULT_MODE );
 	}
 	
-	
 	/**
-	 * 
 	 * Constructs {@code ImagePanel} with image and {@code PanelMode}.
+	 * 
 	 * @param img 		Image for {@code this ImagePanel}.
 	 * @param mode		{@code PanelMode} for {@code this ImagePanel}.
-	 * 
 	 * */
 	public ImagePanel(BufferedImage img, PanelMode mode) {
 		this.src = img;
 		this.panelMode = mode;
-		
 		
 		if( src != null ) {
 			this.src = img;
@@ -120,7 +138,6 @@ public class ImagePanel extends JPanel {
 		initPanelMode( mode );
 	}
 	
-	
 	@Override
 	protected void paintComponent( Graphics g ) {
 		super.paintComponent(g);
@@ -131,12 +148,9 @@ public class ImagePanel extends JPanel {
         g2.dispose();
 	}
 	
-	
 	/**
-	 * 
 	 * Check and set the specified {@code PanelMode} on this {@code ImagePanel}.
 	 * @param mode 		{@code PanelMode}
-	 * 
 	 * */
 	private void initPanelMode( PanelMode mode ) {
 		switch( mode ) {
@@ -155,39 +169,29 @@ public class ImagePanel extends JPanel {
 		}
 		break;
 		
-		default: {
+		default:
 			break;
-		}
-		
 		}
 	}
 	
-	
 	/**
-	 * 
 	 * Returns currently applied canvas mouse listener if applied else returns {@code null}.
-	 * @return {@code DrawingCanvasOnImage} current canvas mouse listener.
 	 * 
+	 * @return {@code DrawingCanvasOnImage} current canvas mouse listener.
 	 * */
 	public DrawingCanvasOnImage getCanvasModeListener() {
 		return brushToolListener;
 	}
 	
-	
 	/**
-	 * 
 	 * @return {@code MouseAdapter} currently applied mouse listener.
-	 * 
 	 * */
 	public MouseAdapter getCurrentMouseListener() {
 		return currentMouseListsner;
 	}
 	
-	
 	/**
-	 * 
 	 * @param panelMode Mode for this {@code ImagePanel}
-	 * 
 	 * */
 	public void setPanelMode( PanelMode panelMode ) {
 		this.panelMode = panelMode;
@@ -195,27 +199,20 @@ public class ImagePanel extends JPanel {
 	
 	
 	/** 
-	 * 
 	 * @return Current {@code PanelMode}.
-	 * 
 	 * */
 	public PanelMode getPanelMode() {
 		return panelMode;
 	}
 	
-	
 	/**
-	 * 
 	 * @return	Current image which is applied to {@code this} {@code ImagePanel}.
-	 * 
 	 * */
 	public BufferedImage getImage() {
 		return src;
 	}
 	
-	
 	/**
-	 * 
 	 * Get non-edited or non-transformed original image.
 	 * @return img original image
 	 * 
@@ -224,35 +221,27 @@ public class ImagePanel extends JPanel {
 		return src;
 	}
 	
-	
 	/**
-	 * 
 	 * Get edited or transformed image.
 	 * @return img copied image from original
-	 * 
 	 * */
 	public BufferedImage getCurrentImage() {
 		return srcCopy;
 	}
-	
 	
 	@Override
 	public Dimension getPreferredSize() {
 		return new Dimension( src.getWidth(), src.getHeight() );
 	}
 	
-	
-	/**
-	 * 
+	/** 
 	 * Sets the new image to {@code this ImagePanel}.
 	 * @param img	{@code BufferedImage} object.
-	 * 
 	 * */
 	public void setImage( BufferedImage imgg ) {
 		this.src = imgg;
 		//this.imgContainer.setIcon( new ImageIcon( imgg ));
 	}
-	
 	
 	public boolean hasAreaSelected() {
 		boolean has = false;
@@ -261,7 +250,6 @@ public class ImagePanel extends JPanel {
 		}
 		return has;
 	}
-	
 	
 	@Override
 	public String toString() {

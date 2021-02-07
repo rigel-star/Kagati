@@ -1,38 +1,94 @@
 package org.lemon.gui.menus;
 
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
-public class Menu3D extends JMenu {
+import org.lemon.filter.gui.FilterPanelWindow;
+import org.lemon.filter.gui.LightFilterPanel;
+import org.lemon.gui.ImageView;
+import org.lemon.gui.Workspace;
+
+public class Menu3D extends JMenu implements ActionListener {
+	
+	/**
+	 * Serial UID
+	 * */
 	private static final long serialVersionUID = 1L;
 	
-	
 	private JMenu light3d;
+	private JMenu object3d;
 	
 	/*types of lights*/
 	private JMenuItem spotLight;
 	private JMenuItem infiniteLight;
 	
+	/*types of objects*/
+	private JMenuItem circle3d;
+	private JMenuItem square3d;
 	
-	public Menu3D(Object container) {
+	private Workspace wks = null;
+	
+	public Menu3D( Workspace wk ) {
 		
-		setText("3D");
+		this.wks = wk;
+		setText( "3D" );
+		
 		light3d = createLight3dMenu();
+		object3d = createObject3dMenu();
 		
-		add(light3d);
+		add( light3d );
+		add( object3d );
 	}
 	
-	
+	/**
+	 * Create menu which contains options for lights.
+	 * 
+	 * @return {@code JMenu} containing all lights.
+	 * */
 	private JMenu createLight3dMenu() {
-		var l3d = new JMenu("Light");
+		var l3d = new JMenu( "Light" );
 		
-		spotLight = new JMenuItem("Spot Light");
-		infiniteLight = new JMenuItem("Infinite Light");
+		spotLight = new JMenuItem( "Spot" );
+		spotLight.addActionListener( this );
 		
-		l3d.add(spotLight);
-		l3d.add(infiniteLight);
+		infiniteLight = new JMenuItem( "Infinite" );
+		infiniteLight.addActionListener( this );
+		
+		l3d.add( spotLight );
+		l3d.add( infiniteLight );
 		
 		return l3d;
 	}
+	
+	/**
+	 * Create menu which contains options for 3d objects.
+	 * 
+	 * @return {@code JMenu} containing all objects.
+	 * */
+	private JMenu createObject3dMenu() {
+		var o3d = new JMenu( "Object" );
+		
+		circle3d = new JMenuItem( "Circle" );
+		square3d = new JMenuItem( "Square" );
+		
+		o3d.add( circle3d );
+		o3d.add( square3d );
+		
+		return o3d;
+	}
 
+	@Override
+	public void actionPerformed( ActionEvent e ) {
+		
+		Component comp = wks.getSelectedFrame();
+		
+		if ( e.getSource() == spotLight ) {
+			LightFilterPanel lip = new LightFilterPanel( (ImageView) comp );
+			new FilterPanelWindow( lip );
+		}
+	}
 }

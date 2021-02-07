@@ -22,7 +22,6 @@ public class LayerList extends JList<Layer> {
 		setCellRenderer( renderer );
 	}
 	
-	
 	public void refresh() {
 		for( Enumeration<Layer> enu = model.elements(); enu.hasMoreElements(); ) {
 			Layer layer  = enu.nextElement();
@@ -30,16 +29,13 @@ public class LayerList extends JList<Layer> {
 		}
 	}
 	
-	
 	public void add( Layer l ) {
 		model.addElement( l );
 	}
 	
-	
 	public int getLayerCount() {
 		return model.size();
 	}
-	
 	
 	public void remove( Layer l ) {
 		model.removeElement( l );

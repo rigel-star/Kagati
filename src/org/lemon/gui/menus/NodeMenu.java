@@ -1,17 +1,19 @@
 package org.lemon.gui.menus;
 
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
-import org.lemon.gui.ImageView;
+import org.lemon.gui.Layer;
+import org.lemon.gui.LayerContainer;
 import org.lemon.gui.Workspace;
-import org.lemon.gui.node.BlurFilterNode;
-import org.lemon.gui.node.HSBAdjustNode;
-import org.lemon.gui.node.TextureNode;
+import org.lemon.gui.layers.NodeLayer;
+import org.lemon.gui.node.BlurFilterNodeComponent;
+import org.lemon.gui.node.HSBAdjustNodeComponent;
+import org.lemon.gui.node.TextureNodeComponent;
 
 public class NodeMenu extends JMenu implements ActionListener {
 	
@@ -21,27 +23,26 @@ public class NodeMenu extends JMenu implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	
 	private JMenuItem blur, hsbControl, texture;
-	
 	private Workspace workspace;
 	
-	
+	/**
+	 * 
+	 * @param 	workspace
+	 * */
 	public NodeMenu( Workspace workspace ) {
 		
 		this.workspace = workspace;
 		
 		setText( "Node" );
-		
 		init();
 		addAll();
 	}
-	
 	
 	private void init() {
 		this.blur = new JMenuItem( "Blur" ) ;
 		this.hsbControl = new JMenuItem( "HSB" );
 		this.texture = new JMenuItem( "Texture" );
 	}
-	
 	
 	private void addAll() {
 		
@@ -56,32 +57,32 @@ public class NodeMenu extends JMenu implements ActionListener {
 		
 	}
 
-
 	@Override
 	public void actionPerformed( ActionEvent e ) {
 		
-		Component node = null;
-		Component selected = workspace.getSelectedFrame();;
-
+		JComponent node = null;
+		Layer layer = null;
+		LayerContainer lycont = workspace.getLayerContainer();
+		
 		if( e.getSource() == hsbControl ) {
-			
-			if( selected instanceof ImageView ) {
-				var v = (ImageView) workspace.getSelectedFrame();
-				node = new HSBAdjustNode( v, v.getImagePanel().getImage() );
-			}
+			node = new HSBAdjustNodeComponent( lycont );
+			layer = new NodeLayer( node, "HSB Node" );
 		}
-		
 		else if( e.getSource() == blur ) {
-			node = new BlurFilterNode();
+			node = new BlurFilterNodeComponent( lycont );
+			layer = new NodeLayer( node, "Blur Node" );
+		}
+		else if( e.getSource() == texture ) {
+			node = new TextureNodeComponent( lycont );
+			layer = new NodeLayer( node, "Texture Node" );
 		}
 		
-		else if( e.getSource() == texture ) {
-			node = new TextureNode();
-		}
+		lycont.addLayer( layer );
+		lycont.revalidate();
 		
 		workspace.add( node );
 		workspace.fetchNodes();
-		workspace.refresh();
+		workspace.refreshListeners();
 		workspace.revalidate();
 	}	
 }

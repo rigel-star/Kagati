@@ -7,15 +7,17 @@ import java.awt.FlowLayout;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import org.lemon.gui.layers.ViewLayer;
+import org.lemon.gui.node.ReceiverNode;
+import org.lemon.gui.node.SenderNode;
 import org.lemon.gui.layers.LayerList;
 import org.lemon.gui.layers.NodeLayer;
-import org.lemon.gui.node.NodePt;
 
 public class LayerContainer extends JInternalFrame {
 	
@@ -26,18 +28,13 @@ public class LayerContainer extends JInternalFrame {
 		
 	private LayerList layerList = new LayerList();
 	private JScrollPane scroll = new JScrollPane(layerList);
-	private Workspace workspace = null;
 
 	private Layer background = null;
 	
 	/**
-	 * 
-	 * @param workspace		Default workspace.
-	 *
+	 * @param
 	 **/
-	public LayerContainer( Workspace workspace ) {
-		
-		this.workspace = workspace;
+	public LayerContainer() {
 		
 		setTitle( "Layers" );
 		setClosable( false );
@@ -48,11 +45,14 @@ public class LayerContainer extends JInternalFrame {
 		
 		add( scroll );
 		add( new BottomMenu(), BorderLayout.SOUTH );
-		
 		setVisible( true );
 	}
 	
-	
+	/**
+	 * Add layer to layer container.
+	 * 
+	 * @param layer 	{@link Layer} to add.
+	 * */
 	public void addLayer( Layer layer ) {
 		
 		if( layer instanceof ViewLayer ) {
@@ -60,36 +60,33 @@ public class LayerContainer extends JInternalFrame {
 			var vlay = (ViewLayer) layer;
 			if( vlay.getProperty() == ViewLayer.BACKGROUND_LAYER || getLayerCount() == 0 ) {
 				
-				if( background != null ) {
+				if( background != null ) 
 					vlay.setTitle( "Layer" );
-				}
+				else
+					vlay.setTitle( "Background" );
 				
-				vlay.setTitle( "Background" );
 				background = vlay;
 			}
 		}
-		
-		else if( layer instanceof NodeLayer ) {
-			
-			var nlay = (NodeLayer) layer;
-			background = nlay;
-		}
+		else if( layer instanceof NodeLayer )
+			background = (NodeLayer) layer;
 		
 		layerList.add( layer );
 		scroll.revalidate();
 	}
 	
+	public void removeLayer( Layer ly ) {
+		layerList.remove( ly );
+	}
 	
 	public int getLayerCount() {
 		return layerList.getLayerCount();
 	}
 	
-	
 	@Override
 	public Dimension getPreferredSize() {
 		return new Dimension( 150, 200 );
 	}
-	
 	
 	/**
 	 * Lies in the bottom of LayerContainer. This class contains command like for deleting or copying layers.
@@ -114,17 +111,14 @@ public class LayerContainer extends JInternalFrame {
 			add( deleteLayerBtn );
 		}
 		
-		
 		/**
-		 * 
-		 * init widgets for bottom menu
-		 * 
+		 * Init widgets for bottom menu.
 		 * */
 		private void init() {
 			
 			this.newLayerBtn = new JButton( "New" );
 			
-			this.copyLayerBtn = new JButton("Cop");
+			this.copyLayerBtn = new JButton("Copy");
 			copyLayerBtn.addActionListener(action -> {
 				
 			});	
@@ -138,8 +132,8 @@ public class LayerContainer extends JInternalFrame {
 				
 				case 0: {
 					Layer lay = layerList.getSelectedValue();
-					if( lay.getLayerComponent() instanceof ControllableNode ) {
-						var fcon = (ControllableNode) lay.getLayerComponent();
+					if( lay.getLayerComponent() instanceof ReceiverNode ) {
+						ReceiverNode fcon = (ReceiverNode) lay.getLayerComponent();
 						/*
 						 * Setting node position null cause workspace will 
 						 * paint node even if the component is 
@@ -147,30 +141,23 @@ public class LayerContainer extends JInternalFrame {
 						 * So if we set node to null then workspace 
 						 * wont get any position to paint node.
 						 */
-						fcon.getNodePt().start = null;
+						fcon.getReceiverNodePt().start = null;
 					}
-					else if( lay.getLayerComponent() instanceof ControllerNode ) {
-						var fcon = (ControllerNode) lay.getLayerComponent();
+					else if( lay.getLayerComponent() instanceof SenderNode ) {
+						SenderNode fcon = (SenderNode) lay.getLayerComponent();
 						//read upper comment to understand why im setting node positions null
-						for( NodePt node: fcon.getNodePts() ) {
+						for( NodePt node: fcon.getSenderNodePts() ) {
 							node.start = null;
 						}
 					}
-					
-					workspace.remove(lay.getLayerComponent());
-					layerList.remove(lay);
-					workspace.revalidate();
+					JComponent jc = lay.getLayerComponent();
+					((JInternalFrame) jc).dispose();
+					layerList.remove( lay );
 				}
 				break;
 				}
-				
 				revalidate();
-			});
-			
-			
-		}
-		
+			});	
+		}		
 	}
-	
-	
 }

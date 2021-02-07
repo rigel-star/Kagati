@@ -3,6 +3,7 @@ package org.lemon.gui.layers;
 import javax.swing.JComponent;
 
 import org.lemon.gui.Layer;
+import org.lemon.gui.node.NodeComponent;
 
 public class ViewLayer implements Layer {
 
@@ -23,20 +24,15 @@ public class ViewLayer implements Layer {
 		this( comp, "Layer", NORMAL_LAYER );
 	}
 	
-	
 	/**
-	 * 
 	 * @param comp 		the image container
 	 * @param title 	title for the {@code Layer}
-	 * 
 	 * */
 	public ViewLayer( JComponent comp, String title ) {
 		this( comp, title, NORMAL_LAYER );
 	}
 	
-	
 	/**
-	 * 
 	 * @param comp 		the image container
 	 * @param property 	property of the {@code Layer}
 	 * 
@@ -45,9 +41,7 @@ public class ViewLayer implements Layer {
 		this( comp, "Layer", NORMAL_LAYER );
 	}
 	
-	
 	/**
-	 * 
 	 * @param comp 		the image container
 	 * @param title 	title for the {@code Layer}
 	 * @param property 	Property of the {@code Layer}
@@ -57,30 +51,29 @@ public class ViewLayer implements Layer {
 		this.comp = comp;
 		this.title = title;
 		this.property = property;
+		
+		if ( comp instanceof NodeComponent ) {
+			((NodeComponent) comp).attachLayer( this );
+		}
 	}
-	
 	
 	public void setProperty( int property ) {
 		this.property = property;
 	}
 	
-	
 	public int getProperty() {
 		return property;
 	}
-	
 	
 	@Override
 	public void setTitle( String  title ) {
 		this.title = title;
 	}
-
 	
 	@Override
 	public String getTitle() {
 		return title;
 	}
-	
 	
 	@Override
 	public JComponent getLayerComponent() {

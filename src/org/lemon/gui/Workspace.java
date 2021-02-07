@@ -11,17 +11,26 @@ import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Line2D;
-import java.awt.geom.QuadCurve2D;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 
+import org.lemon.gui.node.ReceiverNode;
+import org.lemon.gui.node.SenderNode;
+import org.lemon.gui.node.SenderUtilityNode;
 import org.lemon.lang.LemonObject;
-import org.lemon.utils.Pair;
 
-
+/**
+ * 
+ * Main workspace of this application which contains all the 
+ * {@link ImageView}s and {@link Node}s opened in application. 
+ * Workspace is main requirement for all menus because menus need 
+ * to access {@link ImageView} and {@link Node} currently selected 
+ * by user.
+ * 
+ * */
 @LemonObject( type = LemonObject.GUI_CLASS )
 public class Workspace extends JDesktopPane implements ComponentListener {
 	
@@ -30,33 +39,31 @@ public class Workspace extends JDesktopPane implements ComponentListener {
 	 * */
 	private static final long serialVersionUID = 1L;
 	
-	private List<NodePt> nodes = new ArrayList<NodePt>();
-	private List<ControllableNode> fcontrollables = new ArrayList<>();
-	private List<ControllerNode> fcontrollers = new ArrayList<>();
+	private List<NodePt> nodePts = new ArrayList<>();
+	private List<ReceiverNode> receiverNodes = new ArrayList<>();
+	private List<SenderNode> senderNodes = new ArrayList<>();
+	private List<SenderUtilityNode> senderUtilNodes = new ArrayList<>();
 	
-	private Graphics2D wpGraphics = null;
 	private Line2D.Double connect = null;
 	private Color nodeColor = new Color(55, 164, 237);
 	
 	/**
 	 * 
-	 * This boolean value will be checked when connecting the nodes.
-	 * While connecting the nodes, the workspace have to be repainted 
-	 * everytime to show the connecting line in real time.
-	 * But while repainting the workspace, every node will be rechecked 
+	 * While repainting the workspace, every node will be rechecked 
 	 * and repainted on every repaint() method call and
 	 * it is long process. So, to avoid the node reinitializing process, 
 	 * this will check if the nodes are getting connected.
 	 * If the nodes are getting connected this will avoid node reinitialization.
-	 * See {@code paintComponent} method to understand what i'm talking about.
 	 * 
 	 * */
 	private boolean connectingNode = false;
 	
+	private LayerContainer lyc;
 	
 	//TODO:: remove null nodes
-	public Workspace() {
+	public Workspace( LayerContainer lyc ) {
 		
+		this.lyc = lyc;
 		setSize( 5000, 5000 );
 		setBackground( new Color( 160, 160, 160 ));
 		setVisible( true );
@@ -72,16 +79,22 @@ public class Workspace extends JDesktopPane implements ComponentListener {
 	@Override
 	public void paintComponent( Graphics g ) {
 		super.paintComponent( g );
-		wpGraphics = (Graphics2D) g;
+		Graphics2D wpGraphics = (Graphics2D) g;
 		
-		fcontrollables.stream().forEach( fc -> {
-			var node = fc.getNodePt();
-			drawNode( wpGraphics, node );
+		receiverNodes.stream().forEach( fc -> {
+			var node = fc.getReceiverNodePt();
+			drawNodeLine( wpGraphics, node );
 		});
 		
-		fcontrollers.stream().forEach( fc -> {
-			for( NodePt node: fc.getNodePts() ) {
-				drawNode( wpGraphics, node );
+		senderNodes.stream().forEach( fc -> {
+			for( NodePt node: fc.getSenderNodePts() ) {
+				drawNodeLine( wpGraphics, node );
+			}
+		});
+		
+		senderUtilNodes.stream().forEach( sunode -> {
+			for( NodePt npt: sunode.getNodePts() ) {
+				drawNodeLine( wpGraphics, npt );
 			}
 		});
 		
@@ -92,191 +105,182 @@ public class Workspace extends JDesktopPane implements ComponentListener {
 		}
 	}
 	
-	
 	/**
-	 * 
 	 * Refresh's all the listeners.
-	 * 
-	 * */
-	public void refresh() {
+	 **/
+	public void refreshListeners() {
 		
 		for( Component c: getComponents() ) {
 			if( c.getComponentListeners().length == 0 )
 				c.addComponentListener( this );
 		}
-		
 	}
 	
-	
 	/**
-	 * 
 	 * Fetch all the nodes.
-	 * 
 	 * */
 	public void fetchNodes() {
+		
 		for( Component c: getComponents() ) {
-			if( c instanceof ControllerNode ) {
-				var con = (ControllerNode) c;
+			
+			if( c instanceof SenderNode ) {
+				var con = (SenderNode) c;
 				
-				if( !fcontrollers.contains( con ) )
-					fcontrollers.add( con );
+				if( !senderNodes.contains( con ) )
+					senderNodes.add( con );
 
-				for( NodePt node: con.getNodePts() ) {
-					if( !nodes.contains( node )) {
-						nodes.add( node );
-					}
-					
+				for( NodePt node: con.getSenderNodePts() ) {
+					if( !nodePts.contains( node )) {
+						nodePts.add( node );
+					}		
 				}
 			}
-			else if( c instanceof ControllableNode ) {
-				var fc = (ControllableNode) c;
+			else if( c instanceof ReceiverNode ) {
+				var fc = (ReceiverNode) c;
 				
-				if( !fcontrollables.contains( fc ) )
-					fcontrollables.add( fc );
+				if( !receiverNodes.contains( fc ) )
+					receiverNodes.add( fc );
 				
-				if( !nodes.contains( fc.getNodePt() )) {
-					nodes.add( fc.getNodePt() );
+				if( !nodePts.contains( fc.getReceiverNodePt() )) {
+					nodePts.add( fc.getReceiverNodePt() );
+				}
+			}
+			else if( c instanceof SenderUtilityNode ) {
+				var sunode = (SenderUtilityNode) c;
+				
+				for( NodePt npt: sunode.getNodePts() ) {
+					if( !nodePts.contains( npt ))
+						nodePts.add( npt );
 				}
 			}
 		}
 	}
-
-	
-	private void drawNode(Graphics2D g2d, NodePt node) {
-		g2d.setPaint(nodeColor);
-		
-		if(node != null && node.start != null) {
-			g2d.fillOval((int) node.start.x - 5, (int) node.start.y - 5, 10, 10);
-			g2d.setPaint(Color.white);
-			g2d.drawOval((int) node.start.x - 5, (int) node.start.y - 5, 10, 10);
-			
-			if(connectingNode)
-				return;
-			
-			if( node.getComponent() instanceof ControllableNode ) {
-				
-			}
-			else if( node.getComponent() instanceof ControllerNode ) {
-			
-				node.getConnections().forEach(nd -> {
-					
-					ControllableNode c = (ControllableNode) nd;
-					g2d.setPaint( Color.white );
-					g2d.setStroke( new BasicStroke( 1 ) );
-					
-					/*
-					var curve = new QuadCurve2D.Double((int) node.start.x, (int) node.start.y,
-														(int) node.mid.x, (int) node.mid.y,
-														(int) node.end.x, (int) node.end.y);								
-					*/
-					if( c.getNodePt().start != null ) {
-						var line = new Line2D.Double( node.start.x, node.start.y, c.getNodePt().start.x, c.getNodePt().start.y);
-						g2d.draw( line );
-					}
-				});
-			}
-			
-			return;
-		}
-		
-	}
-	
-	
-	private void updateNodes() {
-		
-		fcontrollables.forEach(fc -> {
-			if(fc.getNodePt().start != null)
-				fc.updateNodePt();
-		});
-		
-		fcontrollers.forEach(fc -> {
-			for(NodePt node: fc.getNodePts()) {
-				if(node.start != null) {
-					fc.updateNodePts();
-				}
-			}
-		});
-		repaint();
-	}
-	
 	
 	/**
-	 * Drawing curve between two connections.
+	 * Draw {@link NodePt.getDrawable}.
+	 * 
+	 * @param g2d 		{@code Graphics2D} to draw on
+	 * @param nodePt 	Node to draw.
+	 * @return
+	 * 
 	 * */
-	public void draw( Graphics2D g2d, Pair p ) {
-		g2d.setPaint( Color.white );
-		g2d.setStroke( new BasicStroke( 3 ) );
+	private void drawNodeLine( Graphics2D g2d, NodePt nodePt ) {
+		g2d.setPaint( nodeColor );
 		
-		var v1 = p.getFirstPoint();
-		var v2 = p.getSecondPoint();
-		var start = p.getFirstComponent();
-		var end = p.getSecondComponent();
-		
-		var begin = new Point((int) v1.x + start.getWidth(),
-				(int) v1.y + (start.getHeight() / 2));
-		
-		var stop = new Point((int) v2.x,
-				(int) v2.y + (end.getHeight() / 2));
-		
-		var ctrlPoint = v1.midpoint(v2);
-		
-		var curve = new QuadCurve2D.Double( begin.x, begin.y,
-															ctrlPoint.x, ctrlPoint.y,
-																stop.x, stop.y );
-		g2d.fillOval( begin.x - 5, begin.y, 10, 10 );
-		g2d.fillOval( stop.x - 5, stop.y, 10, 10 );
-		g2d.draw( curve );
-		
+		if( nodePt != null ) {
+			if( nodePt.start != null ) {
+				
+				g2d.fillOval( (int) nodePt.start.x - 5, (int) nodePt.start.y - 5, 10, 10 );
+				g2d.setPaint( Color.white );
+				g2d.drawOval( (int) nodePt.start.x - 5, (int) nodePt.start.y - 5, 10, 10 );
+				
+				if( connectingNode )
+					return;
+				
+				if( nodePt.getComponent() instanceof ReceiverNode ) {
+					
+				}
+				else if( nodePt.getComponent() instanceof SenderNode ) {
+				
+					nodePt.getConnections().forEach( nd -> {
+						
+						ReceiverNode c = (ReceiverNode) nd;
+						g2d.setPaint( Color.white );
+						g2d.setStroke( new BasicStroke( 1 ));
+						
+						if( c.getReceiverNodePt().start != null ) {
+							var line = new Line2D.Double( nodePt.start.x, nodePt.start.y, c.getReceiverNodePt().start.x, c.getReceiverNodePt().start.y);
+							g2d.draw( line );
+						}
+					});
+				}
+				else if( nodePt.getComponent() instanceof SenderUtilityNode ) {
+					
+				}
+			}
+		}
 	}
 	
+	/**
+	 * Update all the Node components.
+	 * */
+	private void updateNodes() {
+		
+		receiverNodes.forEach( fc -> {
+			if( fc.getReceiverNodePt().start != null )
+				fc.updateReceiverNodePt();
+		});
+		
+		senderNodes.forEach( fc -> {
+			for( NodePt node: fc.getSenderNodePts() ) {
+				if( node.start != null ) {
+					fc.updateSenderNodePts();
+				}
+			}
+		});
+		
+		senderUtilNodes.forEach( sutil -> {
+			for( NodePt npt: sutil.getNodePts() ) {
+				if(npt.start != null ) {
+					sutil.updateNodePts();
+				}
+			}
+		});
+		
+		repaint();
+	}
 
 	@Override
-	public void componentResized(ComponentEvent e) {
+	public void componentResized( ComponentEvent e ) {
+		updateNodes();
+	}
+	
+	@Override
+	public void componentMoved( ComponentEvent e ) {
+		updateNodes();
+	}
+	
+	@Override
+	public void componentShown( ComponentEvent e ) {
 		updateNodes();
 	}
 
 	@Override
-	public void componentMoved(ComponentEvent e) {
-		updateNodes();
-	}
-
-	@Override
-	public void componentShown(ComponentEvent e) {
-		updateNodes();
-	}
-
-	@Override
-	public void componentHidden(ComponentEvent e) {
+	public void componentHidden( ComponentEvent e ) {
 		updateNodes();
 	}
 	
-	
-	
+	/**
+	 * 
+	 * Mouse handler for nodes.
+	 * 
+	 * */
 	class MouseHandler extends MouseAdapter {
 		
 		public MouseHandler() {}
 		
 		private Point start = null, end = null;
-		private NodePt startNode = null, endNode;
+		private NodePt startNodePt = null, endNodePt = null;
 		
 		@Override
-		public void mousePressed(MouseEvent e) {
-			super.mousePressed(e);
+		public void mousePressed( MouseEvent e ) {
+			super.mousePressed( e );
 			
-			for(NodePt node: nodes) {
-				if(node.getDrawable().contains(e.getX(), e.getY())) {
+			final int x = e.getX();
+			final int y = e.getY();
+			for( NodePt node: nodePts ) {
+				if( node.getDrawable().contains( x, y )) {
 					start = e.getPoint();
 					end = start;
-					startNode = node;
+					startNodePt = node;
 					break;
 				}
 			}
 		}
 		
-		
 		@Override
-		public void mouseDragged(MouseEvent e) {
-			super.mouseDragged(e);
+		public void mouseDragged( MouseEvent e ) {
+			super.mouseDragged( e );
 			
 			connectingNode = true;
 			
@@ -287,23 +291,22 @@ public class Workspace extends JDesktopPane implements ComponentListener {
 			}
 		}
 		
-		
 		@Override
 		public void mouseReleased( MouseEvent e ) {
 			super.mouseReleased( e );
 			
-			for( NodePt node: nodes ) {
+			for( NodePt node: nodePts ) {
 				if( node.getDrawable().contains( end )) {
-					if( !startNode.equals( node )) { //if start and end node are not same
-						endNode = node;
+					if( !startNodePt.equals( node )) { //if start and end node are not same
+						endNodePt = node;
 					} else {
 						return;
 					}
 				}
 			}
 			
-			if( startNode != null && endNode != null ) {
-				connectNodes( startNode, endNode );
+			if( startNodePt != null && endNodePt != null ) {
+				connectNodes( startNodePt, endNodePt );
 			}
 			
 			start = null;
@@ -313,52 +316,58 @@ public class Workspace extends JDesktopPane implements ComponentListener {
 			repaint();
 		}	
 		
-		
 		/**
-		 * 
 		 * Connect two nodes.
-		 * @param startNode		Node to start from.
-		 * @param endNode		Node to end with.
 		 * 
+		 * @param startNodePt		Node to start from.
+		 * @param endNodePt		Node to end with.
 		 * */
-		private void connectNodes( NodePt startNode, NodePt endNode ) {
+		void connectNodes( NodePt startNodePt, NodePt endNodePt ) {
 			
-			if( startNode.getComponent() instanceof ControllerNode ) {
+			if( startNodePt.getComponent() instanceof SenderNode ) {
 				
-				if( endNode.getComponent() instanceof ControllableNode ) {
+				if( endNodePt.getComponent() instanceof ReceiverNode ) {
 					
-					if( !startNode.getConnections().contains((ControllableNode) endNode.getComponent() ) ) {
+					if( !startNodePt.getConnections().contains( (Node) endNodePt.getComponent() ) ) {
 						
-						startNode.addConnection((ControllableNode) endNode.getComponent() );
-						var controllable = (ControllableNode) endNode.getComponent();
-						controllable.addController( (ControllerNode) startNode.getComponent() );
+						startNodePt.addConnection((ReceiverNode) endNodePt.getComponent() );
+						var controllable = (ReceiverNode) endNodePt.getComponent();
+						controllable.addSender( (SenderNode) startNodePt.getComponent() );
 					}
 					else {
-						JOptionPane.showMessageDialog( endNode.getComponent(), "Already connected!" );
+						JOptionPane.showMessageDialog( endNodePt.getComponent(), "Already connected!" );
 					}
 				}
 				else {
-					JOptionPane.showMessageDialog( endNode.getComponent(), "Connect with image!" );
+					JOptionPane.showMessageDialog( endNodePt.getComponent(), "Connect with image!" );
 				}
 			}
-			else if( startNode.getComponent() instanceof ControllableNode ) {
+			else if( startNodePt.getComponent() instanceof ReceiverNode ) {
 				
-				if( endNode.getComponent() instanceof ControllerNode ) {
+				if( endNodePt.getComponent() instanceof SenderNode ) {
 					
-					if(!endNode.getConnections().contains( (ControllableNode) startNode.getComponent()) ) {
+					if( !endNodePt.getConnections().contains( (Node) startNodePt.getComponent()) ) {
 						
-						endNode.addConnection((ControllableNode) startNode.getComponent());
-						var controllable = (ControllableNode) startNode.getComponent();
-						controllable.addController((ControllerNode) endNode.getComponent());
+						endNodePt.addConnection((ReceiverNode) startNodePt.getComponent());
+						var receiver = (ReceiverNode) startNodePt.getComponent();
+						receiver.addSender((SenderNode) endNodePt.getComponent());
 					}
 					else {
-						JOptionPane.showMessageDialog( endNode.getComponent(), "Already connected!" );
+						JOptionPane.showMessageDialog( endNodePt.getComponent(), "Already connected!" );
 					}
 				}
 				else {
-					JOptionPane.showMessageDialog( endNode.getComponent(), "Connect with filter!" );
+					JOptionPane.showMessageDialog( endNodePt.getComponent(), "Connect with filter!" );
 				}
 			}
-		}	
+		}
+	}
+	
+	/**
+	 * 
+	 * @return {@link LayerContainer}.
+	 * */
+	public LayerContainer getLayerContainer() {
+		return lyc;
 	}
 }

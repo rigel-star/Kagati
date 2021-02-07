@@ -112,7 +112,5 @@ public class MiniImageView extends JPanel {
 		g2d.drawRect((getWidth() / 2) - 5, (getHeight() / 2) - 5, 10, 10);
 		g2d.dispose();
 	}
-	
-	
 
 }
