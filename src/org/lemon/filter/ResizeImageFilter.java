@@ -3,7 +3,7 @@ package org.lemon.filter;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-import org.lemon.image.ImageGraphics;
+import org.lemon.graphics.ImageGraphics;
 import org.lemon.image.LImage;
 
 /**
@@ -40,7 +40,6 @@ public class ResizeImageFilter extends AbstractImageFilter {
 		this.h = newH;
 	}
 	
-	
 	@Override
 	public LImage filter( LImage limage ) {
 		
@@ -54,16 +53,13 @@ public class ResizeImageFilter extends AbstractImageFilter {
 		
 		Graphics2D g2 = out.getAsBufferedImage().createGraphics();
 		g2.drawImage( src, 0, 0, w, h, null );
-		
 		return out;
 	}
 	
-	
 	/**
-	 * 
 	 * Set new width to resize image to.
-	 * @param w 	new width
 	 * 
+	 * @param w 	new width
 	 * */
 	public void setNewWidth( int w ) {
 		this.w = w;

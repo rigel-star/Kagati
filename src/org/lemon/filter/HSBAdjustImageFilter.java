@@ -3,7 +3,7 @@ package org.lemon.filter;
 import java.awt.Color;
 
 import org.lemon.color.IllegalRGBValueException;
-import org.lemon.image.Pixel;
+import org.lemon.graphics.Pixel;
 
 public class HSBAdjustImageFilter extends SinglePixelFilter {
 	
@@ -53,7 +53,7 @@ public class HSBAdjustImageFilter extends SinglePixelFilter {
 	
 	
 	@Override
-	public int processRGB( int rgb ) {
+	public int processRGB( int x, int y, int rgb ) {
 		
 		float[] hsb = new float[3];
 		int[] rgbsep = Pixel.extractRGB( rgb );

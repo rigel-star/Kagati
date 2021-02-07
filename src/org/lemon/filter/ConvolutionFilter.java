@@ -5,7 +5,7 @@ import java.awt.image.Kernel;
 import org.lemon.image.ImageMath;
 import org.lemon.image.LImage;
 
-public abstract class ConvolutionFilter extends AbstractImageFilter {
+public class ConvolutionFilter extends AbstractImageFilter {
 
 	/**
      * Treat pixels off the edge as zero.
