@@ -25,7 +25,7 @@ import javax.swing.event.ChangeListener;
 import org.lemon.gui.ImageView;
 import org.lemon.gui.canvas.DrawingPanel;
 import org.lemon.tools.BrushTool;
-import org.lemon.tools.brush.utils.Brushes;
+import org.lemon.tools.BrushUtils;
 
 
 public class BrushGUI extends JWindow implements ActionListener, ChangeListener {
@@ -37,13 +37,11 @@ public class BrushGUI extends JWindow implements ActionListener, ChangeListener 
 	private JPanel main = new JPanel();
 	private JComponent context;
 	private Graphics2D g2d;
-
 	
 	private JSlider width;
 	
 	private Map<String, BrushTool> brushMap = new HashMap<String, BrushTool>();
 	private JComboBox<String> brushes;
-	
 	
 	public BrushGUI(JComponent context, int x, int y) {
 		
@@ -58,8 +56,7 @@ public class BrushGUI extends JWindow implements ActionListener, ChangeListener 
 		createOpacitySlider();
 		createWidthSlider();
 		createColorButton();
-		createBrushComboBox();
-		
+		createBrushComboBox();	
 		
 		gbc.gridx = 20;
 		gbc.gridy = 125;
@@ -74,8 +71,6 @@ public class BrushGUI extends JWindow implements ActionListener, ChangeListener 
 		pack();
 		
 	}
-	
-	
 	
 	private void createOpacitySlider() {
 		gbc.gridx = 0;
@@ -95,7 +90,6 @@ public class BrushGUI extends JWindow implements ActionListener, ChangeListener 
 		main.add(opacity, gbc);
 		
 	}
-	
 	
 	private void createWidthSlider() {
 		gbc.gridx = 0;
@@ -119,8 +113,6 @@ public class BrushGUI extends JWindow implements ActionListener, ChangeListener 
 		
 		main.add(width, gbc);
 	}
-
-	
 	
 	private void createColorButton() {
 		gbc.gridx = 0;
@@ -141,8 +133,6 @@ public class BrushGUI extends JWindow implements ActionListener, ChangeListener 
 		main.add(color, gbc);
 	}
 	
-	
-	
 	private void createBrushComboBox() {
 		gbc.gridx = 0;
 		gbc.gridy = 85;
@@ -158,10 +148,10 @@ public class BrushGUI extends JWindow implements ActionListener, ChangeListener 
 		
 		initPaintContext();
 		
-		brushMap.put(brushNames[0], Brushes.createNormalBrush(g2d));
-		brushMap.put(brushNames[1], Brushes.createSoftBrush(g2d));
-		brushMap.put(brushNames[2], Brushes.createWobbleBrush(g2d));
-		brushMap.put(brushNames[3], Brushes.createZigzagBrush(g2d));
+		brushMap.put(brushNames[0], BrushUtils.createNormalBrush(g2d));
+		brushMap.put(brushNames[1], BrushUtils.createSoftBrush(g2d));
+		brushMap.put(brushNames[2], BrushUtils.createWobbleBrush(g2d));
+		brushMap.put(brushNames[3], BrushUtils.createZigzagBrush(g2d));
 		
 		brushes = new JComboBox<String>(brushNames);
 		brushes.setFont(font);
@@ -170,8 +160,6 @@ public class BrushGUI extends JWindow implements ActionListener, ChangeListener 
 		main.add(brushes, gbc);
 	}
 	
-	
-	
 	private void initPaintContext() {
 		
 		if(context instanceof ImageView) {
@@ -179,12 +167,8 @@ public class BrushGUI extends JWindow implements ActionListener, ChangeListener 
 		}
 		else if(context instanceof DrawingPanel) {
 			g2d = (Graphics2D) ((DrawingPanel) context).getCanvas().getGraphics();
-		}
-		
+		}	
 	}
-	
-	
-	
 	
 	private void changeBrushSize(int size) {
 		
@@ -192,14 +176,10 @@ public class BrushGUI extends JWindow implements ActionListener, ChangeListener 
 			var view = (ImageView) context;
 			var brush = view.getImagePanel().getCanvasModeListener().getBrush();
 			
-			brush.setStrokeSize(size);
-			
+			brush.setStrokeSize(size);	
 			context.revalidate();
-		}
-		
+		}	
 	}
-	
-	
 	
 	/**
 	 * changing brush
@@ -212,8 +192,6 @@ public class BrushGUI extends JWindow implements ActionListener, ChangeListener 
 		}
 	}
 	
-	
-	
 	@Override
 	public void stateChanged(ChangeEvent e) {
 		
@@ -222,21 +200,15 @@ public class BrushGUI extends JWindow implements ActionListener, ChangeListener 
 		if(e.getSource() == this.width) {
 			
 			changeBrushSize(size);
-		
 		}
-		
 	}
-
-	
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		
 		if(e.getSource() == this.brushes) {
 			changeBrush(brushMap.get(brushes.getSelectedItem().toString()));
-		}
-		
+		}	
 	}
-
 }
 

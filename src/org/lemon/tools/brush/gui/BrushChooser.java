@@ -11,7 +11,7 @@ import javax.swing.JPanel;
 
 import org.lemon.gui.ImageView;
 import org.lemon.tools.BrushTool;
-import org.lemon.tools.brush.utils.Brushes;
+import org.lemon.tools.BrushUtils;
 
 public class BrushChooser extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
@@ -32,15 +32,11 @@ public class BrushChooser extends JPanel implements ActionListener {
 
 	}
 
-	
-	
 	private void addAll() {
 		add(createNormalBrushButton());
 		add(createSoftBrushButton());
 	}
 
-	
-	
 	/**
 	 * normal brush tool button
 	 */
@@ -49,9 +45,6 @@ public class BrushChooser extends JPanel implements ActionListener {
 		return normalBrush;
 	}
 
-	
-	
-	
 	/**
 	 * creating actual normal brush
 	 */
@@ -60,14 +53,11 @@ public class BrushChooser extends JPanel implements ActionListener {
 
 		if (context instanceof ImageView) {
 			canvas = ((ImageView) context).getImagePanel().getImage().createGraphics();
-			return Brushes.createNormalBrush(canvas);
+			return BrushUtils.createNormalBrush(canvas);
 		}
 		return null;
 	}
 
-	
-	
-	
 	/**
 	 * creating actual soft brush
 	 */
@@ -76,13 +66,10 @@ public class BrushChooser extends JPanel implements ActionListener {
 
 		if (context instanceof ImageView) {
 			canvas = ((ImageView) context).getImagePanel().getImage().createGraphics();
-			return Brushes.createSoftBrush(canvas);
+			return BrushUtils.createSoftBrush(canvas);
 		}
 		return null;
 	}
-
-	
-	
 	
 	/**
 	 * soft brush tool button
@@ -91,9 +78,6 @@ public class BrushChooser extends JPanel implements ActionListener {
 		softBrush = new JButton("Soft");
 		return softBrush;
 	}
-
-	
-	
 	
 	/**
 	 * adding action listeners to all the buttons
@@ -103,9 +87,6 @@ public class BrushChooser extends JPanel implements ActionListener {
 		this.softBrush.addActionListener(this);
 	}
 
-	
-	
-	
 	/**
 	 * changing brush
 	 */
@@ -116,9 +97,6 @@ public class BrushChooser extends JPanel implements ActionListener {
 		}
 	}
 
-	
-	
-	
 	/**
 	 * changing brush if the context is image view
 	 */
@@ -128,9 +106,6 @@ public class BrushChooser extends JPanel implements ActionListener {
 		context.revalidate();
 	}
 
-	
-	
-	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 

@@ -67,8 +67,6 @@ public class PolygonalSelectTool extends MouseAdapter implements SelectionTool {
 		if(areaSelectionDone) {
 			g2d.setStroke(new BasicStroke(1, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_BEVEL, 5f, new float[] {5, 5},  2));
 			this.g2d.setPaint( Color.gray );
-			clearSelection();
-			return;
 		}
 		
 		for( int i=0; i<shapes.size(); i++ ) {

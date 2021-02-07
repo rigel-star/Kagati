@@ -8,7 +8,7 @@ import org.lemon.tools.brush.SoftBrushTool;
 import org.lemon.tools.brush.WobbleBrushTool;
 import org.lemon.tools.brush.ZigzagBrushTool;
 
-public class Brushes {
+public class BrushUtils {
 	
 	public static BrushTool createNormalBrush(Graphics2D context) {
 		return new NormalBrushTool(context, Color.black);

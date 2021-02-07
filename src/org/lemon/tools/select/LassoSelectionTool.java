@@ -18,9 +18,7 @@ import javax.swing.JComponent;
 
 import org.lemon.tools.SelectionTool;
 
-
-public class LassoSelectionTool extends MouseAdapter implements SelectionTool{
-
+public class LassoSelectionTool extends MouseAdapter implements SelectionTool {
 	
 	/*image container*/
 	private final JComponent container;
@@ -30,10 +28,8 @@ public class LassoSelectionTool extends MouseAdapter implements SelectionTool{
 	/*cursor image*/
 	private BufferedImage curImg = null;
 	
-	
 	/*start and end point of line*/
 	private int newX, newY, oldX, oldY;
-	
 	
 	public LassoSelectionTool(BufferedImage src, final JComponent container) {
 		

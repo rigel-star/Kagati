@@ -8,15 +8,12 @@ import java.awt.geom.Line2D;
 import org.lemon.tools.BrushTool;
 
 public class WobbleBrushTool implements BrushTool {
-
-	
 	
 	private int strokeSize = BrushTool.defaultStrokeSize;
 	private Color strokeColor = BrushTool.defaultStrokeColor;
 	private Stroke stroke;
 	
 	private Graphics2D context;
-	
 	
 	public WobbleBrushTool(Graphics2D context) {
 		
@@ -28,7 +25,6 @@ public class WobbleBrushTool implements BrushTool {
 		stroke = new WobbleStroke(getStrokeSize(), getStrokeSize(), getStrokeSize());
 		
 		this.context.setStroke(stroke);
-		
 	}
 	
 	
