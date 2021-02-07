@@ -25,4 +25,4 @@ Currently this software looks like this but many changes are being made daily bu
 ![pic1](icons/scrnshot/scrns1c.png)
 
 # Simple Vanishing Point Filter
-![pic2](icons/scrnshot/pwrap.png)
+![pic2](icons/scrnshot/pwrap.PNG)
