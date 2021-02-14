@@ -32,6 +32,8 @@ public class LightFilterPanel extends AbstractFilterPanel {
 	private static int W = 0;
 	private static int H = 0;
 	
+	private ImageView view = null;
+	
 	/**
 	 * @param v 	{@link ImageView} containing image.
 	 * */
@@ -43,6 +45,8 @@ public class LightFilterPanel extends AbstractFilterPanel {
 		LImage src = new LImage( view.getCurrentImage() );
 		W = src.width;
 		H = src.height;
+		
+		this.view = view;
 		
 		init();
 		
@@ -111,8 +115,8 @@ public class LightFilterPanel extends AbstractFilterPanel {
 				((LightImageFilter) filter).getPosition().y = y;
 			}
 			
-			if( !processFilter() ) 
-				System.out.println( "Error processing filter." );
+			LImage out = processFilter();
+			view.getImagePanel().setImage( out.getAsBufferedImage() );
 		}
 	}
 }

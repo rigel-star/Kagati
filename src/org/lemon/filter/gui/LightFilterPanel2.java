@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -12,10 +14,13 @@ import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.SwingConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.lemon.filter.AbstractImageFilter;
 import org.lemon.filter.LightImageFilter;
@@ -29,17 +34,17 @@ public class LightFilterPanel2 extends AbstractFilterPanel {
 	public static void main( String[] args ) {
 		BufferedImage src = null;
 		try {
-			src = ImageIO.read( new File( "C:\\Users\\Ramesh\\Desktop\\opencv\\mack.jpg" ));
+			src = ImageIO.read( new File( "C:\\Users\\Ramesh\\Desktop\\opencv\\astro.jpg" ));
 		} catch ( IOException ex ) {
 			ex.printStackTrace();
 		}
 		
-		final int w = src.getWidth();
-		final int h = src.getHeight();
+		//final int w = src.getWidth();
+		//final int h = src.getHeight();
 		
-		LightImageFilter f = new LightImageFilter( w, h, 50, 100, new Vec2( w >> 1, h >> 1 ));
+		//LightImageFilter f = new LightImageFilter( w, h, 50, 100, new Vec2( w >> 1, h >> 1 ));
 		ImageView v = new ImageView( src, "Image", null );
-		LightFilterPanel2 l2 = new LightFilterPanel2( f, v );
+		LightFilterPanel2 l2 = new LightFilterPanel2( v );
 		new FilterPanelWindow( l2 );
 	}
 	
@@ -58,8 +63,13 @@ public class LightFilterPanel2 extends AbstractFilterPanel {
 	private JButton saveBtn;
 	private JButton cancelBtn;
 	
-	public LightFilterPanel2( AbstractImageFilter f, ImageView v ) {
-		super( f, v );
+	private JCheckBox shadowChkBox = null;
+	private boolean shadows = false;
+	
+	public LightFilterPanel2( ImageView v ) {
+		super( new LightImageFilter( v.getCurrentImage().getWidth(), v.getCurrentImage().getHeight(), 
+				100, 100, new Vec2( v.getCurrentImage().getWidth() >> 1, 
+						v.getCurrentImage().getHeight() >> 1 )), v );
 		
 		LImage src = new LImage( v.getCurrentImage() );
 		W = src.width;
@@ -69,6 +79,8 @@ public class LightFilterPanel2 extends AbstractFilterPanel {
 		
 		setPreferredSize( new Dimension( W + 300, H + 50 ));
 		setLayout( new BorderLayout( 5, 5 ));
+		
+		MouseController mcontrol = new MouseController();
 		
 		JPanel sliderPan = new JPanel();
 		sliderPan.setLayout( new GridLayout( 2, 2, 2, 2 ));
@@ -84,6 +96,8 @@ public class LightFilterPanel2 extends AbstractFilterPanel {
 		
 		imgHolder.setIcon( new ImageIcon( src.getAsBufferedImage() ));
 		imgHolder.setPreferredSize( new Dimension( W, H ));
+		imgHolder.addMouseListener( mcontrol );
+		imgHolder.addMouseMotionListener( mcontrol );
 		
 		BorderLayoutJPanel mainPan = new BorderLayoutJPanel( W + 300, H + 50 );
 		JPanel center = mainPan.getCenterPanel();
@@ -92,6 +106,7 @@ public class LightFilterPanel2 extends AbstractFilterPanel {
 		
 		JPanel right = new JPanel();
 		right.setLayout( new BoxLayout( right, BoxLayout.Y_AXIS ));
+		right.add( shadowChkBox );
 		right.add( sliderPan );
 		right.add( btnPanel );
 		
@@ -104,17 +119,90 @@ public class LightFilterPanel2 extends AbstractFilterPanel {
 	 * Initialize the widgets.
 	 * */
 	private void init() {
+		
+		ChangeController ccontrol = new ChangeController();
+		
 		int maxRadi = Math.min( W, H );
 		int ori = SwingConstants.HORIZONTAL;
+		
 		radiusSlider = new JSlider( ori, 0, maxRadi, ((LightImageFilter)filter).getRadius() );
 		radiusSlider.setPreferredSize( new Dimension( 150, 30 ));
+		radiusSlider.addChangeListener(  ccontrol );
+		
 		strnthSlider = new JSlider( ori, 0, 200, ((LightImageFilter)filter).getStrength() );
 		strnthSlider.setPreferredSize( new Dimension( 150, 30 ));
+		strnthSlider.addChangeListener( ccontrol );
+		
+		shadowChkBox = new JCheckBox( "Render Shadow", false );
+		shadowChkBox.addActionListener( a -> {
+			
+			//toggle the shadow render state
+			if ( !shadows ) 
+				shadows = true;
+			else
+				shadows = false;
+		});
 		
 		saveBtn = new JButton( "Save" );
 		saveBtn.setPreferredSize( new Dimension( 40, 40 ));
+		saveBtn.addActionListener( a -> {
+			
+		});
+		
 		cancelBtn = new JButton( "Cancel" );
 		cancelBtn.setPreferredSize( new Dimension( 40, 40 ));
+		cancelBtn.addActionListener( a -> {
+			
+		});
+	}
+	
+	/**
+	 * Mouse controller for {@link LightFilterPanel2}.
+	 * */
+	class MouseController extends MouseAdapter {
+		
+		@Override
+		public void mouseDragged( MouseEvent e ) {
+			super.mouseDragged( e );
+			
+			if ( e.getSource() == imgHolder ) {
+				LightImageFilter light = (LightImageFilter) filter;
+				light.setPosition( new Vec2( e.getX(), e.getY() ) );
+				imgHolder.repaint();
+			}
+		}
+		
+		@Override
+		public void mouseReleased( MouseEvent e ) {
+			super.mouseReleased( e );
+			
+			LImage out = processFilter();
+			imgHolder.setIcon( new ImageIcon( out.getAsBufferedImage() ) );
+			imgHolder.revalidate();
+		}
+	}
+	
+	/**
+	 * Value changed controller for {@link LightFilterPanel2}.
+	 * */
+	class ChangeController implements ChangeListener {
+
+		@Override
+		public void stateChanged( ChangeEvent e ) {
+			
+			if ( e.getSource() == radiusSlider ) {
+				int val = radiusSlider.getValue();
+				((LightImageFilter) filter).setRadius( val );
+			}
+			else if ( e.getSource() == strnthSlider ) {
+				int val = strnthSlider.getValue();
+				((LightImageFilter) filter).setStrength( val );
+			}
+			
+			LImage out = processFilter();
+			imgHolder.setIcon( new ImageIcon( out.getAsBufferedImage() ) );
+			imgHolder.revalidate();
+		}
 	}
 
 	@Override

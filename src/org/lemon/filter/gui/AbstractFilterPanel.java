@@ -52,7 +52,6 @@ public abstract class AbstractFilterPanel extends JPanel {
 		setBorder( b );
 		
 		this.src = new LImage( view.getCurrentImage() );
-		processFilter();
 	}
 	
 	/**
@@ -74,24 +73,14 @@ public abstract class AbstractFilterPanel extends JPanel {
 	 * 			error occured while processing the image, 
 	 * 			returns {@code False}.
 	 * */
-	protected boolean processFilter() {
+	protected LImage processFilter() {
 		if ( filter == null )
-			return false;
+			return null;
 		
-		new Thread( new Runnable() {
-			
-			@Override
-			public void run() {
-				BufferedImage copy = Utils.getImageCopy( src.getAsBufferedImage() );
-				filtered = filter.filter( new LImage( copy ));
-				
-				view.getImagePanel().setImage( filtered.getAsBufferedImage() );
-				view.getImagePanel().repaint();
-				view.getImagePanel().revalidate();
-			}
-		}).start();
+		BufferedImage copy = Utils.getImageCopy( src.getAsBufferedImage() );
+		filtered = filter.filter( new LImage( copy ));
 		
-		return true;
+		return filtered;
 	}
 	
 	/**
