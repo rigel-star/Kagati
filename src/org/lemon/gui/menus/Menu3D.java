@@ -8,7 +8,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
 import org.lemon.filter.gui.FilterPanelWindow;
-import org.lemon.filter.gui.LightFilterPanel;
+import org.lemon.filter.gui.LightFilterPanel2;
 import org.lemon.gui.ImageView;
 import org.lemon.gui.Workspace;
 
@@ -87,7 +87,7 @@ public class Menu3D extends JMenu implements ActionListener {
 		Component comp = wks.getSelectedFrame();
 		
 		if ( e.getSource() == spotLight ) {
-			LightFilterPanel lip = new LightFilterPanel( (ImageView) comp );
+			LightFilterPanel2 lip = new LightFilterPanel2( ( ImageView ) comp );
 			new FilterPanelWindow( lip );
 		}
 	}
