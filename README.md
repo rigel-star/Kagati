@@ -1,4 +1,5 @@
 # Lemon
+![logo](icons/logo.jpg)
 
 Lemon, a work in progress by RigelStar, is early stage Image Manipulation Program for Windows environment. Currently, not much is implemented but progress is stilll going on. 
 You may see some dependencies has been used(though they all are created by RigelStar) but those will shortly be removed and everything will be from scratch.
