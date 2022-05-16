@@ -1,4 +1,4 @@
-package org.lemon.gui.menus;
+package org.lemon.gui.menu;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;

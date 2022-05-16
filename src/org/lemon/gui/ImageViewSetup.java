@@ -20,7 +20,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import org.lemon.gui.layers.ViewLayer;
+import org.lemon.gui.layer.ViewLayer;
 
 import sround.awt.RoundJTextField;
 

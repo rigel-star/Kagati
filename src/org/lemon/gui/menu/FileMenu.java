@@ -1,4 +1,4 @@
-package org.lemon.gui.menus;
+package org.lemon.gui.menu;
 
 import java.awt.Composite;
 import java.awt.event.ActionEvent;
@@ -17,7 +17,7 @@ import org.lemon.gui.ImageViewSetup;
 import org.lemon.gui.LayerContainer;
 import org.lemon.gui.WorkspaceArena;
 import org.lemon.gui.image.ChooseImage;
-import org.lemon.gui.layers.ViewLayer;
+import org.lemon.gui.layer.ViewLayer;
 import org.lemon.image.LImage;
 
 public class FileMenu extends JMenu implements ActionListener {

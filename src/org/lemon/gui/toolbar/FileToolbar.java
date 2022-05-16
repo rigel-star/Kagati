@@ -1,4 +1,4 @@
-package org.lemon.gui.toolbars;
+package org.lemon.gui.toolbar;
 
 import java.awt.Color;
 import java.awt.FlowLayout;
@@ -12,13 +12,12 @@ import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import org.lemon.gui.ImageView;
 import org.lemon.gui.ImageViewSetup;
-import org.lemon.gui.JPlainButton;
 import org.lemon.gui.Layer;
 import org.lemon.gui.LayerContainer;
 import org.lemon.gui.WorkspaceArena;
 import org.lemon.gui.image.ChooseImage;
 import org.lemon.gui.image.ImagePanel;
-import org.lemon.gui.layers.ViewLayer;
+import org.lemon.gui.layer.ViewLayer;
 import org.lemon.tools.BrushTool;
 import org.lemon.tools.brush.BrushToolListener;
 
@@ -39,17 +38,17 @@ public class FileToolbar extends JToolBar {
 		ActionListener al = new ActionHandler();
 		Color cl = new Color( 50, 50, 50 );
 		
-		openBttn = new JPlainButton( "Open" );
+		openBttn = new JButton( "Open" );
 		openBttn.setIcon( new ImageIcon( "icons/button/open.png" ));
 		openBttn.setBackground( cl );
 		openBttn.addActionListener( al );
 		
-		saveBttn = new JPlainButton( "Save" );
+		saveBttn = new JButton( "Save" );
 		saveBttn.setIcon( new ImageIcon( "icons/button/save.png" ));
 		saveBttn.setBackground( cl );
 		saveBttn.addActionListener( al );
 		
-		newBttn = new JPlainButton( "New Page" );
+		newBttn = new JButton( "New Page" );
 		newBttn.setIcon( new ImageIcon( "icons/button/new.png" ));
 		newBttn.setBackground( cl );
 		newBttn.addActionListener( al );

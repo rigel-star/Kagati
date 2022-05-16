@@ -1,4 +1,4 @@
-package org.lemon.gui.toolbars;
+package org.lemon.gui.toolbar;
 
 import java.awt.FlowLayout;
 

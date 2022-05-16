@@ -13,7 +13,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import org.lemon.gui.layers.LayerList;
+import org.lemon.gui.layer.LayerList;
 
 public class LayerContainer extends JInternalFrame 
 {

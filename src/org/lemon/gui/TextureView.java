@@ -24,10 +24,10 @@ import org.lemon.filter.ResizeImageFilter;
 import org.lemon.graphics.Texture;
 import org.lemon.graphics.texture.WoodTexture;
 import org.lemon.image.LImage;
-import org.lemon.lang.NonNull;
 import org.lemon.utils.Utils;
 
-public class TextureView extends NodeView {
+public class TextureView extends NodeView 
+{
 	private static final long serialVersionUID = 1L;
 	
 	private static JLabel txtrHolder = null;
@@ -45,8 +45,9 @@ public class TextureView extends NodeView {
 	
 	private JPanel sliderContainer = null;
 	
-	public TextureView( @NonNull LayerContainer lycont ) {
-		super( lycont );
+	public TextureView(LayerContainer lycont) 
+	{
+		super(lycont, null, null);
 		this.init();
 		
 		setSize( 200, 300 );

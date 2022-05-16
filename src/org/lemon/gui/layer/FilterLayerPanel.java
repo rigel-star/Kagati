@@ -1,4 +1,4 @@
-package org.lemon.gui.layers;
+package org.lemon.gui.layer;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;

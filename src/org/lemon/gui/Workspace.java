@@ -7,7 +7,7 @@ import java.awt.FlowLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.lemon.gui.toolbars.FileToolbar;
+import org.lemon.gui.toolbar.FileToolbar;
 
 public class Workspace extends Container {
 	private static final long serialVersionUID = 1L;

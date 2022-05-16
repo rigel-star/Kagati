@@ -1,4 +1,4 @@
-package org.lemon.gui.menus;
+package org.lemon.gui.menu;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,7 +17,7 @@ import org.lemon.gui.Layer;
 import org.lemon.gui.LayerContainer;
 import org.lemon.gui.TextureView;
 import org.lemon.gui.WorkspaceArena;
-import org.lemon.gui.layers.FilterLayer;
+import org.lemon.gui.layer.FilterLayer;
 import org.lemon.gui.node.FilterReceiverNode;
 import org.lemon.gui.node.FilterSenderNode;
 

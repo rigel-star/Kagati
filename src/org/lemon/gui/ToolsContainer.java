@@ -16,8 +16,8 @@ import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
 
 import org.lemon.gui.image.ImagePanel;
-import org.lemon.gui.toolbars.BrushToolbar;
-import org.lemon.gui.toolbars.FileToolbar;
+import org.lemon.gui.toolbar.BrushToolbar;
+import org.lemon.gui.toolbar.FileToolbar;
 import org.lemon.tools.BrushTool;
 import org.lemon.tools.BrushTool.BrushType;
 import org.lemon.tools.LemonTool.ToolType;

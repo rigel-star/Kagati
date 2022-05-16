@@ -1,4 +1,4 @@
-package org.lemon.gui.layers;
+package org.lemon.gui.layer;
 
 import javax.swing.JComponent;
 

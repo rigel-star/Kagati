@@ -10,11 +10,11 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 
-import org.lemon.gui.menus.NodeMenu;
-import org.lemon.gui.menus.ToolsMenu;
-import org.lemon.gui.menus.FileMenu;
-import org.lemon.gui.menus.FilterMenu;
-import org.lemon.gui.menus.Menu3D;
+import org.lemon.gui.menu.NodeMenu;
+import org.lemon.gui.menu.ToolsMenu;
+import org.lemon.gui.menu.FileMenu;
+import org.lemon.gui.menu.FilterMenu;
+import org.lemon.gui.menu.Menu3D;
 
 public class ApplicationFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
