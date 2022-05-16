@@ -2,29 +2,28 @@ package org.lemon.gui;
 
 import javax.swing.JComponent;
 
-/**
- * 
- * Layer Interface.
- * 
- * */
-public interface Layer {
+public abstract class Layer {
+	private JComponent component;
+	private String title;
 	
-	/**
-	 * @return 		{@code JComponent} attached with this {@link Layer}.
-	 * */
-	public JComponent getLayerComponent();
+	public Layer(JComponent comp, String title)
+	{
+		this.component = comp;
+		this.title = title;
+	}
 	
+	public JComponent getLayerComponent()
+	{
+		return component;
+	}
 	
-	/**
-	 * @return Title of this {@link Layer}
-	 * */
-	public String getTitle();
+	public String getTitle()
+	{
+		return title;
+	}
 	
-	
-	/**
-	 * Set title of this {@link Layer}.
-	 * @param title 	New title.
-	 * 
-	 * */
-	public void setTitle( String title );
+	public void setTitle( String title )
+	{
+		this.title = title;
+	}
 }

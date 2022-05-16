@@ -11,7 +11,7 @@ import javax.swing.JPanel;
 
 import org.lemon.gui.ImageView;
 import org.lemon.tools.BrushTool;
-import org.lemon.tools.BrushUtils;
+import org.lemon.tools.brush.SoftBrushTool;
 
 public class BrushChooser extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
@@ -22,100 +22,58 @@ public class BrushChooser extends JPanel implements ActionListener {
 	private JComponent context;
 
 	public BrushChooser(JComponent context) {
-
 		this.context = context;
 
 		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-
-		addAll();
-		addActionListeners();
-
-	}
-
-	private void addAll() {
 		add(createNormalBrushButton());
 		add(createSoftBrushButton());
+		normalBrush.addActionListener(this);
+		softBrush.addActionListener(this);
 	}
 
-	/**
-	 * normal brush tool button
-	 */
 	private JButton createNormalBrushButton() {
 		normalBrush = new JButton("Normal");
 		return normalBrush;
 	}
 
-	/**
-	 * creating actual normal brush
-	 */
 	private BrushTool createNormalBrush() {
 		Graphics2D canvas = null;
 
 		if (context instanceof ImageView) {
-			canvas = ((ImageView) context).getImagePanel().getImage().createGraphics();
-			return BrushUtils.createNormalBrush(canvas);
+			canvas = ((ImageView) context).getDrawable();
+			return new BrushTool(canvas);
 		}
 		return null;
 	}
 
-	/**
-	 * creating actual soft brush
-	 */
 	private BrushTool createSoftBrush() {
 		Graphics2D canvas = null;
 
 		if (context instanceof ImageView) {
-			canvas = ((ImageView) context).getImagePanel().getImage().createGraphics();
-			return BrushUtils.createSoftBrush(canvas);
+			canvas = ((ImageView) context).getDrawable();
+			return new SoftBrushTool(canvas);
 		}
 		return null;
 	}
 	
-	/**
-	 * soft brush tool button
-	 */
 	private JButton createSoftBrushButton() {
 		softBrush = new JButton("Soft");
 		return softBrush;
 	}
-	
-	/**
-	 * adding action listeners to all the buttons
-	 */
-	private void addActionListeners() {
-		this.normalBrush.addActionListener(this);
-		this.softBrush.addActionListener(this);
-	}
 
-	/**
-	 * changing brush
-	 */
 	private void changeBrush(BrushTool newBrush) {
-
 		if (context instanceof ImageView) {
-			changeBrushIfImageView(newBrush);
+			
 		}
-	}
-
-	/**
-	 * changing brush if the context is image view
-	 */
-	private void changeBrushIfImageView(BrushTool newBrush) {
-		
-		((ImageView) context).getImagePanel().getCanvasModeListener().setBrush(newBrush);
-		context.revalidate();
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-
 		if(e.getSource() == this.normalBrush) {
 			changeBrush(createNormalBrush());
 		}
 		else if (e.getSource() == this.softBrush) {
 			changeBrush(createSoftBrush());
-		}
-		
+		}	
 	}
-
 }

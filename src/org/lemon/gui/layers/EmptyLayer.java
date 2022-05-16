@@ -7,20 +7,21 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
 
-public class EmptyLayer extends ViewLayer {
-	
-	public EmptyLayer() {
-		super(new EmptyCanvas(), "New Layer", NORMAL_LAYER);
+public class EmptyLayer extends ViewLayer 
+{	
+	public EmptyLayer() 
+	{
+		super(new EmptyCanvas(), "New Layer");
 	}
 	
-	
-	/*Empty canvas for empty layer*/
-	public static class EmptyCanvas extends JPanel {
+	public static class EmptyCanvas extends JPanel 
+	{
 		private static final long serialVersionUID = 1L;
 		
 		private Canvas canvas = null;
 		
-		public EmptyCanvas() {
+		public EmptyCanvas() 
+		{
 			canvas = new Canvas();
 			canvas.setBackground(Color.white);
 			
@@ -28,7 +29,8 @@ public class EmptyLayer extends ViewLayer {
 			add(canvas, BorderLayout.CENTER);
 		}
 		
-		public BufferedImage getEmptyImage() {
+		public BufferedImage getEmptyImage() 
+		{
 			return new BufferedImage(700, 700, BufferedImage.TYPE_INT_ARGB);
 		}
 	}

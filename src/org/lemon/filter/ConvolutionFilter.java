@@ -39,40 +39,30 @@ public class ConvolutionFilter extends AbstractImageFilter {
      */
 	private int edgeAction = CLAMP_EDGES;
 	
-	
-	public ConvolutionFilter() {
-		this( new float[9] );
-	}
-	
-	
 	public ConvolutionFilter( float[] matrix ) {
 		this( new Kernel( 3, 3, matrix ) );
 	}
-	
 	
 	public ConvolutionFilter( int rows, int cols, float[] matrix ) {
 		this( new Kernel( cols, rows, matrix ) );
 	}
 	
-	
 	public ConvolutionFilter( Kernel kernel ) {
 		this.kernel = kernel;
 	}
 	
-	
 	@Override
-	public LImage filter( LImage limage ) {
-		
+	public LImage filter(LImage limage) 
+	{
 		int width = limage.width;
 		int height = limage.height;
+		int data[]  = new int[width * height];
+		limage.getPixels(0, 0, width, height, data);
 		
-		int data[]  = new int[ width * height ];
-		limage.getPixels( 0, 0, width, height, data );
+		int out[]  = new int[width * height];
 		
-		int out[]  = new int[ width * height ];
-		
-		if( premultiplyAlpha )
-			ImageMath.premultiplyAlpha( data );
+		if(premultiplyAlpha)
+			ImageMath.premultiplyAlpha(data);
 		
 		convolve( kernel, data, out, width, height, edgeAction );
 		
@@ -84,11 +74,9 @@ public class ConvolutionFilter extends AbstractImageFilter {
 		return limage;
 	}
 	
-	
 	public static void convolve( Kernel kernel, int[] data, int[] out, int width, int height, int edgeAction ) {
 		convolve(kernel, data, out, width, height, true, edgeAction);
 	}
-	
 	
 	public static void convolve( Kernel kernel, int[] data, int[] out, int width, int height, boolean alpha, int edgeAction ) {
 		if (kernel.getHeight() == 1)
@@ -98,7 +86,6 @@ public class ConvolutionFilter extends AbstractImageFilter {
 		else
 			convolveHV(kernel, data, out, width, height, alpha, edgeAction);
 	}
-	
 	
 	public static void convolveHV(Kernel kernel, int[] inPixels, int[] outPixels, int width, int height, boolean alpha, int edgeAction) {
 		int index = 0;
@@ -117,9 +104,9 @@ public class ConvolutionFilter extends AbstractImageFilter {
 					int ioffset;
 					if (0 <= iy && iy < height)
 						ioffset = iy*width;
-					else if ( edgeAction == CLAMP_EDGES )
+					else if (edgeAction == CLAMP_EDGES)
 						ioffset = y*width;
-					else if ( edgeAction == WRAP_EDGES )
+					else if (edgeAction == WRAP_EDGES)
 						ioffset = ((iy+height) % height) * width;
 					else
 						continue;
@@ -146,20 +133,20 @@ public class ConvolutionFilter extends AbstractImageFilter {
 					}
 				}
 				
-				int ia = alpha ? constrain( (int)(a + 0.5), 0, 255 ) : 0xff;
-				int ir = constrain( (int)(r + 0.5), 0, 255 );
-				int ig = constrain( (int)(g + 0.5), 0, 255 );
-				int ib = constrain( (int)(b + 0.5), 0, 255 );
+				int ia = alpha ? constrain((int)(a + 0.5), 0, 255 ) : 0xff;
+				int ir = constrain((int)(r + 0.5), 0, 255);
+				int ig = constrain((int)(g + 0.5), 0, 255);
+				int ib = constrain((int)(b + 0.5), 0, 255);
 				
 				outPixels[index++] = (ia << 24) | (ir << 16) | (ig << 8) | ib;
 			}
 		}
 	}
 	
-	
 	/**
 	 * 
 	 * Convolve with a kernel consisting of one row.
+	 * 
      * @param kernel the kernel
      * @param inPixels the input pixels
      * @param outPixels the output pixels
@@ -278,44 +265,35 @@ public class ConvolutionFilter extends AbstractImageFilter {
 		}
 	}
 	
-	
 	public void setEdgeAction( int edgeAction ) {
 		this.edgeAction = edgeAction;
 	}
 	
-	
 	public int getEdgeAction() {
 		return edgeAction;
 	}
-	
-	
+		
 	public void setUseAlpha( boolean useAlpha ) {
 		this.alpha = useAlpha;
 	}
-
 
 	public boolean getUseAlpha() {
 		return alpha;
 	}
 
-
 	public void setPremultiplyAlpha( boolean premultiplyAlpha ) {
 		this.premultiplyAlpha = premultiplyAlpha;
 	}
 
- 
 	public boolean getPremultiplyAlpha() {
 		return premultiplyAlpha;
 	}
-	
 	
 	public void setKernel( Kernel kernel ) {
 		this.kernel = kernel;
 	}
 	
-	
 	public Kernel getKernel() {
 		return kernel;
 	}
-
 }

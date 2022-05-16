@@ -5,9 +5,9 @@ import javax.swing.JComponent;
 import org.lemon.gui.Layer;
 import org.lemon.gui.NodeView;
 
-public class ViewLayer extends Layer 
+public class FilterLayer extends Layer 
 {	
-	public ViewLayer(JComponent comp, String title) 
+	public FilterLayer(JComponent comp, String title) 
 	{
 		super(comp, title);
 		

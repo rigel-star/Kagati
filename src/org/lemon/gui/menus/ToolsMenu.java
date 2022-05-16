@@ -10,21 +10,16 @@ import org.lemon.filter.gui.AbstractFilterPanel;
 import org.lemon.filter.gui.FilterPanelWindow;
 import org.lemon.filter.gui.TransformFilterPanel;
 import org.lemon.gui.ImageView;
-import org.lemon.gui.Workspace;
-import org.lemon.lang.NonNull;
+import org.lemon.gui.WorkspaceArena;
 
-public class ToolsMenu extends JMenu implements ActionListener {
-
-	/**
-	 * Serial UID
-	 */
+public class ToolsMenu extends JMenu implements ActionListener 
+{
 	private static final long serialVersionUID = 1L;
 	
-	private static JMenu transform = null;
-	private static Workspace wks;
+	private JMenu transform = null;
+	private WorkspaceArena wks;
 	
-	public ToolsMenu( @NonNull Workspace wk ) {
-		
+	public ToolsMenu(WorkspaceArena wk) {
 		wks = wk;
 		this.init();
 		setText( "Tools" );
@@ -57,11 +52,12 @@ public class ToolsMenu extends JMenu implements ActionListener {
 	}
 	
 	@Override
-	public void actionPerformed( ActionEvent e ) {
-		
-		if ( e.getSource() == translate ) {
-			AbstractFilterPanel pan = new TransformFilterPanel( (ImageView) wks.getSelectedFrame() );
-			new FilterPanelWindow( pan );
+	public void actionPerformed(ActionEvent e) 
+	{
+		if (e.getSource() == translate) 
+		{
+			AbstractFilterPanel pan = new TransformFilterPanel((ImageView) wks.getSelectedFrame());
+			new FilterPanelWindow(pan);
 		}	
 	}
 }

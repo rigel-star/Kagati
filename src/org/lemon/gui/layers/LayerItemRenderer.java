@@ -24,42 +24,42 @@ public class LayerItemRenderer implements ListCellRenderer<Layer> {
     	
 	}
     
-    
-    public Border getNoFocusBorder() {
-    	
-        Border border = UIManager.getBorder( "List.cellNoFocusBorder" );
-        if ( System.getSecurityManager() != null ) {
-            if ( border != null ) return border;
+    public Border getNoFocusBorder() 
+    {	
+        Border border = UIManager.getBorder("List.cellNoFocusBorder");
+        if (System.getSecurityManager() != null) 
+        {
+            if(border != null) 
+            	return border;
             return SAFE_NO_FOCUS_BORDER;
-        } else {
-            if ( border != null &&
-                    ( noFocusBorder == null ||
-                    noFocusBorder == DEFAULT_NO_FOCUS_BORDER )) {
+        } 
+        else 
+        {
+            if(border != null && (noFocusBorder == null || noFocusBorder == DEFAULT_NO_FOCUS_BORDER)) 
                 return border;
-            }
             return noFocusBorder;
         }
     }
     
 	
 	@Override
-	public Component getListCellRendererComponent( JList<? extends Layer> list, Layer value, int index,
-			boolean isSelected, boolean cellHasFocus ) {
+	public Component getListCellRendererComponent(JList<? extends Layer> list, Layer value, int index,
+			boolean isSelected, boolean cellHasFocus) {
 		
 		JComponent pan = null;
 		
-		if( value instanceof ViewLayer ) {
-			pan =  new ViewLayerPanel( (ViewLayer) value );
+		if(value instanceof ViewLayer) 
+		{
+			pan =  new ViewLayerPanel((ViewLayer) value);
 		}
-		else if( value instanceof NodeLayer ) {
-			pan = new NodeLayerPanel( (NodeLayer) value );
+		else if(value instanceof FilterLayer) 
+		{
+			pan = new FilterLayerPanel((FilterLayer) value);
 		}
 
         JList.DropLocation dropLocation = list.getDropLocation();
-        if ( dropLocation != null
-                        && !dropLocation.isInsert()
-                        && dropLocation.getIndex() == index ) {
-
+        if((dropLocation != null) && !(dropLocation.isInsert()) && (dropLocation.getIndex() == index))
+        {
             bg = UIManager.getColor( "List.dropCellBackground" );
             fg = UIManager.getColor( "List.dropCellForeground" );
 
@@ -76,29 +76,25 @@ public class LayerItemRenderer implements ListCellRenderer<Layer> {
         }
 		
         Border border = null;
-        if ( cellHasFocus ) {
-            if ( isSelected ) {
-                border = UIManager.getBorder( "List.focusSelectedCellHighlightBorder" );
-            }
-            if ( border == null ) {
-                border = UIManager.getBorder( "List.focusCellHighlightBorder" );
-            }
-        } else {
+        if(cellHasFocus) 
+        {
+            if(isSelected)
+                border = UIManager.getBorder("List.focusSelectedCellHighlightBorder");
+            if(border == null)
+                border = UIManager.getBorder("List.focusCellHighlightBorder");
+        } 
+        else
             border = getNoFocusBorder();
-        }
-        pan.setBorder( border );
         
+        pan.setBorder(border);
 		return pan;
 	}
-	
 	
 	public void setSelectionBackground( Color c ) {
 		this.bg = c;
 	}
 	
-	
 	public void setSelectionForeground( Color c ) {
 		this.fg = c;
 	}
-	
 }

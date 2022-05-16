@@ -10,7 +10,7 @@ import javax.swing.JMenuItem;
 import org.lemon.filter.gui.FilterPanelWindow;
 import org.lemon.filter.gui.LightFilterPanel2;
 import org.lemon.gui.ImageView;
-import org.lemon.gui.Workspace;
+import org.lemon.gui.WorkspaceArena;
 
 public class Menu3D extends JMenu implements ActionListener {
 	
@@ -30,9 +30,9 @@ public class Menu3D extends JMenu implements ActionListener {
 	private JMenuItem circle3d;
 	private JMenuItem square3d;
 	
-	private Workspace wks = null;
+	private WorkspaceArena wks = null;
 	
-	public Menu3D( Workspace wk ) {
+	public Menu3D( WorkspaceArena wk ) {
 		
 		this.wks = wk;
 		setText( "3D" );

@@ -5,11 +5,6 @@ import java.awt.image.WritableRaster;
 
 import org.lemon.image.LImage;
 
-/**
- * 
- * Single Pixel Filter processes the image pixel wise.
- * 
- * */
 public abstract class SinglePixelFilter extends AbstractImageFilter {
 	
 	@Override
@@ -54,5 +49,5 @@ public abstract class SinglePixelFilter extends AbstractImageFilter {
 	 * @param rgb 		RGB value to process.
 	 * @return 			Processed RGB value.
 	 * */
-	public abstract int processRGB( int x, int y, int rgb );
+	public abstract int processRGB(int x, int y, int rgb);
 }

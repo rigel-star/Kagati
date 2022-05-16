@@ -1,4 +1,4 @@
-package org.lemon.color;
+package org.lemon.colors;
 
 public class IllegalRGBValueException extends IllegalArgumentException {
 

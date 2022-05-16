@@ -14,54 +14,27 @@ import org.lemon.gui.ImageView;
 import org.lemon.gui.ImageViewSetup;
 import org.lemon.gui.JPlainButton;
 import org.lemon.gui.Layer;
-import org.lemon.gui.Workspace;
+import org.lemon.gui.LayerContainer;
+import org.lemon.gui.WorkspaceArena;
 import org.lemon.gui.image.ChooseImage;
 import org.lemon.gui.image.ImagePanel;
 import org.lemon.gui.layers.ViewLayer;
-import org.lemon.lang.NonNull;
+import org.lemon.tools.BrushTool;
+import org.lemon.tools.brush.BrushToolListener;
 
-/**
- * 
- * File handling {@code ToolBar}.
- * 
- * */
 public class FileToolbar extends JToolBar {
-
-	/**
-	 * Serial UID
-	 */
 	private static final long serialVersionUID = 1L;
 	
-	private static JButton openBttn = null;
-	private static JButton saveBttn = null;
-	private static JButton newBttn = null;
+	private JButton openBttn = null;
+	private JButton saveBttn = null;
+	private JButton newBttn = null;
 	
-	private static Workspace wks = null;
+	private WorkspaceArena workspace = null;
+	private LayerContainer layerContainer = null;
 	
-	/**
-	 * Constructs {@link FileToolbar} with specified 
-	 * {@link Workspace}.
-	 * @param wk 	Main {@code Workspace}.
-	 * */
-	public FileToolbar( @NonNull final Workspace wk ) {
-		wks = wk;
-		
-		init();
-		
-		JPanel bttnPanel = new JPanel();
-		bttnPanel.setLayout( new FlowLayout( FlowLayout.LEFT, 2, 2 ));
-		
-		bttnPanel.add( openBttn );
-		bttnPanel.add( saveBttn );
-		bttnPanel.add( newBttn );
-		
-		add( bttnPanel );
-	}
-	
-	/**
-	 * Init the widgets.
-	 * */
-	private void init() {
+	public FileToolbar(final WorkspaceArena wk, final LayerContainer layerContainer) {
+		this.workspace = wk;
+		this.layerContainer = layerContainer;
 		
 		ActionListener al = new ActionHandler();
 		Color cl = new Color( 50, 50, 50 );
@@ -80,59 +53,69 @@ public class FileToolbar extends JToolBar {
 		newBttn.setIcon( new ImageIcon( "icons/button/new.png" ));
 		newBttn.setBackground( cl );
 		newBttn.addActionListener( al );
+		
+		JPanel bttnPanel = new JPanel();
+		bttnPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 2, 2));
+		
+		bttnPanel.add(openBttn);
+		bttnPanel.add(saveBttn);
+		bttnPanel.add(newBttn);
+		
+		add(bttnPanel);
 	}
 	
-	/**
-	 * Action handler of {@link FileToolbar}.
-	 * */
-	static class ActionHandler implements ActionListener {
+	private class ActionHandler implements ActionListener {
 
 		@Override
-		public void actionPerformed( ActionEvent e ) {
-			
-			if ( e.getSource() == openBttn ) {
-				openFile();
+		public void actionPerformed(ActionEvent e) {
+			if (e.getSource() == openBttn) {
+				actionOpenFile();
 			}
-			else if ( e.getSource() == saveBttn ) {
-				saveFile();
+			else if (e.getSource() == saveBttn) {
+				actionSaveFile();
 			}
-			else if ( e.getSource() == newBttn ) {
-				newFile();
+			else if (e.getSource() == newBttn) {
+				actionNewFile();
 			}
 		}
 		
-		/**
-		 * Open file from computer.
-		 * */
-		private void openFile() {
-			
+		private void actionOpenFile() {
 			ChooseImage imgChoose = new ChooseImage();
 			BufferedImage img = imgChoose.getChoosenImage();
 			
 			String title = imgChoose.getChoosenFile().getName();
-			ImageView imgView = new ImageView( img, title, true, ImagePanel.PanelMode.SNAP_MODE, wks.getLayerContainer() );
+			ImageView imageView = new ImageView(img, title, layerContainer);
+			ImagePanel panel = imageView.getImagePanel();
 			
-			wks.add( imgView );
-			wks.fetchNodes();
-			wks.refreshListeners();
-			wks.revalidate();
+			switch(workspace.getGlobalLemonTool())
+			{
+				case BRUSH:
+					new BrushToolListener(panel, new BrushTool.Builder(imageView.getDrawable(), BrushTool.BrushType.NORMAL).build());
+					break;
+					
+				case HAND:
+					break;
+					
+				case SELECT:
+					break;
+					
+				case CROP:
+					break;
+			}
 			
-			Layer ly = new ViewLayer( imgView, imgView.getTitle(), ViewLayer.BACKGROUND_LAYER );
-			wks.getLayerContainer().addLayer( ly );
+			workspace.add(imageView);
+			workspace.revalidate();
+			
+			Layer ly = new ViewLayer(imageView, imageView.getTitle());
+			layerContainer.addLayer(ly);
 		}
 		
-		/**
-		 * Save file in computer.
-		 * */
-		private void saveFile() {
+		private void actionSaveFile() {
 			
 		}
 		
-		/**
-		 * Create new file.
-		 * */
-		private void newFile() {
-			new ImageViewSetup( wks );
+		private void actionNewFile() {
+			new ImageViewSetup(workspace, layerContainer);
 		}
 	}
 }

@@ -15,13 +15,13 @@ public class GaussianBlurImageFilter extends ConvolutionFilter implements BlurFi
 	
     
 	public GaussianBlurImageFilter() {
-		super( blurMatrix );
+		super(blurMatrix);
 	}
 
 
 	@Override
-	public LImage blur( LImage src ) {
-		return filter( src );
+	public LImage blur(LImage src) {
+		return filter(src);
 	}
 	
 }

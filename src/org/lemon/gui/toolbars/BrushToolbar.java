@@ -1,92 +1,108 @@
 package org.lemon.gui.toolbars;
 
-import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 
 import javax.swing.JButton;
-import javax.swing.JColorChooser;
+import javax.swing.JComponent;
+import javax.swing.JInternalFrame;
+import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
-import org.lemon.AppGlobalProperties;
+import org.lemon.gui.ImageView;
+import org.lemon.gui.WorkspaceArena;
+import org.lemon.gui.image.ImagePanel;
 import org.lemon.tools.BrushTool;
-
-
-/**
- * Main toolbar sits on the top of application and below menu.
- * Main toolbar for fast access of tools which are frequently used in application.
- * MainToolBar's container is {@code MainApplicationFrame}.
- * */
+import org.lemon.tools.BrushTool.BrushType;
+import org.lemon.tools.brush.BrushToolListener;
 
 public class BrushToolbar extends JToolBar implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	
-	private JButton colorPicker;
+	private WorkspaceArena workspace;
+	private JButton normalBrush, softBrush, wobbleBrush, zigzagBrush;
 	
-	private Color choosenColor = Color.red;
+	private BrushTool.BrushType currentBrush = BrushType.NORMAL;
 	
-	private AppGlobalProperties agp;
-
-	private BrushTool brush;
-	
-	public BrushToolbar(AppGlobalProperties agp, BrushTool brush) {
-		setRollover(true);
-		setFloatable(false);
+	public BrushToolbar(final WorkspaceArena workspace) {
+		this.workspace = workspace;
 		
-		this.agp = agp;
-		this.brush = brush;
+		normalBrush = new JButton("Normal");
+		normalBrush.addActionListener(this);
 		
-		this.init();
-		this.actionEvents();
-		this.addAll();
+		softBrush = new JButton("Soft");
+		softBrush.addActionListener(this);
 		
-	}
-	
-	
-	/*init every widget in toolbar*/
-	private void init() {
-		this.colorPicker = new JButton("COLOR");
-		this.colorPicker.setBackground(this.choosenColor);
-		this.colorPicker.setToolTipText("Choose color");
-		this.colorPicker.setForeground(this.choosenColor);
+		wobbleBrush = new JButton("Wobble");
+		wobbleBrush.addActionListener(this);
 		
+		zigzagBrush = new JButton("Zigzag");
+		zigzagBrush.addActionListener(this);
+		
+		JPanel bttnPanel = new JPanel();
+		bttnPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 2, 2));
+		
+		bttnPanel.add(normalBrush);
+		bttnPanel.add(softBrush);
+		bttnPanel.add(wobbleBrush);
+		bttnPanel.add(zigzagBrush);
+		
+		add(bttnPanel);
+		
+		// setRollover(true);
+		// setFloatable(false);
 	}
 	
-	
-	
-	/*add all the widgets to the toolbar*/
-	private void addAll() {
-		add(this.colorPicker);
+	public BrushTool.BrushType getCurrentBrushType()
+	{
+		return this.currentBrush;
 	}
 	
-	
-	/*init every widget action event in this method*/
-	private void actionEvents() {
-		colorPicker.addActionListener(this);
-	}
-	
-	
-	/**
-	 * Get slected color.
-	 * @return choosenColor
-	 * */
-	public Color getChosenColor() {
-		return choosenColor;
-	}
-
-
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		JInternalFrame frames[] = this.workspace.getAllFrames();
+		Object source = e.getSource();
 		
-		if(e.getSource() == this.colorPicker) {
-			
-			this.choosenColor = JColorChooser.showDialog(getParent(), "Color Picker", Color.white);
-			this.colorPicker.setBackground(choosenColor);
-			this.colorPicker.setForeground(choosenColor);
-			this.agp.setGlobalColor(choosenColor);
-			this.brush.setStrokeColor(choosenColor);
+		for(JInternalFrame frame: frames) {
+			if(frame instanceof ImageView) {
+				ImageView view = (ImageView) frame;
+				ImagePanel panel = view.getImagePanel();
+				
+				if(source == normalBrush)
+					applyBrushToolListener(panel, view.getDrawable(), BrushType.NORMAL);
+				if(source == softBrush)
+					applyBrushToolListener(panel, view.getDrawable(), BrushType.SOFT);
+				if(source == wobbleBrush)
+					applyBrushToolListener(panel, view.getDrawable(), BrushType.WOBBLE);
+				if(source == zigzagBrush)
+					applyBrushToolListener(panel, view.getDrawable(), BrushType.ZIGZAG);
+			}
+		}
+	}
+	
+	private void applyBrushToolListener(JComponent component, Graphics2D context, BrushType type)
+	{
+		currentBrush = type;
+		removeMouseListeners(component);
+		
+		BrushTool btool = new BrushTool.Builder(context, type).build();
+		new BrushToolListener(component, btool);
+	}
+	
+	private void removeMouseListeners(JComponent component)
+	{
+		for(MouseListener ml: component.getMouseListeners())
+		{
+			component.removeMouseListener(ml);
 		}
 		
+		for(MouseMotionListener mml: component.getMouseMotionListeners())
+		{
+			component.removeMouseMotionListener(mml);
+		}
 	}
-
 }

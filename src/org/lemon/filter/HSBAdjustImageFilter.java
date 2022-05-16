@@ -1,8 +1,6 @@
 package org.lemon.filter;
 
 import java.awt.Color;
-
-import org.lemon.color.IllegalRGBValueException;
 import org.lemon.graphics.Pixel;
 
 public class HSBAdjustImageFilter extends SinglePixelFilter {
@@ -108,7 +106,7 @@ public class HSBAdjustImageFilter extends SinglePixelFilter {
 	private int incBrightness( int hsb2, int add ) {
 		
 		if( add < 0 || add > 255 )
-			throw new IllegalRGBValueException( "add value must be between 0 to 255. Your value: " + add );
+			throw new IllegalArgumentException( "add value must be between 0 to 255. Your value: " + add );
 		return constrain( hsb2 + add, 0, 255 );
 	}
 	

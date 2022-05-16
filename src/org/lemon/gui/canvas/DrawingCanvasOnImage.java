@@ -8,7 +8,6 @@ import java.awt.event.MouseEvent;
 
 import org.lemon.gui.image.ImagePanel;
 import org.lemon.tools.BrushTool;
-import org.lemon.tools.brush.NormalBrushTool;
 
 /**
  * Class description: This class takes an image as param and applies canvas in it.<p>
@@ -26,46 +25,23 @@ public class DrawingCanvasOnImage extends MouseAdapter {
 	private int newX, newY, oldX, oldY;
 	private Color sColor;
 	
-	public DrawingCanvasOnImage(ImagePanel panel, Color c) {
-		//assigning globals
+	public DrawingCanvasOnImage(ImagePanel panel, Color c) 
+	{
 		this.ip = panel;
 		this.sColor = c;
-		this.g2d = ip.getImage().createGraphics();
-		brushTool = new NormalBrushTool(g2d, c);
+		this.g2d = ip.getCurrentImage().createGraphics();
+		brushTool = new BrushTool(g2d);
 		brushTool.setStrokeColor(sColor);
 	}
-	
-	
-	public void setBrush(BrushTool brush) {
-		this.brushTool = brush;
-	}
-	
-	
-	public BrushTool getBrush() {
-		return brushTool;
-	}
-	
-	
-	public void setColor(Color c) {
-		this.sColor = c;
-	}
-	
-	
-	public Color getColor() {
-		return sColor;
-	}
-	
 	
 	@Override
 	public void mousePressed(MouseEvent e) {
 		super.mousePressed(e);
-		
 		newX = e.getX();
 		newY = e.getY();
 		oldX = newX;
 		oldY = newY;
 	}
-	
 	
 	@Override
 	public void mouseDragged(MouseEvent e) {
@@ -74,16 +50,12 @@ public class DrawingCanvasOnImage extends MouseAdapter {
 		newX = e.getX();
 		newY = e.getY();
 		
-		//drawing line wherever the mouse goes
 		brushTool.draw(newX, newY, oldX, oldY);
-		//this.g2d.dispose();
 		this.ip.repaint();
 		
 		oldX = newX;
 		oldY = newY;
-		
 	}
-
 	
 	@Override
 	public void mouseMoved(MouseEvent e) {
