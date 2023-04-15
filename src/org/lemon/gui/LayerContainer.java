@@ -22,12 +22,8 @@ public class LayerContainer extends JInternalFrame
 	private LayerList layerList = new LayerList();
 	private JScrollPane scroll = new JScrollPane(layerList);
 	
-	private WorkspaceArena workspace = null;
-	
-	public LayerContainer(WorkspaceArena workspace)
+	public LayerContainer()
 	{
-		this.workspace = workspace;
-		
 		setTitle("Layers");
 		setClosable(false);
 		setBorder(BorderFactory.createLineBorder(Color.black, 1));
@@ -67,27 +63,11 @@ public class LayerContainer extends JInternalFrame
 		private static final long serialVersionUID = 1L;
 		
 		private JButton deleteLayerBtn;
-		private JButton copyLayerBtn;
 		private JButton newLayerBtn;
 		
-		public BottomMenu() 
-		{
-			init();
-			setLayout(new FlowLayout(FlowLayout.CENTER));
-			
-			add(newLayerBtn);
-			add(deleteLayerBtn);
-		}
-		
-		private void init() 
+		private BottomMenu() 
 		{
 			newLayerBtn = new JButton("New");	
-			copyLayerBtn = new JButton("Copy");
-			
-			copyLayerBtn.addActionListener(action -> {
-				
-			});	
-			
 			deleteLayerBtn = new JButton("Del");
 			deleteLayerBtn.addActionListener(action -> {
 				int option = JOptionPane.showConfirmDialog(layerList, "Delete this layer?");
@@ -103,6 +83,10 @@ public class LayerContainer extends JInternalFrame
 				}
 				revalidate();
 			});	
+			
+			setLayout(new FlowLayout(FlowLayout.CENTER));
+			add(newLayerBtn);
+			add(deleteLayerBtn);
 		}		
 	}
 }
