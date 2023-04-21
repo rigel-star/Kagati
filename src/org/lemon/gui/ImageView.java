@@ -10,7 +10,7 @@ import javax.swing.BorderFactory;
 
 import org.lemon.gui.image.ImagePanel;
 
-public class ImageView extends View
+public class ImageView extends AbstractView
 {
 	private static final long serialVersionUID = 1L;
 	

@@ -4,14 +4,14 @@ import javax.swing.JInternalFrame;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
-public class View extends JInternalFrame
+public abstract class AbstractView extends JInternalFrame
 {
 	private static final long serialVersionUID = 1L;
 	
 	private LayerContainer layerContainer;
 	private Layer layer;
 	
-	public View(LayerContainer layerContainer)
+	public AbstractView(LayerContainer layerContainer)
 	{
 		this.layerContainer = layerContainer;
 		
@@ -20,7 +20,7 @@ public class View extends JInternalFrame
 			public void internalFrameClosing(InternalFrameEvent e) 
 			{
 				super.internalFrameClosing(e);
-				View.this.layerContainer.removeLayer(layer);
+				AbstractView.this.layerContainer.removeLayer(layer);
 			}
 		});
 	}

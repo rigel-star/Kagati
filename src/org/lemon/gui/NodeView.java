@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.lemon.gui.node.Node;
 
-public abstract class NodeView extends View
+public abstract class NodeView extends AbstractView
 {
 	private static final long serialVersionUID = 1L;
 	
