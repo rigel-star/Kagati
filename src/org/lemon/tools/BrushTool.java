@@ -7,6 +7,7 @@ import java.awt.Stroke;
 import java.awt.geom.Line2D;
 
 import org.lemon.tools.brush.PencilTool;
+import org.lemon.tools.brush.SoftBrushTool;
 import org.lemon.tools.brush.WobbleBrushTool;
 import org.lemon.tools.brush.ZigzagBrushTool;
 
@@ -98,24 +99,28 @@ public class BrushTool implements LemonTool {
 		{
 			switch(type)
 			{
-			case NORMAL:
-				this.tool = new BrushTool(g2d);
-				break;
+				case NORMAL:
+					this.tool = new BrushTool(g2d);
+					break;
+					
+				case PENCIL:
+					this.tool = new PencilTool(g2d);
+					break;
+					
+				case ZIGZAG:
+					this.tool = new ZigzagBrushTool(g2d);
+					break;
+					
+				case WOBBLE:
+					this.tool = new WobbleBrushTool(g2d);
+					break;
 				
-			case PENCIL:
-				this.tool = new PencilTool(g2d);
-				break;
-				
-			case ZIGZAG:
-				this.tool = new ZigzagBrushTool(g2d);
-				break;
-				
-			case WOBBLE:
-				this.tool = new WobbleBrushTool(g2d);
-				break;
-				
-			default:
-				System.out.println("Brush invalid!");
+				case SOFT:
+					this.tool = new SoftBrushTool(g2d);
+					break;
+					
+				default:
+					System.out.println("Brush invalid!");
 			}
 		}
 		

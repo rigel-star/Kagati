@@ -24,10 +24,10 @@ public class ApplicationFrame extends JFrame {
 	
 	public ApplicationFrame() {
 		menuBar = new JMenuBar();
-		JMenu fileMenu = new FileMenu(workspace.getWorkspaceArena(), workspace.getLayerContainer());
+		JMenu fileMenu = new FileMenu(workspace.getWorkspaceArena());
 		JMenu filterMenu = new FilterMenu(workspace.getWorkspaceArena());
 		JMenu toolsMenu = new ToolsMenu(workspace.getWorkspaceArena());
-		JMenu nodeMenu = new NodeMenu(workspace.getWorkspaceArena(), workspace.getLayerContainer());
+		JMenu nodeMenu = new NodeMenu(workspace.getWorkspaceArena());
 		JMenu threeDMenu = new Menu3D(workspace.getWorkspaceArena());
 		
 		menuBar.add(fileMenu);

@@ -16,8 +16,8 @@ public class CanvasView extends ImageView {
 	 * @param bg		Background color for canvas. 
 	 * @param title		Title of the canvas.
 	 * */
-	public CanvasView(int width, int height, Color bg, String title, LayerContainer lycont)
+	public CanvasView(int width, int height, Color bg, String title)
 	{
-		super(LImage.createImage(width, height, bg, BufferedImage.TYPE_INT_ARGB).getAsBufferedImage(), title, lycont);
+		super(LImage.createImage(width, height, bg, BufferedImage.TYPE_INT_ARGB).getAsBufferedImage(), title);
 	}
 }

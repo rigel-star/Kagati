@@ -43,7 +43,7 @@ public class LightFilterPanel2 extends AbstractFilterPanel {
 		//final int h = src.getHeight();
 		
 		//LightImageFilter f = new LightImageFilter( w, h, 50, 100, new Vec2( w >> 1, h >> 1 ));
-		ImageView v = new ImageView( src, "Image", null );
+		ImageView v = new ImageView(src, "Image");
 		LightFilterPanel2 l2 = new LightFilterPanel2( v );
 		new FilterPanelWindow( l2 );
 	}

@@ -12,10 +12,8 @@ public abstract class NodeView extends AbstractView
 	private List<Node> senderNodes;
 	private List<Node> receiverNodes;
 	
-	public NodeView(LayerContainer layerContainer, List<Node> receivers, List<Node> senders) 
+	public NodeView(List<Node> receivers, List<Node> senders) 
 	{
-		super(layerContainer);
-		
 		this.senderNodes = senders;
 		this.receiverNodes = receivers;
 	}

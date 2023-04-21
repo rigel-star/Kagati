@@ -15,7 +15,6 @@ import javax.swing.JToolBar;
 
 import org.lemon.gui.ImageView;
 import org.lemon.gui.WorkspaceArena;
-import org.lemon.gui.image.ImagePanel;
 import org.lemon.tools.BrushTool;
 import org.lemon.tools.BrushTool.BrushType;
 import org.lemon.tools.brush.BrushToolListener;
@@ -70,21 +69,19 @@ public class BrushToolbar extends JToolBar implements ActionListener {
 		for(JInternalFrame frame: frames) {
 			if(frame instanceof ImageView) {
 				ImageView view = (ImageView) frame;
-				ImagePanel panel = view.getImagePanel();
-				
 				if(source == normalBrush)
-					applyBrushToolListener(panel, view.getDrawable(), BrushType.NORMAL);
+					applyBrushToolListener(view, view.getDrawable(), BrushType.NORMAL);
 				if(source == softBrush)
-					applyBrushToolListener(panel, view.getDrawable(), BrushType.SOFT);
+					applyBrushToolListener(view, view.getDrawable(), BrushType.SOFT);
 				if(source == wobbleBrush)
-					applyBrushToolListener(panel, view.getDrawable(), BrushType.WOBBLE);
+					applyBrushToolListener(view, view.getDrawable(), BrushType.WOBBLE);
 				if(source == zigzagBrush)
-					applyBrushToolListener(panel, view.getDrawable(), BrushType.ZIGZAG);
+					applyBrushToolListener(view, view.getDrawable(), BrushType.ZIGZAG);
 			}
 		}
 	}
 	
-	private void applyBrushToolListener(JComponent component, Graphics2D context, BrushType type)
+	private void applyBrushToolListener(ImageView component, Graphics2D context, BrushType type)
 	{
 		currentBrush = type;
 		removeMouseListeners(component);

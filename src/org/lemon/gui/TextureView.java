@@ -45,9 +45,9 @@ public class TextureView extends NodeView
 	
 	private JPanel sliderContainer = null;
 	
-	public TextureView(LayerContainer lycont) 
+	public TextureView() 
 	{
-		super(lycont, null, null);
+		super(null, null);
 		this.init();
 		
 		setSize( 200, 300 );

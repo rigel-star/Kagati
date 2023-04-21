@@ -15,7 +15,6 @@ import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
 
-import org.lemon.gui.image.ImagePanel;
 import org.lemon.gui.toolbar.BrushToolbar;
 import org.lemon.gui.toolbar.FileToolbar;
 import org.lemon.tools.BrushTool;
@@ -93,24 +92,19 @@ public class ToolsContainer extends JInternalFrame implements ActionListener {
 		for(JInternalFrame frame: frames) {
 			if(frame instanceof ImageView) {
 				ImageView view = (ImageView) frame;
-				ImagePanel panel = view.getImagePanel();
-				
 				if(source == brushTool)
-					applyBrushTool(panel, view.getDrawable(), BrushType.NORMAL);
+					applyBrushTool(view, view.getDrawable(), BrushType.NORMAL);
 				else if(source == pencilTool)
-					applyBrushTool(panel, view.getDrawable(), BrushType.PENCIL);
+					applyBrushTool(view, view.getDrawable(), BrushType.PENCIL);
 				else if(source == handTool)
-					applyHandTool(panel);
+					applyHandTool(view);
 			}
 		}
 	}
 	
-	private void applyHandTool(JComponent component)
+	private void applyHandTool(ImageView component)
 	{
 		JPanel toolbar = workspace.getToolbarContainer();
-		if(toolbar.getComponent(0) instanceof FileToolbar)
-			return;
-		
 		toolbar.remove(0);
 		toolbar.add(new FileToolbar(workspace.getWorkspaceArena(), workspace.getLayerContainer()), 0);
 		toolbar.revalidate();
@@ -120,12 +114,9 @@ public class ToolsContainer extends JInternalFrame implements ActionListener {
 		workspace.getWorkspaceArena().setGlobalLemonTool(ToolType.HAND);
 	}
 	
-	private void applyBrushTool(JComponent component, Graphics2D context, BrushType type)
+	private void applyBrushTool(ImageView component, Graphics2D context, BrushType type)
 	{
 		JPanel toolbar = workspace.getToolbarContainer();
-		if(toolbar.getComponent(0) instanceof BrushToolbar)
-			return;
-		
 		removeMouseListeners(component);
 		
 		BrushTool btool = new BrushTool.Builder(context, type).build();
@@ -141,13 +132,9 @@ public class ToolsContainer extends JInternalFrame implements ActionListener {
 	private void removeMouseListeners(JComponent component)
 	{
 		for(MouseListener ml: component.getMouseListeners())
-		{
 			component.removeMouseListener(ml);
-		}
 		
 		for(MouseMotionListener mml: component.getMouseMotionListeners())
-		{
 			component.removeMouseMotionListener(mml);
-		}
 	}
 }

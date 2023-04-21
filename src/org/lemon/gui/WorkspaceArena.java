@@ -4,32 +4,44 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
+import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
 
+import org.lemon.gui.layer.FilterLayer;
+import org.lemon.gui.layer.ViewLayer;
 import org.lemon.gui.node.Node;
+import org.lemon.tools.BrushTool;
 import org.lemon.tools.LemonTool;
 import org.lemon.tools.LemonTool.ToolType;
+import org.lemon.tools.brush.BrushToolListener;
 
-public class WorkspaceArena extends JDesktopPane implements ComponentListener 
+public class WorkspaceArena extends JDesktopPane
 {
 	private static final long serialVersionUID = 1L;
 	
 	private LemonTool.ToolType globalLemonTool = ToolType.HAND;
 	private Color globalLemonColor;
+
+	private Map<NodeView, Layer> viewLayerMapping = new HashMap<>();
+	private LayerContainer layerContainer = null;
 	
-	public WorkspaceArena() {
+	public WorkspaceArena(LayerContainer layerContainer) {
+		this.layerContainer = layerContainer;
 		setSize(5000, 5000);
 		setBackground(new Color(160, 160, 160));
 		setVisible(true);
-		addComponentListener(this);
+		addComponentListener(new WorkspaceArenaComponentHandler());
 		
 		MouseHandler mh = new MouseHandler();
 		addMouseListener(mh);
@@ -65,21 +77,77 @@ public class WorkspaceArena extends JDesktopPane implements ComponentListener
 			{
 				NodeView view = (NodeView) frame;
 				List<Node> senders = view.getSenderNodes();
-				for(Node node: senders)
+				if(senders != null)
 				{
-					g2d.setPaint(node.getColor());
-					g2d.fill(new Ellipse2D.Double(sendCurrentX, sendCurrentY, nodePointSize, nodePointSize));
-					sendCurrentY += nodePointSize + 5;
+					for(Node node: senders)
+					{
+						g2d.setPaint(node.getColor());
+						g2d.fill(new Ellipse2D.Double(sendCurrentX, sendCurrentY, nodePointSize, nodePointSize));
+						sendCurrentY += nodePointSize + 5;
+					}
 				}
 				
 				List<Node> receivers = view.getReceiverNodes();
-				for(Node node: receivers)
+				if(receivers != null)
 				{
-					g2d.setPaint(node.getColor());
-					g2d.fill(new Ellipse2D.Double(receiveCurrentX, receiveCurrentY, nodePointSize, nodePointSize));
-					receiveCurrentY += nodePointSize + 5;
+					for(Node node: receivers)
+					{
+						g2d.setPaint(node.getColor());
+						g2d.fill(new Ellipse2D.Double(receiveCurrentX, receiveCurrentY, nodePointSize, nodePointSize));
+						receiveCurrentY += nodePointSize + 5;
+					}
 				}
 			}
+		}
+	}
+
+	public void addView(AbstractView view)
+	{
+		if(view == null) return;
+		if(view instanceof ImageView)
+		{
+			if(globalLemonTool == ToolType.BRUSH)
+			{
+				new BrushToolListener((ImageView) view, new BrushTool.Builder(((ImageView) view).getCurrentImage().createGraphics(), BrushTool.BrushType.NORMAL).build());
+			}
+			Layer imageViewLayer = new ViewLayer(view, view.getTitle());
+			layerContainer.addLayer(imageViewLayer);
+			viewLayerMapping.put((NodeView) view, imageViewLayer);
+		}
+		else
+		{
+			if(view instanceof NodeView)
+			{
+				Layer nodeViewLayer = new FilterLayer(view, view.getTitle());
+				layerContainer.addLayer(nodeViewLayer);
+				viewLayerMapping.put((NodeView) view, nodeViewLayer);
+			}
+			else return;
+		}
+		view.addInternalFrameListener(new ViewActionHandler());
+		add(view);
+		revalidate();
+	}
+
+	private final class ViewActionHandler extends InternalFrameAdapter
+	{
+		@Override
+		public void internalFrameClosing(InternalFrameEvent e) 
+		{
+			JInternalFrame source = e.getInternalFrame();
+			layerContainer.removeLayer(viewLayerMapping.get(source));
+			viewLayerMapping.remove(source);
+			layerContainer.revalidate();
+			revalidate();
+		}
+	}
+
+	private final class WorkspaceArenaComponentHandler extends ComponentAdapter
+	{
+		@Override
+		public void componentMoved(ComponentEvent e) 
+		{
+			repaint();
 		}
 	}
 	
@@ -103,47 +171,8 @@ public class WorkspaceArena extends JDesktopPane implements ComponentListener
 		this.globalLemonColor = color;
 	}
 
-	@Override
-	public void componentResized(ComponentEvent e) 
-	{
-		
-	}
-	
-	@Override
-	public void componentMoved(ComponentEvent e) 
-	{
-		repaint();
-	}
-	
-	@Override
-	public void componentShown(ComponentEvent e) 
-	{
-		
-	}
-
-	@Override
-	public void componentHidden(ComponentEvent e) 
-	{
-		
-	}
-	
 	class MouseHandler extends MouseAdapter 
 	{
-		
-		public MouseHandler() {}
-		
-		@Override
-		public void mousePressed(MouseEvent e) 
-		{
-			super.mousePressed(e);
-		}
-		
-		@Override
-		public void mouseDragged(MouseEvent e) 
-		{
-			super.mouseDragged(e);
-		}
-		
 		@Override
 		public void mouseReleased(MouseEvent e) 
 		{

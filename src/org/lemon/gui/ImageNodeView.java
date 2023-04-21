@@ -14,7 +14,7 @@ public class ImageNodeView extends NodeView
 
 	public ImageNodeView(LayerContainer lycont, List<Node> receivers, List<Node> senders, ImageView imageView) 
 	{
-		super(lycont, receivers, senders);
+		super(receivers, senders);
 		this.imageView = imageView;
 		
 		setSize(200, 300);

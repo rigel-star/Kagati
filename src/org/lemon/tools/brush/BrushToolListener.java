@@ -6,6 +6,7 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JComponent;
 
+import org.lemon.gui.ImageView;
 import org.lemon.tools.BrushTool;
 
 public class BrushToolListener extends MouseAdapter {
@@ -14,7 +15,7 @@ public class BrushToolListener extends MouseAdapter {
 	private BrushTool btool = null;
 	private JComponent component;
 	
-	public BrushToolListener(JComponent component, BrushTool btool)
+	public BrushToolListener(ImageView component, BrushTool btool)
 	{
 		this.btool = btool;
 		this.component = component;

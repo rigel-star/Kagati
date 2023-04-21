@@ -36,8 +36,8 @@ public class BlurFilterNodeView extends NodeView
 	
 	private Joystick spinBlurJoy = new Joystick( 100 );
 	
-	public BlurFilterNodeView(final LayerContainer lycont, List<Node> receivers, List<Node> senders) {
-		super(lycont, receivers, senders);
+	public BlurFilterNodeView(List<Node> receivers, List<Node> senders) {
+		super(receivers, senders);
 		
 		String[] blurs = {
 				"Select",

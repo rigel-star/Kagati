@@ -12,16 +12,12 @@ import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import org.lemon.gui.ImageView;
 import org.lemon.gui.ImageViewSetup;
-import org.lemon.gui.Layer;
 import org.lemon.gui.LayerContainer;
 import org.lemon.gui.WorkspaceArena;
 import org.lemon.gui.image.ChooseImage;
-import org.lemon.gui.image.ImagePanel;
-import org.lemon.gui.layer.ViewLayer;
-import org.lemon.tools.BrushTool;
-import org.lemon.tools.brush.BrushToolListener;
 
-public class FileToolbar extends JToolBar {
+public class FileToolbar extends JToolBar 
+{
 	private static final long serialVersionUID = 1L;
 	
 	private JButton openBttn = null;
@@ -31,7 +27,8 @@ public class FileToolbar extends JToolBar {
 	private WorkspaceArena workspace = null;
 	private LayerContainer layerContainer = null;
 	
-	public FileToolbar(final WorkspaceArena wk, final LayerContainer layerContainer) {
+	public FileToolbar(final WorkspaceArena wk, final LayerContainer layerContainer) 
+	{
 		this.workspace = wk;
 		this.layerContainer = layerContainer;
 		
@@ -63,8 +60,8 @@ public class FileToolbar extends JToolBar {
 		add(bttnPanel);
 	}
 	
-	private class ActionHandler implements ActionListener {
-
+	private class ActionHandler implements ActionListener 
+	{
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if (e.getSource() == openBttn) {
@@ -81,40 +78,19 @@ public class FileToolbar extends JToolBar {
 		private void actionOpenFile() {
 			ChooseImage imgChoose = new ChooseImage();
 			BufferedImage img = imgChoose.getChoosenImage();
-			
 			String title = imgChoose.getChoosenFile().getName();
-			ImageView imageView = new ImageView(img, title, layerContainer);
-			ImagePanel panel = imageView.getImagePanel();
-			
-			switch(workspace.getGlobalLemonTool())
-			{
-				case BRUSH:
-					new BrushToolListener(panel, new BrushTool.Builder(imageView.getDrawable(), BrushTool.BrushType.NORMAL).build());
-					break;
-					
-				case HAND:
-					break;
-					
-				case SELECT:
-					break;
-					
-				case CROP:
-					break;
-			}
-			
-			workspace.add(imageView);
-			workspace.revalidate();
-			
-			Layer ly = new ViewLayer(imageView, imageView.getTitle());
-			layerContainer.addLayer(ly);
+			ImageView imageView = new ImageView(img, title);
+			workspace.addView(imageView);
 		}
 		
-		private void actionSaveFile() {
+		private void actionSaveFile() 
+		{
 			
 		}
 		
-		private void actionNewFile() {
-			new ImageViewSetup(workspace, layerContainer);
+		private void actionNewFile() 
+		{
+			new ImageViewSetup(workspace);
 		}
 	}
 }

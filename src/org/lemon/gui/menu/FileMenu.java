@@ -14,10 +14,8 @@ import org.lemon.filter.ResizeImageFilter;
 import org.lemon.graphics.Texture;
 import org.lemon.gui.ImageView;
 import org.lemon.gui.ImageViewSetup;
-import org.lemon.gui.LayerContainer;
 import org.lemon.gui.WorkspaceArena;
 import org.lemon.gui.image.ChooseImage;
-import org.lemon.gui.layer.ViewLayer;
 import org.lemon.image.LImage;
 
 public class FileMenu extends JMenu implements ActionListener {
@@ -26,12 +24,9 @@ public class FileMenu extends JMenu implements ActionListener {
 	private JMenuItem openFile, saveFile, newFile;
 	
 	private WorkspaceArena wks;
-	private LayerContainer lyrs;
 	
-	public FileMenu(final WorkspaceArena workspace, final LayerContainer layers) {
+	public FileMenu(final WorkspaceArena workspace) {
 		this.wks = workspace;
-		this.lyrs = layers;
-		
 		setText("File");
 		
 		this.newFile = new JMenuItem("New..." );
@@ -55,28 +50,20 @@ public class FileMenu extends JMenu implements ActionListener {
 			openFile();
 	}
 	
-	private void newFile() {
-		new ImageViewSetup( wks, lyrs );
+	private void newFile() 
+	{
+		new ImageViewSetup(wks);
 	}
 	
-	private void openFile() {
+	private void openFile() 
+	{
 		ChooseImage imgChoose = new ChooseImage();
 		BufferedImage img = imgChoose.getChoosenImage();
-		
-		Composite cc = new AddComposite( .5f );
-		CompositeFilter cf = new CompositeFilter( cc );
-		LImage out = cf.compose( 
-				new ResizeImageFilter( img.getWidth(), img.getHeight()).filter( Texture.WOOD.getDrawable()),
-						new LImage( img ));
-		
+		Composite cc = new AddComposite(.5f);
+		CompositeFilter cf = new CompositeFilter(cc);
+		LImage out = cf.compose(new ResizeImageFilter(img.getWidth(), img.getHeight()).filter(Texture.WOOD.getDrawable()), new LImage(img));
 		img = out.getAsBufferedImage();
-		
-		String title = imgChoose.getChoosenFile().getName();
-		ImageView imgView = new ImageView(img, title, lyrs);
-		
-		wks.add(imgView);
-		wks.revalidate();
-		
-		lyrs.addLayer(new ViewLayer(imgView, title));
+		ImageView imgView = new ImageView(img, imgChoose.getChoosenFile().getName());
+		wks.addView(imgView);
 	}
 }

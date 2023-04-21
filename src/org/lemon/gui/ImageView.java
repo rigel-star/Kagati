@@ -10,22 +10,21 @@ import javax.swing.BorderFactory;
 
 import org.lemon.gui.image.ImagePanel;
 
-public class ImageView extends AbstractView
+public class ImageView extends NodeView
 {
 	private static final long serialVersionUID = 1L;
 	
 	private ImagePanel imagePanel = null;
 	private BufferedImage imageSource = null;
 	
-	public ImageView(BufferedImage img, final LayerContainer lycont) 
+	public ImageView(BufferedImage img) 
 	{
-		this(img, null, lycont);
+		this(img, null);
 	}
 	
-	public ImageView(BufferedImage img, final String title, final LayerContainer layerContainer )  
+	public ImageView(BufferedImage img, final String title)  
 	{
-		super(layerContainer);
-		
+		super(null, null);
 		if(img == null)
 			throw new NullPointerException( "Image can't be null." );
 		

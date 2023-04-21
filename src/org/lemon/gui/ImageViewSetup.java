@@ -46,17 +46,15 @@ public class ImageViewSetup extends JDialog implements ActionListener {
 	private JPanel measureContainer = null;
 	
 	private WorkspaceArena workspace = null;
-	private LayerContainer layerContainer = null;
 	
 	/**
 	 * Constructs {@code ImageViewSetup} with specified {@code Workspace}.
 	 * @param wk		{@View} container
 	 * */
-	public ImageViewSetup(WorkspaceArena wk, LayerContainer layerContainer) {
+	public ImageViewSetup(WorkspaceArena wk) {
 		
 		init();
 		this.workspace = wk;
-		this.layerContainer = layerContainer;
 		
 		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 		Dimension size = getPreferredSize();
@@ -200,22 +198,19 @@ public class ImageViewSetup extends JDialog implements ActionListener {
 	}
 	
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		if(e.getSource() == okBttn) {
-			int width = Integer.parseInt( widthFld.getText() );
-			int height = Integer.parseInt( heightFld.getText() );
+	public void actionPerformed(ActionEvent e) 
+	{
+		if(e.getSource() == okBttn) 
+		{
+			int width = Integer.parseInt(widthFld.getText());
+			int height = Integer.parseInt(heightFld.getText());
 			String title = titleFld.getText();
-			ImageView view = new CanvasView(width, height, Color.yellow, title, layerContainer);
-			
-			Layer layer = new ViewLayer(view, title);
-			layerContainer.addLayer(layer);
-			
-			workspace.add(view);
-			workspace.revalidate();
-			
+			ImageView view = new CanvasView(width, height, Color.yellow, title);
+			workspace.addView(view);
 			dispose();
 		}
-		else if(e.getSource() == cancelBttn) {
+		else if(e.getSource() == cancelBttn) 
+		{
 			dispose();
 		}
 	}

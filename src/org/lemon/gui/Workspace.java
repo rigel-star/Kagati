@@ -20,9 +20,9 @@ public class Workspace extends Container {
 	
 	public Workspace()
 	{
-		workspaceArena = new WorkspaceArena();
-		toolsContainer = new ToolsContainer(this);
 		layerContainer = new LayerContainer();
+		workspaceArena = new WorkspaceArena(layerContainer);
+		toolsContainer = new ToolsContainer(this);
 		toolbarContainer = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		toolInfoPanel = new JPanel();
 		
