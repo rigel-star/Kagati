@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.RenderingHints;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
@@ -53,23 +54,24 @@ public class WorkspaceArena extends JDesktopPane
 	{
 		super.paintComponent(g);
 		Graphics2D g2d = (Graphics2D) g;
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		
-		final int nodePointSize = 10;
+		final int nodePointSize = 12;
 		JInternalFrame frames[] = getAllFrames();
 		
 		for(JInternalFrame frame: frames)
 		{
 			final Point framePosition = frame.getLocation();
 			final int frameWidth = frame.getWidth();
-			final int frameHeight = frame.getHeight();
+			// final int frameHeight = frame.getHeight();
 			
 			final int receiveStartX = framePosition.x - (nodePointSize >> 1);
-			final int receiveStartY = framePosition.y + (frameHeight >> 1);
+			final int receiveStartY = framePosition.y + 30;
 			int receiveCurrentX = receiveStartX;
 			int receiveCurrentY = receiveStartY;
 			
 			final int sendStartX = framePosition.x + frameWidth - (nodePointSize >> 1);
-			final int sendStartY = framePosition.y + (frameHeight >> 1);
+			final int sendStartY = framePosition.y + 30;
 			int sendCurrentX = sendStartX;
 			int sendCurrentY = sendStartY;
 			
@@ -178,6 +180,6 @@ public class WorkspaceArena extends JDesktopPane
 		{
 			super.mouseReleased(e);
 			repaint();
-		}	
+		}
 	}
 }
