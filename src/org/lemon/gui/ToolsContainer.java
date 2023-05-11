@@ -45,7 +45,7 @@ public class ToolsContainer extends JInternalFrame implements ActionListener {
 		polySnapTool = createToolButton(new ImageIcon("icons/tools/cutter.png"), this);
 		brushTool = createToolButton(new ImageIcon("icons/tools/brush.png"), this);
 		cropTool = createToolButton(new ImageIcon("icons/tools/crop.png"), this);
-		colPickerTool = createToolButton("Color", this);
+		colPickerTool = createToolButton("Color Hola Mol", this);
 		
 		colPickerTool.setBackground(Color.BLACK);
 		colPickerTool.setForeground(Color.BLACK);
