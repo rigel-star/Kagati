@@ -106,6 +106,7 @@ public class FilterMenu extends JMenu implements ActionListener {
 		else if(e.getSource() == waterRippleFilter)
 			src = new WaterRippleImageFilter().filter(srcL).getAsBufferedImage();
 		
+		((ImageView) selected).getImagePanel().setImage(src);
 		((ImageView) selected).getImagePanel().repaint();
 	}
 }
