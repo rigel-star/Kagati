@@ -1,11 +1,14 @@
 package org.lemon.tools;
 
 public interface LemonTool {
-	public static enum ToolType
-	{
+	public static enum ToolType {
 		BRUSH,
 		HAND,
 		SELECT,
-		CROP
+		RECT_MARQUEE,
+		CIRCLE_MARQUEE,
+		CROP,
+		OPEN,
+		NEW
 	}
 }

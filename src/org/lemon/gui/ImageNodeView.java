@@ -14,15 +14,11 @@ import org.lemon.gui.image.ImagePanel;
 import org.lemon.gui.node.Node;
 import org.lemon.image.LImage;
 
-public class ImageNodeView extends NodeView 
-{
-	private static final long serialVersionUID = 1L;
-	
+public class ImageNodeView extends NodeView {
 	private ImageView imageView;
 	private JPanel contentPane;
 
-	public ImageNodeView(List<Node> receivers, List<Node> senders, ImageView imageView) 
-	{
+	public ImageNodeView(List<Node> receivers, List<Node> senders, ImageView imageView) {
 		super(receivers, senders);
 		this.imageView = imageView;
 		this.contentPane = new JPanel();
@@ -39,13 +35,12 @@ public class ImageNodeView extends NodeView
 		setSize(200, 300);
 		setTitle(imageView.getTitle());
 		setResizable(false);
-		setVisible(true);
 		setClosable(true);
 		setLocation(20, 50);
+		setVisible(true);
 	}
 	
-	public ImageView getImageView()
-	{
+	public ImageView getImageView() {
 		return imageView;
 	}
 }

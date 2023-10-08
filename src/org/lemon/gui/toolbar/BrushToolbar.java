@@ -11,21 +11,25 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
-import javax.swing.JToolBar;
 
+import org.lemon.gui.AbstractToolBar;
 import org.lemon.gui.ImageView;
 import org.lemon.gui.WorkspaceArena;
 import org.lemon.tools.BrushTool;
 import org.lemon.tools.BrushTool.BrushType;
 import org.lemon.tools.brush.BrushToolListener;
 
-public class BrushToolbar extends JToolBar implements ActionListener {
+public class BrushToolbar extends AbstractToolBar implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	
 	private WorkspaceArena workspace;
 	private JButton normalBrush, softBrush, wobbleBrush, zigzagBrush;
 	
 	private BrushTool.BrushType currentBrush = BrushType.NORMAL;
+
+	public BrushToolbar() {
+
+	}
 	
 	public BrushToolbar(final WorkspaceArena workspace) {
 		this.workspace = workspace;

@@ -20,13 +20,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import org.lemon.gui.layer.ViewLayer;
-
 import sround.awt.RoundJTextField;
 
 public class ImageViewSetup extends JDialog implements ActionListener {
-	private static final long serialVersionUID = 1L;
-	
 	private final static int V_GAP = 10;
 	private final static int H_GAP = 10;
 	private final static int BORDER = 12;
@@ -175,8 +171,8 @@ public class ImageViewSetup extends JDialog implements ActionListener {
 				"Pixels"
 		};
 		
-		JComboBox<String> combo = new JComboBox<String>( measureModes );
-		combo.setPreferredSize( new Dimension( 100, 30 ));
+		JComboBox<String> combo = new JComboBox<String>(measureModes);
+		combo.setPreferredSize(new Dimension(100, 30));
 		return combo;
 	}
 	
@@ -187,8 +183,8 @@ public class ImageViewSetup extends JDialog implements ActionListener {
 				"Gray scale",
 		};
 		
-		JComboBox<String> combo = new JComboBox<String>( measureModes );
-		combo.setPreferredSize( new Dimension(100, 30));
+		JComboBox<String> combo = new JComboBox<String>(measureModes);
+		combo.setPreferredSize(new Dimension(100, 30));
 		return combo;
 	}
 	
@@ -198,10 +194,8 @@ public class ImageViewSetup extends JDialog implements ActionListener {
 	}
 	
 	@Override
-	public void actionPerformed(ActionEvent e) 
-	{
-		if(e.getSource() == okBttn) 
-		{
+	public void actionPerformed(ActionEvent e) {
+		if(e.getSource() == okBttn) {
 			int width = Integer.parseInt(widthFld.getText());
 			int height = Integer.parseInt(heightFld.getText());
 			String title = titleFld.getText();
@@ -209,8 +203,7 @@ public class ImageViewSetup extends JDialog implements ActionListener {
 			workspace.addView(view);
 			dispose();
 		}
-		else if(e.getSource() == cancelBttn) 
-		{
+		else if(e.getSource() == cancelBttn) {
 			dispose();
 		}
 	}

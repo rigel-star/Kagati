@@ -6,38 +6,31 @@ import java.awt.image.WritableRaster;
 import org.lemon.image.LImage;
 
 public abstract class SinglePixelFilter extends AbstractImageFilter {
-	
 	@Override
-	public LImage filter( LImage limage ) {
-		
+	public LImage filter(LImage limage) {
 		final int width = limage.width;
         final int height = limage.height;
-        
 		BufferedImage asBuff = limage.getAsBufferedImage();
         WritableRaster srcRaster = limage.getAsBufferedImage().getRaster();
-        
-        BufferedImage outImg = new BufferedImage( width, height, asBuff.getType() );
+        BufferedImage outImg = new BufferedImage(width, height, asBuff.getType());
         WritableRaster dstRaster = outImg.getRaster();
 		
-		int[] inPixels = new int[ width ];
-		
-		for( int y = 0; y < height; ++y ) {
-			if( asBuff.getType() == BufferedImage.TYPE_INT_ARGB ) {
-				srcRaster.getDataElements( 0, y, width, 1, inPixels );
-				
-				for( int x = 0; x < width; ++x ) 
-					inPixels[x] = processRGB(x, y, inPixels[x] );
-				
-				dstRaster.setDataElements( 0, y, width, 1, inPixels );
+		int[] inPixels = new int[width];
+		for(int y = 0; y < height; ++y) {
+			if(asBuff.getType() == BufferedImage.TYPE_INT_ARGB) {
+				srcRaster.getDataElements(0, y, width, 1, inPixels);
+				for(int x = 0; x < width; ++x) 
+					inPixels[x] = processRGB(x, y, inPixels[x]);
+				dstRaster.setDataElements(0, y, width, 1, inPixels);
 			}
 			else {
-				asBuff.getRGB( 0, y, width, 1, inPixels, 0, width );
-				for ( int x = 0; x < width; x++ )
+				asBuff.getRGB(0, y, width, 1, inPixels, 0, width);
+				for (int x = 0; x < width; x++)
 					inPixels[x] = processRGB( x, y, inPixels[x] );
-				outImg.setRGB( 0, y, width, 1, inPixels, 0, width );
+				outImg.setRGB(0, y, width, 1, inPixels, 0, width);
 			}
 		}
-		return new LImage( outImg );
+		return new LImage(outImg);
 	}
 	
 	/**

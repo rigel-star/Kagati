@@ -8,32 +8,27 @@ import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 
 public class ChooseImage {
-
-	
-	private File file;
-	private BufferedImage img = null;
+	private File chosenFile;
 	
 	public ChooseImage() {
-		JFileChooser fileC = new JFileChooser();
-		
-		int result = fileC.showOpenDialog(null);
-        if (result == JFileChooser.APPROVE_OPTION) {
-            file = fileC.getSelectedFile();
+		JFileChooser fileChooser = new JFileChooser();
+		int result = fileChooser.showOpenDialog(null);
+        if(result == JFileChooser.APPROVE_OPTION) {
+            chosenFile = fileChooser.getSelectedFile();
         }
-		
 	}
 	
 	public BufferedImage getChoosenImage() {
 		try {
-			this.img = ImageIO.read(this.file);
-		} catch (IOException e) {
+			return ImageIO.read(this.chosenFile);
+		} 
+		catch(IOException e) {
 			e.printStackTrace();
+			return null;
 		}
-		return this.img;
 	}
 	
 	public File getChoosenFile() {
-		return this.file;
+		return this.chosenFile;
 	}
-
 }

@@ -5,35 +5,32 @@ public class ImageMath {
 	/**
      * The value of half pi as a float.
      */
-	public final static float HALF_PI = (float)Math.PI/2.0f;
+	public final static float HALF_PI = (float) Math.PI / 2.0f;
 
     /**
      * The value of quarter pi as a float.
      */
-	public final static float QUARTER_PI = (float)Math.PI/4.0f;
+	public final static float QUARTER_PI = (float) Math.PI / 4.0f;
 
     /**
      * The value of two pi as a float.
      */
-	public final static float TWO_PI = (float)Math.PI*2.0f;
+	public final static float TWO_PI = (float) Math.PI * 2.0f;
 	
 	/**
 	 * Premultiply alpha with image data.
 	 * 
 	 * @param data image data to premultiply alpha with
 	 * */
-	public static void premultiplyAlpha( int[] data ) {
-		
-		for( int ii = 0; ii < data.length; ii++ ) {
+	public static void premultiplyAlpha(int[] data) {
+		for(int ii = 0; ii < data.length; ii++) {
+			int a = (data[ii] >> 24) & 0xFF;
+			int r = (data[ii] >> 16) & 0xFF;
+			int g = (data[ii] >> 8) & 0xFF;
+			int b = (data[ii]) & 0xFF;
 			
-			int a = ( data[ii] >> 24 ) & 0xFF;
-			int r = ( data[ii] >> 16 ) & 0xFF;
-			int g = ( data[ii] >> 8 ) & 0xFF;
-			int b = ( data[ii] ) & 0xFF;
-			
-			float f = a * ( 1 / 255 );
-			
-			if( f != 0 ) {
+			float f = a * (1 / 255);
+			if(f != 0) {
 				r *= f;
 				g *= f;
 				b *= f;
@@ -48,9 +45,7 @@ public class ImageMath {
 	 * @param data image data to unpremultiply alpha from
 	 * */
 	public static void unpremultiplyAlpha( int[] data ) {
-		
 		for ( int i = 0; i < data.length; i ++ ) {
-        
             int a = ( data[i] >> 24 ) & 0xff;
             int r = ( data[i] >> 16 ) & 0xff;
             int g = ( data[i] >> 8 ) & 0xff;
@@ -58,7 +53,6 @@ public class ImageMath {
             
             if ( a != 0 && a != 255 ) {
                 float f = 255.0f / a;
-                
                 r *= f;
                 g *= f;
                 b *= f;
@@ -68,7 +62,6 @@ public class ImageMath {
                     g = 255;
                 if ( b > 255 )
                     b = 255;
-                
                 data[i] = (a << 24) | (r << 16) | (g << 8) | b;
             }
         }
@@ -104,7 +97,6 @@ public class ImageMath {
 	 */
 	public static double mod(double a, double b) {
 		int n = (int)(a/b);
-		
 		a -= n*b;
 		if (a < 0)
 			return a + b;
@@ -119,7 +111,6 @@ public class ImageMath {
 	 */
 	public static float mod(float a, float b) {
 		int n = (int)(a/b);
-		
 		a -= n*b;
 		if (a < 0)
 			return a + b;
@@ -134,7 +125,6 @@ public class ImageMath {
 	 */
 	public static int mod(int a, int b) {
 		int n = a/b;
-		
 		a -= n*b;
 		if (a < 0)
 			return a + b;
@@ -185,7 +175,6 @@ public class ImageMath {
 		m0 = cx * b0 + x * b1;
 		m1 = cx * b2 + x * b3;
 		int b = (int)(cy * m0 + y * m1);
-
 		return (a << 24) | (r << 16) | (g << 8) | b;
 	}
 }

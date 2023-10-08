@@ -2,35 +2,28 @@ package org.lemon.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
-import java.awt.FlowLayout;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.lemon.gui.toolbar.FileToolbar;
-
 public class Workspace extends Container {
-	private static final long serialVersionUID = 1L;
+	private final ToolBarContainer toolbarContainer;
+	private final ToolsContainer toolsContainer;
+	private final LayerContainer layerContainer;
+	private final WorkspaceArena workspaceArena;
+	private final JPanel toolInfoPanel;
 	
-	private JPanel toolbarContainer = null;
-	private WorkspaceArena workspaceArena = null;
-	private ToolsContainer toolsContainer = null;
-	private LayerContainer layerContainer = null;
-	private JPanel toolInfoPanel = null;
-	
-	public Workspace()
-	{
+	public Workspace() {
+		new WorkspaceArena(); // to initialize the variable toolChangeListener; no other purpose of this call
 		layerContainer = new LayerContainer();
-		workspaceArena = new WorkspaceArena(layerContainer);
-		toolsContainer = new ToolsContainer(this);
-		toolbarContainer = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		toolsContainer = new ToolsContainer();
+		toolbarContainer = new ToolBarContainer(toolsContainer);
+		workspaceArena = new WorkspaceArena(layerContainer, toolbarContainer);
+		WorkspaceArena.toolChangeListener.changeWorkspaceArena(workspaceArena);
 		toolInfoPanel = new JPanel();
-		
-		setLayout(new BorderLayout());
-		
-		toolbarContainer.add(new FileToolbar(workspaceArena, layerContainer), 0);
 		toolInfoPanel.add(new JLabel("File handling"), 0);
 		
+		setLayout(new BorderLayout());
 		add(toolsContainer, BorderLayout.WEST);
 		add(layerContainer, BorderLayout.EAST);
 		add(workspaceArena, BorderLayout.CENTER);
@@ -38,8 +31,7 @@ public class Workspace extends Container {
 		add(toolbarContainer, BorderLayout.NORTH);
 	}
 	
-	public JPanel getToolbarContainer()
-	{
+	public ToolBarContainer getToolbarContainer() {
 		return this.toolbarContainer;
 	}
 

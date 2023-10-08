@@ -3,7 +3,6 @@ package org.lemon.gui;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
@@ -14,6 +13,7 @@ import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JComboBox;
@@ -21,24 +21,29 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import org.lemon.gui.node.Node;
+import org.lemon.filter.GaussianBlurImageFilter;
+import org.lemon.gui.node.ColorOutputNode;
+import org.lemon.gui.node.FilterInputNode;
+import org.lemon.gui.node.FilterOutputNode;
 
-public class BlurFilterNodeView extends NodeView 
-{
-	private static final long serialVersionUID = 1L;
-	
+public class BlurFilterNodeView extends NodeView  {
 	private JPanel controlPanel = null;
-	
 	private JComboBox<String> blurChooser = null;
-	
 	private JPanel spinBlurPanel = new JPanel();
 	private JPanel blurChooserPanel = new JPanel();
-	
 	private Joystick spinBlurJoy = new Joystick( 100 );
 	
-	public BlurFilterNodeView(List<Node> receivers, List<Node> senders) {
-		super(receivers, senders);
-		
+	public BlurFilterNodeView() {
+		super(new ArrayList<>() {{
+					add(new FilterInputNode());
+				}},
+				new ArrayList<>() {{
+					add(new FilterOutputNode(new GaussianBlurImageFilter()));
+					add(new ColorOutputNode());
+				}}
+		);
+
+		setTitle("Blur");
 		String[] blurs = {
 				"Select",
 				"Gaussian blur..."
@@ -56,13 +61,6 @@ public class BlurFilterNodeView extends NodeView
 		controlPanel = new JPanel();
 		controlPanel.setLayout( new GridLayout( 2, 1 ));
 		
-		setSize(200, 300);
-		setTitle("Blur");
-		setResizable(false);
-		setVisible(true);
-		setClosable(true);
-		setLocation(20, 50);
-		
 		blurChooserPanel.add(new JLabel("Blurs:"));
 		blurChooserPanel.add(blurChooser);
 		
@@ -72,14 +70,10 @@ public class BlurFilterNodeView extends NodeView
 		controlPanel.add(blurChooserPanel);
 		controlPanel.add(spinBlurPanel);
 		
-		Container c = getContentPane();
-		c.add(controlPanel);
-	}
-	
-	@Override
-	public Dimension getPreferredSize() 
-	{
-		return new Dimension(200, 140);
+		JPanel c = getContentPanel();
+		c.setLayout(new GridLayout(2, 1));
+		c.add(blurChooserPanel);
+		c.add(spinBlurPanel);
 	}
 	
 	/**

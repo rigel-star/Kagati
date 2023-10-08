@@ -1,19 +1,20 @@
 package org.lemon.gui;
 
-import java.awt.Color;
+import java.awt.BasicStroke;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.RenderingHints;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.geom.Ellipse2D;
-import java.util.HashMap;
+import java.awt.geom.Line2D;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
+import javax.imageio.ImageIO;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.event.InternalFrameAdapter;
@@ -22,120 +23,68 @@ import javax.swing.event.InternalFrameEvent;
 import org.lemon.gui.layer.FilterLayer;
 import org.lemon.gui.layer.ViewLayer;
 import org.lemon.gui.node.Node;
-import org.lemon.tools.BrushTool;
 import org.lemon.tools.LemonTool;
 import org.lemon.tools.LemonTool.ToolType;
-import org.lemon.tools.brush.BrushToolListener;
+import org.lemon.tools.file.NewFileTool;
+import org.lemon.tools.file.OpenFileTool;
+import org.lemon.tools.select.CircleMarqueeSelectionTool;
+import org.lemon.tools.select.RectMarqueeSelectionTool;
 
-public class WorkspaceArena extends JDesktopPane
-{
-	private static final long serialVersionUID = 1L;
-	
-	private LemonTool.ToolType globalLemonTool = ToolType.HAND;
-	private Color globalLemonColor;
-
+public class WorkspaceArena extends JDesktopPane implements Node.NodeClickListener {
 	private Map<NodeView, Layer> viewLayerMapping = new HashMap<>();
 	private LayerContainer layerContainer = null;
-	
-	public WorkspaceArena(LayerContainer layerContainer) {
-		this.layerContainer = layerContainer;
-		setSize(5000, 5000);
-		setBackground(new Color(160, 160, 160));
-		setVisible(true);
-		addComponentListener(new WorkspaceArenaComponentHandler());
-		
-		MouseHandler mh = new MouseHandler();
-		addMouseListener(mh);
-		addMouseMotionListener(mh);
+	private ToolBarContainer toolBarContainer;
+
+	public static AbstractToolBarToolChangeListener toolChangeListener;
+
+	public WorkspaceArena() {
+		toolChangeListener = new AbstractToolBarToolChangeListener();
 	}
-	
-	@Override
-	public void paintComponent(Graphics g) 
-	{
-		super.paintComponent(g);
-		Graphics2D g2d = (Graphics2D) g;
-		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		
-		final int nodePointSize = 12;
-		JInternalFrame frames[] = getAllFrames();
-		
-		for(JInternalFrame frame: frames)
-		{
-			final Point framePosition = frame.getLocation();
-			final int frameWidth = frame.getWidth();
-			// final int frameHeight = frame.getHeight();
-			
-			final int receiveStartX = framePosition.x - (nodePointSize >> 1);
-			final int receiveStartY = framePosition.y + 30;
-			int receiveCurrentX = receiveStartX;
-			int receiveCurrentY = receiveStartY;
-			
-			final int sendStartX = framePosition.x + frameWidth - (nodePointSize >> 1);
-			final int sendStartY = framePosition.y + 30;
-			int sendCurrentX = sendStartX;
-			int sendCurrentY = sendStartY;
-			
-			if(frame instanceof NodeView)
-			{
-				NodeView view = (NodeView) frame;
-				List<Node> senders = view.getSenderNodes();
-				if(senders != null)
-				{
-					for(Node node: senders)
-					{
-						g2d.setPaint(node.getColor());
-						g2d.fill(new Ellipse2D.Double(sendCurrentX, sendCurrentY, nodePointSize, nodePointSize));
-						sendCurrentY += nodePointSize + 5;
-					}
-				}
-				
-				List<Node> receivers = view.getReceiverNodes();
-				if(receivers != null)
-				{
-					for(Node node: receivers)
-					{
-						g2d.setPaint(node.getColor());
-						g2d.fill(new Ellipse2D.Double(receiveCurrentX, receiveCurrentY, nodePointSize, nodePointSize));
-						receiveCurrentY += nodePointSize + 5;
-					}
-				}
-			}
+
+	public WorkspaceArena(LayerContainer layerContainer, ToolBarContainer toolBarContainer) {
+		this.layerContainer = layerContainer;
+		this.toolBarContainer = toolBarContainer;
+		this.toolBarContainer.getToolBar().addToolChangeListener(toolChangeListener);
+
+		WorkspaceArenaMouseAdapter mouseAdapter = new WorkspaceArenaMouseAdapter();
+		addMouseMotionListener(mouseAdapter);
+		addMouseListener(mouseAdapter);
+
+		try {
+			ImageView testView = new ImageView(ImageIO.read(new File("/Users/rigelstar/Desktop/extra/Test Images/worker.jpeg")), "worker.jpeg");
+			addView(testView);
+		}
+		catch(IOException e) {
+			e.printStackTrace();
 		}
 	}
 
-	public void addView(AbstractView view)
-	{
+	public void addView(AbstractView view) {
 		if(view == null) return;
-		if(view instanceof ImageView)
-		{
-			if(globalLemonTool == ToolType.BRUSH)
-			{
-				new BrushToolListener((ImageView) view, new BrushTool.Builder(((ImageView) view).getCurrentImage().createGraphics(), BrushTool.BrushType.NORMAL).build());
-			}
+		if(view instanceof ImageView) {
 			Layer imageViewLayer = new ViewLayer(view, view.getTitle());
 			layerContainer.addLayer(imageViewLayer);
 			viewLayerMapping.put((NodeView) view, imageViewLayer);
 		}
-		else
-		{
-			if(view instanceof NodeView)
-			{
+		else {
+			if(view instanceof NodeView nodeView) {
 				Layer nodeViewLayer = new FilterLayer(view, view.getTitle());
 				layerContainer.addLayer(nodeViewLayer);
-				viewLayerMapping.put((NodeView) view, nodeViewLayer);
+				viewLayerMapping.put(nodeView, nodeViewLayer);
+				nodeView.render();
+				nodeView.addNodeClickListener(this);
 			}
 			else return;
 		}
 		view.addInternalFrameListener(new ViewActionHandler());
 		add(view);
 		revalidate();
+		repaint();
 	}
 
-	private final class ViewActionHandler extends InternalFrameAdapter
-	{
+	private final class ViewActionHandler extends InternalFrameAdapter {
 		@Override
-		public void internalFrameClosing(InternalFrameEvent e) 
-		{
+		public void internalFrameClosing(InternalFrameEvent e) {
 			JInternalFrame source = e.getInternalFrame();
 			layerContainer.removeLayer(viewLayerMapping.get(source));
 			viewLayerMapping.remove(source);
@@ -143,43 +92,103 @@ public class WorkspaceArena extends JDesktopPane
 			revalidate();
 		}
 	}
+	
+	public class AbstractToolBarToolChangeListener implements AbstractToolBar.ToolChangeListener {
+		private WorkspaceArena workspaceArena;
 
-	private final class WorkspaceArenaComponentHandler extends ComponentAdapter
-	{
 		@Override
-		public void componentMoved(ComponentEvent e) 
-		{
+		public void toolChange(LemonTool.ToolType newTool) {
+			if(newTool == ToolType.OPEN) {
+				new OpenFileTool(workspaceArena);
+			}
+			else if(newTool == ToolType.NEW) {
+				new NewFileTool(workspaceArena);
+			}
+			else if(newTool == ToolType.RECT_MARQUEE) {
+				if(workspaceArena.getSelectedFrame() instanceof ImageView imageView) {
+					new RectMarqueeSelectionTool(imageView);
+				}
+			}
+			else if(newTool == ToolType.CIRCLE_MARQUEE) {
+				if(workspaceArena.getSelectedFrame() instanceof ImageView iv) {
+					new CircleMarqueeSelectionTool(iv);
+				}
+			}
+		}
+
+		public void changeWorkspaceArena(WorkspaceArena arena) {
+			this.workspaceArena = arena;
+		}
+	}
+
+	private boolean nodeConnectionStarted = false;
+	private int nodeConnectionStartX = 0;
+	private int nodeConnectionStartY = 0;
+	private int nodeConnectionEndX = 0;
+	private int nodeConnectionEndY = 0;
+	private Node startingNode, endingNode;
+	private List<NodeConnectionInfo> nodeConnectionInfos = new ArrayList<>();
+
+	@Override
+	protected void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		Graphics2D g2d = (Graphics2D) g;
+		g2d.setStroke(new BasicStroke(2));
+		if(nodeConnectionStarted) {
+			g2d.setColor(startingNode.getColor());
+			g2d.draw(new Line2D.Float(
+				nodeConnectionStartX, nodeConnectionStartY,
+				nodeConnectionEndX, nodeConnectionEndY
+			));
+		}
+
+		for(NodeConnectionInfo info: nodeConnectionInfos) {
+			g2d.setColor(info.startingNode.getColor());
+			g2d.draw(new Line2D.Float(info.startingNodeLocation, info.endingNodeLocation));
+		}
+	}
+
+	private class WorkspaceArenaMouseAdapter extends MouseAdapter {
+		@Override
+		public void mouseMoved(MouseEvent e) {
+			nodeConnectionEndX = e.getX();
+			nodeConnectionEndY = e.getY();
+			repaint();
+		}
+
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			nodeConnectionStarted = false;
+			startingNode = null;
+			endingNode = null;
 			repaint();
 		}
 	}
-	
-	public LemonTool.ToolType getGlobalLemonTool()
-	{
-		return globalLemonTool;
-	}
-	
-	public Color getGlobalLemonColor()
-	{
-		return globalLemonColor;
-	}
-	
-	public void setGlobalLemonTool(LemonTool.ToolType tool)
-	{
-		this.globalLemonTool = tool;
-	}
-	
-	public void setGlobalLemonColor(Color color)
-	{
-		this.globalLemonColor = color;
+
+	@Override
+	public void nodeClick(Node.NodeClickEvent event) {
+		if(!nodeConnectionStarted) {
+			nodeConnectionStarted = true;
+			nodeConnectionStartX = event.getX();
+			nodeConnectionStartY = event.getY();
+			startingNode = event.getNode();
+		}
+		else {
+			endingNode = event.getNode();
+			NodeConnectionInfo info = new NodeConnectionInfo();
+			info.startingNode = startingNode;
+			info.endingNode = endingNode;
+			info.startingNodeLocation = new Point(nodeConnectionStartX, nodeConnectionStartY);
+			info.endingNodeLocation = new Point(nodeConnectionEndX, nodeConnectionEndY);
+			nodeConnectionInfos.add(info);
+			nodeConnectionStarted = false;
+		}
 	}
 
-	class MouseHandler extends MouseAdapter 
-	{
-		@Override
-		public void mouseReleased(MouseEvent e) 
-		{
-			super.mouseReleased(e);
-			repaint();
-		}
+	private class NodeConnectionInfo {
+		public Point startingNodeLocation;
+		public Point endingNodeLocation;
+		public Node startingNode;
+		public Node endingNode;
 	}
 }

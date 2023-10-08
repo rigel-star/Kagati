@@ -8,13 +8,11 @@ public abstract class AbstractView extends JInternalFrame
 	
 	private Layer layer;
 
-	public void attachLayer(Layer layer)
-	{
+	public void attachLayer(Layer layer) {
 		this.layer = layer;
 	}
 	
-	public Layer getAttachedLayer()
-	{
+	public Layer getAttachedLayer() {
 		return layer;
 	}
 }

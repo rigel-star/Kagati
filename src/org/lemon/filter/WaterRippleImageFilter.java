@@ -8,7 +8,6 @@ import org.lemon.image.LImage;
 import org.lemon.math.Vec2;
 
 public class WaterRippleImageFilter extends TransformFilter {
-
 	private static float wavelength = 16;
 	private static float amplitude = 10;
 	private static float phase = 0;

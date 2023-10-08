@@ -15,64 +15,54 @@ import javax.swing.JScrollPane;
 
 import org.lemon.gui.layer.LayerList;
 
-public class LayerContainer extends JInternalFrame 
-{
+public class LayerContainer extends JInternalFrame {
 	private static final long serialVersionUID = 1L;
 		
 	private LayerList layerList = new LayerList();
 	private JScrollPane scroll = new JScrollPane(layerList);
 	
-	public LayerContainer()
-	{
+	public LayerContainer() {
 		setTitle("Layers");
 		setClosable(false);
 		setBorder(BorderFactory.createLineBorder(Color.black, 1));
 		setMaximizable(false);
 		setIconifiable(false);
 		setLayout(new BorderLayout());
-		
 		add(scroll);
 		add(new BottomMenu(), BorderLayout.SOUTH);
 		setVisible(true);
 	}
 	
-	public void addLayer(Layer layer) 
-	{
+	public void addLayer(Layer layer) {
 		layerList.addLayer(layer);
 		scroll.revalidate();
 	}
 	
-	public void removeLayer(Layer ly) 
-	{
+	public void removeLayer(Layer ly) {
 		layerList.removeLayer(ly);
 	}
 	
-	public int getLayerCount() 
-	{
+	public int getLayerCount() {
 		return layerList.getLayerCount();
 	}
 	
 	@Override
-	public Dimension getPreferredSize() 
-	{
+	public Dimension getPreferredSize() {
 		return new Dimension(150, 200);
 	}
 	
-	private class BottomMenu extends JPanel 
-	{
+	private class BottomMenu extends JPanel {
 		private static final long serialVersionUID = 1L;
 		
 		private JButton deleteLayerBtn;
 		private JButton newLayerBtn;
 		
-		private BottomMenu() 
-		{
+		private BottomMenu() {
 			newLayerBtn = new JButton("New");	
 			deleteLayerBtn = new JButton("Del");
 			deleteLayerBtn.addActionListener(action -> {
 				int option = JOptionPane.showConfirmDialog(layerList, "Delete this layer?");
-				switch(option)
-				{
+				switch(option){
 					case 0: {
 						Layer lay = layerList.getSelectedValue();
 						JComponent jc = lay.getLayerComponent();

@@ -1,18 +1,15 @@
 package org.lemon.math;
 
-
 public class Matrix3 {
-
-	double a11;
-	double a12;
-	double a13;
-	double a21;
-	double a22;
-	double a23;
-	double a31;
-	double a32;
-	double a33;
-
+	private double a11;
+	private double a12;
+	private double a13;
+	private double a21;
+	private double a22;
+	private double a23;
+	private double a31;
+	private double a32;
+	private double a33;
 	
 	public Matrix3(double a11, double a12, double a13, double a21, double a22, double a23, double a31, double a32,
 			double a33) {
@@ -27,7 +24,6 @@ public class Matrix3 {
 		this.a33 = a33;
 	}
 
-	
 	public Matrix3(Matrix3 m) {
 		this.a11 = m.a11;
 		this.a12 = m.a12;
@@ -39,10 +35,9 @@ public class Matrix3 {
 		this.a32 = m.a32;
 		this.a33 = m.a33;
 	}
-
 	
 	// From http://www.dr-lex.be/random/matrix_inv.html
-	void invert() {
+	public void invert() {
 		double invDet = 1.0 / determinant();
 		double nm00 = a33 * a22 - a32 * a23;
 		double nm01 = -(a33 * a12 - a32 * a13);
@@ -64,29 +59,24 @@ public class Matrix3 {
 		a33 = nm22 * invDet;
 	}
 
-	
 	// From http://www.dr-lex.be/random/matrix_inv.html
-	double determinant() {
+	public double determinant() {
 		return a11 * (a22 * a33 - a23 * a32) - a12 * (a23 * a31 - a21 * a33) + a13 * (a21 * a32 - a22 * a31);
 	}
 
-	
-	void mul(double factor) {
+	public void mul(double factor) {
 		a11 *= factor;
 		a12 *= factor;
 		a13 *= factor;
-
 		a21 *= factor;
 		a22 *= factor;
 		a23 *= factor;
-
 		a31 *= factor;
 		a32 *= factor;
 		a33 *= factor;
 	}
 
-	
-	void mul(Matrix3 m) {
+	public void mul(Matrix3 m) {
 		double nm00 = a11 * m.a11 + a12 * m.a21 + a13 * m.a31;
 		double nm01 = a11 * m.a12 + a12 * m.a22 + a13 * m.a32;
 		double nm02 = a11 * m.a13 + a12 * m.a23 + a13 * m.a33;
@@ -108,12 +98,9 @@ public class Matrix3 {
 		a31 = nm20;
 		a32 = nm21;
 		a33 = nm22;
-
 	}
 	
-	
-	void transform(Point3 p)
-    {
+	public void transform(Point3 p) {
         double x = a11 * p.x + a12 * p.y + a13 * p.z;
         double y = a21 * p.x + a22 * p.y + a23 * p.z;
         double z = a31 * p.x + a32 * p.y + a33 * p.z;
@@ -121,5 +108,4 @@ public class Matrix3 {
         p.y = y;
         p.z = z;
     }
-
 }
