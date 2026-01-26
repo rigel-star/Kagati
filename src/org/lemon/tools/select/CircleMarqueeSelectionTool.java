@@ -19,6 +19,7 @@ public class CircleMarqueeSelectionTool extends SelectionTool {
 
     @Override
     public void mousePressed(MouseEvent e) {
+        super.mousePressed(e);
         initial = e.getPoint();
         offset = new Point(initial.x - (int) circlularSelectedArea.getX(), initial.y - (int) circlularSelectedArea.getY());
         if(circlularSelectedArea.contains(e.getX(), e.getY())) {
