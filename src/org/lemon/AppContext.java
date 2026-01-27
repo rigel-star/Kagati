@@ -5,6 +5,7 @@ package org.lemon;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.File;
 
 public class AppContext {
 	private final PropertyChangeSupport propertyChangeSupport;
@@ -14,6 +15,8 @@ public class AppContext {
 
 	// node info
 	private boolean isNodeBeingDragged = false;
+
+	private File latestOpenedFile;
 
 	public AppContext() {
 		propertyChangeSupport = new PropertyChangeSupport(this);
@@ -26,6 +29,15 @@ public class AppContext {
 	public void addPropertyChangeListener(PropertyChangeListener pcl) {
         propertyChangeSupport.addPropertyChangeListener(pcl);
     }
+
+	public void setLatestOpenedFile(File file) {
+        this.latestOpenedFile = file;
+        propertyChangeSupport.firePropertyChange("latestOpenedFile", null, file);
+    }
+
+	public File getLatestOpenedFile() {
+		return latestOpenedFile;
+	}
 
 	public void setTool(String toolName) {
 		String oldState = this.toolName;

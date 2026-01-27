@@ -16,6 +16,7 @@ import org.lemon.gui.LayerContainer;
 import org.lemon.gui.ToolBarContainer;
 import org.lemon.gui.ToolsContainer;
 import org.lemon.gui.WorkspaceArena;
+import org.lemon.views.workspace.EditorWorkspace;
 
 public class EditorView extends Container implements PropertyChangeListener {
 	private final ToolBarContainer toolbarContainer;
@@ -25,15 +26,19 @@ public class EditorView extends Container implements PropertyChangeListener {
 	private final JPanel toolInfoPanel;
 
 	private final AppContext ctx;
+	private final EditorWorkspace editorWorkspace;
 	
 	public EditorView(AppContext ctx) {
 		this.ctx = ctx;
-		this.ctx.addPropertyChangeListener(this);
 
-		new WorkspaceArena(); // to initialize the variable toolChangeListener; no other purpose of this call
 		layerContainer = new LayerContainer();
 		toolsContainer = new ToolsContainer();
 		toolbarContainer = new ToolBarContainer(toolsContainer);
+
+		this.editorWorkspace = new EditorWorkspace(ctx, layerContainer, toolbarContainer);
+		this.ctx.addPropertyChangeListener(this);
+
+		new WorkspaceArena(); // to initialize the variable toolChangeListener; no other purpose of this call
 		workspaceArena = new WorkspaceArena(layerContainer, toolbarContainer);
 		WorkspaceArena.toolChangeListener.changeWorkspaceArena(workspaceArena);
 		toolInfoPanel = new JPanel();
@@ -42,7 +47,7 @@ public class EditorView extends Container implements PropertyChangeListener {
 		setLayout(new BorderLayout());
 		add(toolsContainer, BorderLayout.WEST);
 		add(layerContainer, BorderLayout.EAST);
-		add(workspaceArena, BorderLayout.CENTER);
+		add(editorWorkspace, BorderLayout.CENTER);
 		add(toolInfoPanel, BorderLayout.SOUTH);
 		add(toolbarContainer, BorderLayout.NORTH);
 	}

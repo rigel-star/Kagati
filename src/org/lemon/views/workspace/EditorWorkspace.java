@@ -35,6 +35,7 @@ import org.lemon.gui.ToolBarContainer;
 import org.lemon.gui.layer.FilterLayer;
 import org.lemon.gui.layer.ViewLayer;
 import org.lemon.gui.node.Node;
+import org.lemon.views.workspace.frames.ImageFrame;
 
 public class EditorWorkspace extends JDesktopPane implements Node.NodeClickListener, PropertyChangeListener {
 	private Map<NodeView, Layer> viewLayerMapping = new HashMap<>();
@@ -184,6 +185,12 @@ public class EditorWorkspace extends JDesktopPane implements Node.NodeClickListe
 
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
+		if ("latestOpenedFile".equals(evt.getPropertyName())) {
+			File file = (File) evt.getNewValue();
+			ImageFrame frame = new ImageFrame(file);
+			addFrame(frame);
+		}
+
 		throw new UnsupportedOperationException("Unimplemented method 'propertyChange'");
 	}
 }
