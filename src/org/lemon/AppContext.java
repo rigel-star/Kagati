@@ -7,12 +7,16 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
 public class AppContext {
-	private final PropertyChangeSupport support;
+	private final PropertyChangeSupport propertyChangeSupport;
 
+	// currently selected tool
 	private String toolName = "brush";
 
+	// node info
+	private boolean isNodeBeingDragged = false;
+
 	public AppContext() {
-		support = new PropertyChangeSupport(this);
+		propertyChangeSupport = new PropertyChangeSupport(this);
 	}
 
 	public static AppContext defaultContext() {
@@ -20,14 +24,26 @@ public class AppContext {
 	}
 
 	public void addPropertyChangeListener(PropertyChangeListener pcl) {
-        support.addPropertyChangeListener(pcl);
+        propertyChangeSupport.addPropertyChangeListener(pcl);
     }
 
 	public void setTool(String toolName) {
+		String oldState = this.toolName;
 		this.toolName = toolName;
+		propertyChangeSupport.firePropertyChange("toolName", oldState, toolName);
 	}
 
 	public String getTool() {
 		return toolName;
+	}
+
+	public void setIsNodeBeingDragged(boolean newState) {
+		boolean oldState = isNodeBeingDragged;
+		this.isNodeBeingDragged = newState;
+		propertyChangeSupport.firePropertyChange("isNodeBeingDragged", oldState, newState);
+	}
+
+	public boolean getIsNodeBeingDragged() {
+		return isNodeBeingDragged;
 	}
 }

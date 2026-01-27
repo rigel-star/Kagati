@@ -5,6 +5,8 @@ package org.lemon.views;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -15,7 +17,7 @@ import org.lemon.gui.ToolBarContainer;
 import org.lemon.gui.ToolsContainer;
 import org.lemon.gui.WorkspaceArena;
 
-public class EditorView extends Container {
+public class EditorView extends Container implements PropertyChangeListener {
 	private final ToolBarContainer toolbarContainer;
 	private final ToolsContainer toolsContainer;
 	private final LayerContainer layerContainer;
@@ -26,6 +28,7 @@ public class EditorView extends Container {
 	
 	public EditorView(AppContext ctx) {
 		this.ctx = ctx;
+		this.ctx.addPropertyChangeListener(this);
 
 		new WorkspaceArena(); // to initialize the variable toolChangeListener; no other purpose of this call
 		layerContainer = new LayerContainer();
@@ -58,5 +61,10 @@ public class EditorView extends Container {
 
 	public LayerContainer getLayerContainer() {
 		return layerContainer;
+	}
+
+	@Override
+	public void propertyChange(PropertyChangeEvent evt) {
+		throw new UnsupportedOperationException("Unimplemented method 'propertyChange'");
 	}
 }
