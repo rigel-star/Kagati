@@ -1,0 +1,64 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2026 Kagati Foundation
+
+package org.lemon;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Toolkit;
+
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+
+import org.lemon.gui.menu.NodeMenu;
+import org.lemon.gui.menu.ToolsMenu;
+import org.lemon.gui.Workspace;
+import org.lemon.gui.menu.FileMenu;
+import org.lemon.gui.menu.FilterMenu;
+import org.lemon.gui.menu.Menu3D;
+
+public class AppFrame extends JFrame {
+	private static final long serialVersionUID = 1L;
+	
+	private final JMenuBar menuBar;
+	private Workspace workspace = new Workspace();
+
+	// context
+	private final AppContext context;
+	
+	public AppFrame(AppContext context) {
+		this.context = context;
+		this.menuBar = new JMenuBar();
+
+		JMenu fileMenu = new FileMenu(workspace.getWorkspaceArena());
+		JMenu filterMenu = new FilterMenu(workspace.getWorkspaceArena());
+		JMenu toolsMenu = new ToolsMenu(workspace.getWorkspaceArena());
+		JMenu nodeMenu = new NodeMenu(workspace.getWorkspaceArena());
+		JMenu threeDMenu = new Menu3D(workspace.getWorkspaceArena());
+		
+		menuBar.add(fileMenu);
+		menuBar.add(nodeMenu);
+		menuBar.add(toolsMenu);
+		menuBar.add(filterMenu);
+		menuBar.add(threeDMenu);
+		
+		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+		
+		setBackground(Color.GRAY);
+		setTitle("Lemon Image Editor");
+		setSize(screen.width - 50, screen.height - 50);
+		setExtendedState( MAXIMIZED_BOTH);
+		setResizable(true);
+		setLayout(new BorderLayout());
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		Container c = getContentPane();
+		c.add(workspace, BorderLayout.CENTER);
+		
+		setJMenuBar(menuBar);
+		setVisible(true);
+	}
+}

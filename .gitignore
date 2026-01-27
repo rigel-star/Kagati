@@ -36,3 +36,5 @@ bin/
 .vscode/
 .metals/
 .metadata/
+.bsp/
+target/
