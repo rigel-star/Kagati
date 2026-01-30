@@ -15,6 +15,7 @@ import javax.swing.JMenuBar;
 
 import org.lemon.gui.menu.NodeMenu;
 import org.lemon.gui.menu.ToolsMenu;
+import org.lemon.views.EditorView;
 import org.lemon.gui.Workspace;
 import org.lemon.gui.menu.FileMenu;
 import org.lemon.gui.menu.FilterMenu;
@@ -26,11 +27,15 @@ public class AppFrame extends JFrame {
 	private final JMenuBar menuBar;
 	private Workspace workspace = new Workspace();
 
+	private final EditorView editorView;
+
 	// context
 	private final AppContext context;
 	
 	public AppFrame(AppContext context) {
 		this.context = context;
+
+		this.editorView = new EditorView(context);
 		this.menuBar = new JMenuBar();
 
 		JMenu fileMenu = new FileMenu(workspace.getWorkspaceArena());
@@ -56,7 +61,7 @@ public class AppFrame extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		Container c = getContentPane();
-		c.add(workspace, BorderLayout.CENTER);
+		c.add(editorView, BorderLayout.CENTER);
 		
 		setJMenuBar(menuBar);
 		setVisible(true);

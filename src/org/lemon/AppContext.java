@@ -7,15 +7,18 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
 
+import org.lemon.tools.ToolType;
+
 public class AppContext {
 	private final PropertyChangeSupport propertyChangeSupport;
 
 	// currently selected tool
-	private String toolName = "brush";
+	private ToolType currToolType =  ToolType.Brush;
 
 	// node info
 	private boolean isNodeBeingDragged = false;
 
+	// the last file which was opened
 	private File latestOpenedFile;
 
 	public AppContext() {
@@ -39,14 +42,14 @@ public class AppContext {
 		return latestOpenedFile;
 	}
 
-	public void setTool(String toolName) {
-		String oldState = this.toolName;
-		this.toolName = toolName;
-		propertyChangeSupport.firePropertyChange("toolName", oldState, toolName);
+	public void setTool(ToolType tool) {
+		ToolType oldState = this.currToolType;
+		this.currToolType = tool;
+		propertyChangeSupport.firePropertyChange("currentToolType", oldState, tool);
 	}
 
-	public String getTool() {
-		return toolName;
+	public ToolType getTool() {
+		return currToolType;
 	}
 
 	public void setIsNodeBeingDragged(boolean newState) {
