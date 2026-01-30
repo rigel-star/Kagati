@@ -19,13 +19,14 @@ sourceSets {
 
 dependencies {
     implementation files("./libs/sround-v_test.jar")
+	implementation 'com.formdev:flatlaf:3.7'
 }
 
 application {
-    mainClass = 'org.lemon.Lemon'
+    mainClass = 'org.kagatifoundation.KagatiLauncher'
 }
 
 tasks.register('runCustom', JavaExec) {
-    mainClass = 'org.lemon.Lemon'
+    mainClass = 'org.kagatifoundation.KagatiLauncher'
     classpath = sourceSets.main.runtimeClasspath
 }
