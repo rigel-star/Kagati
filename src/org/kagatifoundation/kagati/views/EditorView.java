@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Kagati Foundation
 
-package org.kagatifoundation.views;
+package org.kagatifoundation.kagati.views;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -11,11 +11,11 @@ import java.beans.PropertyChangeListener;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.kagatifoundation.AppContext;
 import org.lemon.gui.LayerContainer;
 import org.lemon.gui.ToolsContainer;
-import org.kagatifoundation.views.workspace.EditorWorkspace;
-import org.kagatifoundation.views.workspace.frames.layout.ToolbarContainer;
+import org.kagatifoundation.kagati.AppContext;
+import org.kagatifoundation.kagati.views.workspace.EditorWorkspace;
+import org.kagatifoundation.kagati.views.workspace.frames.layout.ToolbarContainer;
 
 public class EditorView extends Container implements PropertyChangeListener {
 	private final ToolsContainer toolsContainer;

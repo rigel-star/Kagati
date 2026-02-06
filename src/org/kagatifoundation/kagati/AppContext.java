@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Kagati Foundation
 
-package org.kagatifoundation;
+package org.kagatifoundation.kagati;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
 
-import org.kagatifoundation.tools.ToolType;
+import org.kagatifoundation.kagati.tools.ToolType;
 
 public class AppContext {
 	private final PropertyChangeSupport propertyChangeSupport;

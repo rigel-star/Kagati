@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Kagati Foundation
 
-package org.kagatifoundation.views.workspace.frames.layout;
+package org.kagatifoundation.kagati.views.workspace.frames.layout;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -14,8 +14,8 @@ import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import org.kagatifoundation.AppContext;
-import org.kagatifoundation.tools.ToolType;
+import org.kagatifoundation.kagati.AppContext;
+import org.kagatifoundation.kagati.tools.ToolType;
 import org.lemon.utils.Utils;
 
 public class ToolbarContainer extends JInternalFrame implements ActionListener {

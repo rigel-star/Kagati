@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Kagati Foundation
 
-package org.kagatifoundation;
+package org.kagatifoundation.kagati;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -12,7 +12,7 @@ import java.awt.Toolkit;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 
-import org.kagatifoundation.views.EditorView;
+import org.kagatifoundation.kagati.views.EditorView;
 
 public class AppFrame extends JFrame {
 	private static final long serialVersionUID = 1L;

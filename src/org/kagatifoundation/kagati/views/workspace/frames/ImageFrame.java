@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Kagati Foundation
 
-package org.kagatifoundation.views.workspace.frames;
+package org.kagatifoundation.kagati.views.workspace.frames;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -16,7 +16,7 @@ import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
-import org.kagatifoundation.views.workspace.WorkspaceFrame;
+import org.kagatifoundation.kagati.views.workspace.WorkspaceFrame;
 
 public class ImageFrame extends WorkspaceFrame {
 	private final File openedFile;

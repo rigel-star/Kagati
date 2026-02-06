@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Kagati Foundation
 
-package org.kagatifoundation.views.workspace;
+package org.kagatifoundation.kagati.views.workspace;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -11,9 +11,8 @@ import javax.swing.JDesktopPane;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
-import org.kagatifoundation.AppContext;
-
-import org.kagatifoundation.views.workspace.frames.ImageFrame;
+import org.kagatifoundation.kagati.AppContext;
+import org.kagatifoundation.kagati.views.workspace.frames.ImageFrame;
 
 public class EditorWorkspace extends JDesktopPane implements PropertyChangeListener {
 

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Kagati Foundation
 
-package org.kagatifoundation;
+package org.kagatifoundation.kagati;
 
 import java.io.IOException;
 

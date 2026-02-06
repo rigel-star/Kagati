@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Kagati Foundation
 
-package org.kagatifoundation.tools;
+package org.kagatifoundation.kagati.tools;
 
 public enum ToolType {
 	Brush,
